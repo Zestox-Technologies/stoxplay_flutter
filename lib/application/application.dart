@@ -16,45 +16,45 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, child) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light, // Makes status bar icons white
-          child: MaterialApp(
-            title: Strings.stoxplay,
-            debugShowCheckedModeBanner: false,
-            routes: RouteList.routes,
-            theme: ThemeData(
-              useMaterial3: true,
-              primaryColor: AppColors.colorPrimary,
-              scaffoldBackgroundColor: AppColors.colorPrimary,
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: AppColors.colorPrimary,
-                primary: AppColors.colorPrimary,
-                secondary: AppColors.colorPrimary,
-              ),
-              fontFamily: 'Sofia Sans',
-              appBarTheme: AppBarTheme(
-                backgroundColor: AppColors.colorPrimary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                systemOverlayStyle:
-                    SystemUiOverlayStyle.light, // For AppBar status bar
-              ),
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.purple661F,
-                  foregroundColor: AppColors.black,
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              floatingActionButtonTheme: FloatingActionButtonThemeData(
-                backgroundColor: AppColors.colorPrimary,
+        return MaterialApp(
+          title: Strings.stoxplay,
+          debugShowCheckedModeBanner: false,
+          routes: RouteList.routes,
+          theme: ThemeData(
+            useMaterial3: true,
+            primaryColor: AppColors.colorPrimary,
+            scaffoldBackgroundColor: AppColors.colorPrimary,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.colorPrimary,
+              primary: AppColors.colorPrimary,
+              secondary: AppColors.colorPrimary,
+            ),
+            fontFamily: 'Sofia Sans',
+            appBarTheme: AppBarTheme(
+              backgroundColor: AppColors.colorPrimary,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: AppColors.colorPrimary,
+                statusBarIconBrightness: Brightness.dark, // Dark icons
+                statusBarBrightness: Brightness.light, // For iOS
               ),
             ),
-            initialRoute: AppRoutes.splashPage,
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.purple661F,
+                foregroundColor: AppColors.black,
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            floatingActionButtonTheme: FloatingActionButtonThemeData(
+              backgroundColor: AppColors.colorPrimary,
+            ),
           ),
+          initialRoute: AppRoutes.splashPage,
         );
       },
     );

@@ -27,9 +27,7 @@ class CommonBottomNavbar extends StatelessWidget {
       child: child,
     );
   }
-
 }
-
 
 class CustomBottomNavbar extends StatefulWidget {
   const CustomBottomNavbar({super.key});

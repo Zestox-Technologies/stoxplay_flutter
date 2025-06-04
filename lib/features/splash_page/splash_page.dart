@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_stoxplay_icon.dart';
+import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
+import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
@@ -159,6 +161,21 @@ class _SplashPageState extends State<SplashPage>
                     child: Image.asset(AppAssets.iconShadow, width: 120.w),
                   ),
                 ),
+                Opacity(
+                  opacity: _textOpacityAnimation.value,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 350.h),
+                    child: TextView(
+                      text:
+                          'Let’s Play    |     Let’s Learn    |    Let’s Stoxplay',
+                      fontSize: 17.sp,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.bold,
+                      fontColor: AppColors.blue3200,
+                    ),
+                  ),
+                ),
+
                 Transform.translate(
                   offset: Offset(0, _textMoveAnimation.value.w + 20.h),
                   child: Opacity(

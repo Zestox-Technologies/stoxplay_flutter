@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 
 ///[WidgetExtension] this class contain basic widget extensions
 extension WidgetExtension on Widget {
@@ -151,4 +152,19 @@ extension WidgetExtension on Widget {
   }
 
   Widget expand({flex = 1}) => Expanded(flex: flex, child: this);
+}
+
+extension StockPositionExtension on StockPosition {
+  String get toName {
+    switch (this) {
+      case StockPosition.leader:
+        return "L";
+      case StockPosition.coLeader:
+        return "CL";
+      case StockPosition.viceLeader:
+        return "VL";
+      case StockPosition.none:
+        return "";
+    }
+  }
 }

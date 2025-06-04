@@ -15,4 +15,6 @@ class AppRoutes {
   static const String stockSelectionScreen = '/stockSelectionScreen';
   static const String battleGroundScreen = '/battleGroundScreen';
   static const String contestDetailsPage = '/contestDetailsPage';
+  static const String contestWinnerPage = '/contestWinnerPage';
+  static const String winningsScreen = '/winningsScreen';
 }

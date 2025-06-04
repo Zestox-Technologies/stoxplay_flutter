@@ -1,3 +1,4 @@
+import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 
 class ContestModel {
   final String title;
@@ -22,12 +23,11 @@ class ContestModel {
       price: json['price'] as String,
       timeLeft: json['timeLeft'] as String,
       image: json['image'] as String,
-      contestPriceList: (json['contestPriceList'] as List)
-          .map((e) => ContestPrice.fromJson(e))
-          .toList(),
-      stocks: (json['stocks'] as List)
-          .map((e) => Stock.fromJson(e))
-          .toList(),
+      contestPriceList:
+          (json['contestPriceList'] as List)
+              .map((e) => ContestPrice.fromJson(e))
+              .toList(),
+      stocks: (json['stocks'] as List).map((e) => Stock.fromJson(e)).toList(),
     );
   }
 
@@ -72,28 +72,55 @@ class ContestPrice {
 }
 
 class Stock {
-  final String stockName;
-  final int id;
-  final String stockPrice;
-  final String percentage;
-  final String image;
+  String? stockName;
+  int? id;
+  String? stockPrice;
+  String? percentage;
+  String? image;
+  StockPrediction stockPrediction;
+  StockPosition stockPosition;
 
   Stock({
-    required this.stockName,
-    required this.id,
-    required this.stockPrice,
-    required this.percentage,
-    required this.image,
+    this.stockName,
+    this.id,
+    this.stockPrice,
+    this.percentage,
+    this.image,
+    this.stockPrediction = StockPrediction.none,
+    this.stockPosition = StockPosition.none,
   });
+
 
   factory Stock.fromJson(Map<String, dynamic> json) {
     return Stock(
-      stockName: json['stockName'] as String,
-      id: json['id'] as int,
-      stockPrice: json['stockPrice'] as String,
-      percentage: json['percentage'] as String,
-      image: json['image'] as String,
+      stockName: json['stockName'] as String?,
+      id: json['id'] as int?,
+      stockPrice: json['stockPrice'] as String?,
+      percentage: json['percentage'] as String?,
+      image: json['image'] as String?,
+      stockPrediction: _parseStockPrediction(json['prediction']),
+      stockPosition: _parseStockPosition(json['stockPosition']),
     );
+  }
+
+  static StockPrediction _parseStockPrediction(dynamic value) {
+    if (value is String) {
+      return StockPrediction.values.firstWhere(
+        (e) => e.toString().split('.').last == value,
+        orElse: () => StockPrediction.none,
+      );
+    }
+    return StockPrediction.none;
+  }
+
+  static StockPosition _parseStockPosition(dynamic value) {
+    if (value is String) {
+      return StockPosition.values.firstWhere(
+        (e) => e.toString().split('.').last == value,
+        orElse: () => StockPosition.none,
+      );
+    }
+    return StockPosition.none;
   }
 
   Map<String, dynamic> toJson() {
@@ -103,6 +130,30 @@ class Stock {
       'stockPrice': stockPrice,
       'percentage': percentage,
       'image': image,
+      'prediction': stockPrediction.toString().split('.').last,
+      'stockPosition': stockPosition.toString().split('.').last,
     };
   }
-} 
+}
+extension StockCopyWith on Stock {
+  Stock copyWith({
+    String? stockName,
+    int? id,
+    String? stockPrice,
+    String? percentage,
+    String? image,
+    StockPrediction? stockPrediction,
+    StockPosition? stockPosition,
+  }) {
+    return Stock(
+      stockName: stockName ?? this.stockName,
+      id: id ?? this.id,
+      stockPrice: stockPrice ?? this.stockPrice,
+      percentage: percentage ?? this.percentage,
+      image: image ?? this.image,
+      stockPrediction: stockPrediction ?? this.stockPrediction,
+      stockPosition: stockPosition ?? this.stockPosition,
+    );
+  }
+}
+

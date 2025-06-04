@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:stoxplay/features/profile_page/pages/profile_page.dart';
 import 'package:stoxplay/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/glow_icon.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -74,7 +75,7 @@ final List<ContestModel> contests = [
     contestPriceList: [
       ContestPrice(contestPrice: 500, spots: '2000', prizePool: "8,10,000"),
       ContestPrice(contestPrice: 1000, spots: '1000', prizePool: "8,10,000"),
-      ContestPrice(contestPrice: 5000, spots: '500', prizePool: "20,00,000"),
+      ContestPrice(contestPrice: 5000, spots: '500', prizePool: "20,40,000"),
     ],
     stocks: [
       Stock(
@@ -241,7 +242,7 @@ final List<ContestModel> contests = [
     contestPriceList: [
       ContestPrice(contestPrice: 500, spots: '2000', prizePool: "8,10,000"),
       ContestPrice(contestPrice: 1000, spots: '1000', prizePool: "8,10,000"),
-      ContestPrice(contestPrice: 5000, spots: '500', prizePool: "20,00,000"),
+      ContestPrice(contestPrice: 5000, spots: '500', prizePool: "20,40,000"),
     ],
     stocks: [
       Stock(
@@ -408,7 +409,7 @@ final List<ContestModel> contests = [
     contestPriceList: [
       ContestPrice(contestPrice: 500, spots: '2000', prizePool: "8,10,000"),
       ContestPrice(contestPrice: 1000, spots: '1000', prizePool: "8,10,000"),
-      ContestPrice(contestPrice: 5000, spots: '500', prizePool: "20,00,000"),
+      ContestPrice(contestPrice: 5000, spots: '500', prizePool: "20,40,000"),
     ],
     stocks: [
       Stock(
@@ -586,3 +587,30 @@ final selectStocksStyle = TextStyle(
     ),
   ],
 );
+
+BoxDecoration primaryContainerDecoration = BoxDecoration(
+  color: AppColors.white,
+  borderRadius: BorderRadius.circular(12.r),
+  boxShadow: [
+    BoxShadow(
+      color: AppColors.blue7E.withOpacity(0.3),
+      offset: const Offset(0, 0),
+      blurRadius: 12,
+      spreadRadius: 1,
+    ),
+  ],
+  border: Border.all(color: AppColors.blue7E.withOpacity(0.5)),
+);
+
+List<ProfileItemModel> profileItems = [
+  ProfileItemModel(icon: AppAssets.playIcon, title: "Playing History"),
+  ProfileItemModel(icon: AppAssets.personalInfoIcon, title: "Personal Info"),
+  ProfileItemModel(icon: AppAssets.playIcon, title: "How to Play"),
+  ProfileItemModel(icon: AppAssets.helpIcon, title: "Contact Us"),
+  ProfileItemModel(
+    icon: AppAssets.termsAndConditionsIcon,
+    title: "T&C of Zestox Technologies",
+  ),
+  ProfileItemModel(icon: AppAssets.userProfileIcon, title: "About StoxPlay"),
+  ProfileItemModel(icon: AppAssets.logoutIcon, title: "Logout"),
+];

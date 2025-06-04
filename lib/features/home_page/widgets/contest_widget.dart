@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:stoxplay/features/home_page/pages/contest_details_page.dart';
+import 'package:stoxplay/features/home_page/pages/contest_details_page/contest_details_page.dart';
 import 'package:stoxplay/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/primary_container.dart';
@@ -75,10 +75,16 @@ class ContestWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextView(
-                text: "Max ${data.price} Win",
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w300,
+              Row(
+                children: [
+                  Image.asset(AppAssets.medalIcon, height: 10.h, width: 10.w),
+                  Gap(5.w),
+                  TextView(
+                    text: data.price,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ],
               ),
               Image.asset(
                 AppAssets.notificationBellIcon,

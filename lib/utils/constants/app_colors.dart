@@ -35,6 +35,9 @@ class AppColors {
   static const Color blackD3D3Light = Color(0x26D3D3D3); // colorXxLightest
   static const Color blackC0C0 = Color(0xffC0C0C0); // colorXxLightest
   static const Color black9A9A = Color(0xff9A9A9A); // colorXxLightest
+  static const Color black8686 = Color(0xff868686); // colorXxLightest
+  static const Color black46464 = Color(0xff464646); // colorXxLightest
+  static const Color black6767 = Color(0xff676767); // colorXxLightest
 
   // Blue Shades
   static const Color blue = Colors.blue;
@@ -62,9 +65,8 @@ class AppColors {
   static const Color purple661F = Color(0xff661FB1); // buttonColor
 
   // Green Shades
-  static const Color green38EE = Color(0xff38EE06); // upButtonColor
-  static const Color greenShadow66 = Color(0x6638EE06); // upButtonColor
-  static const Color green0CAE = Color(0xff0CAE3C);   // color0CAE3C
+  static const Color green0CAE = Color(0xff0CAE3C); // upButtonColor
+  static const Color green38EE = Color(0x6638EE06); // upButtonColor
   static const Color green0CAELight = Color(0x260CAE3C); // colorOnlineLight
   static const Color green0CAELighter = Color(
     0x1A0CAE3C,

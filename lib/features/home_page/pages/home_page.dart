@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
-import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -22,6 +21,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leadingWidth: 0,
+        forceMaterialTransparency: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -40,79 +40,91 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: ValueListenableBuilder(
-          valueListenable: selectedIndex,
-          builder: (context, selected, _) {
-            return Column(
-              children: [
-                Image.asset(
-                  AppAssets.carouselImage,
-                  height: 150.h,
-                  width: MediaQuery.of(context).size.width,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 22.w),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 50.h,
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          separatorBuilder: (context, index) => Gap(15.w),
-                          itemCount: list.length,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) => CommonTabWidget(
-                            onTap: () {
-                              selectedIndex.value = index;
-                            },
-                            isSelected: selectedIndex.value == index,
-                            title: list[index],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            bottom: 220.h,
+            child: Image.asset(AppAssets.lightSplashStrokes),
+          ),
+          SingleChildScrollView(
+            child: ValueListenableBuilder(
+              valueListenable: selectedIndex,
+              builder: (context, selected, _) {
+                return Column(
+                  children: [
+                    Image.asset(
+                      AppAssets.carouselImage,
+                      height: 150.h,
+                      width: MediaQuery.of(context).size.width,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 22.w),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 50.h,
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              separatorBuilder: (context, index) => Gap(15.w),
+                              itemCount: list.length,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder:
+                                  (context, index) => CommonTabWidget(
+                                    onTap: () {
+                                      selectedIndex.value = index;
+                                    },
+                                    isSelected: selectedIndex.value == index,
+                                    title: list[index],
+                                  ),
+                            ),
                           ),
-                        ),
-                      ),
-                      Gap(15.h),
-                      selectedIndex.value == 0
-                          ? Column(
-                              children: [
-                                Stack(
-                                  children: [
-                                    Divider(
-                                      color: AppColors.black,
-                                    ).paddingTop(5.h),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Container(
-                                        color: AppColors.white,
-                                        child: TextView(
-                                          text: Strings.sectorsPlay,
-                                          fontSize: 18.sp,
-                                        ).paddingSymmetric(horizontal: 20.w),
+                          Gap(15.h),
+                          selectedIndex.value == 0
+                              ? Column(
+                                children: [
+                                  Stack(
+                                    children: [
+                                      Divider(
+                                        color: AppColors.black,
+                                      ).paddingTop(5.h),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          color: AppColors.white,
+                                          child: TextView(
+                                            text: Strings.sectorsPlay,
+                                            fontSize: 18.sp,
+                                          ).paddingSymmetric(horizontal: 20.w),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Gap(15.h),
-                                ListView.separated(
-                                  physics: NeverScrollableScrollPhysics(),
-                                  separatorBuilder: (context, index) => Gap(10.h),
-                                  itemCount: contests.length,
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-                                    return ContestWidget(data: contests[index]);
-                                  },
-                                ),
-                              ],
-                            )
-                          : Center(child: Text(Strings.learn)),
-                      Gap(10.h),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+                                    ],
+                                  ),
+                                  Gap(15.h),
+                                  ListView.separated(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    separatorBuilder:
+                                        (context, index) => Gap(10.h),
+                                    itemCount: contests.length,
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, index) {
+                                      return ContestWidget(
+                                        data: contests[index],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )
+                              : Center(child: Text(Strings.learn)),
+                          Gap(10.h),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -144,7 +156,6 @@ class CommonTabWidget extends StatelessWidget {
                 isSelected
                     ? AppColors.blue7E.withOpacity(0.5)
                     : AppColors.white70,
-            // Border: 1px solid #7E1FE380
             width: 1.0,
           ),
           boxShadow: [
