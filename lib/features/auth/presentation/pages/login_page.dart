@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:pinput/pinput.dart';
+import 'package:stoxplay/core/di/service_locator.dart';
+import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/auth/data/models/auth_params_model.dart';
+import 'package:stoxplay/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:stoxplay/features/auth/presentation/cubit/auth_state.dart';
+import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/common/functions/snackbar.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_stoxplay_icon.dart';
@@ -13,259 +22,352 @@ import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
+import 'package:stoxplay/utils/extensions/text_formatter_extension.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
-  TextEditingController mobileNoController = TextEditingController();
-  TextEditingController otpController = TextEditingController();
-  ValueNotifier<bool> isCheckboxChecked = ValueNotifier<bool>(false);
-  ValueNotifier<int> stepper = ValueNotifier<int>(0);
-  TextEditingController referralIdController = TextEditingController();
+  final TextEditingController mobileNoController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
+  final ValueNotifier<bool> isCheckboxChecked = ValueNotifier<bool>(false);
+  final ValueNotifier<int> stepper = ValueNotifier<int>(0);
+  final TextEditingController referralIdController = TextEditingController();
+  final FocusNode mobileFocusNode = FocusNode();
+  final FocusNode referralFocusNode = FocusNode();
+
+  void _onSendOtp(BuildContext context, AuthCubit authCubit, AuthState state) async {
+    final phone = mobileNoController.text.trim();
+    final referCode = referralIdController.text.trim();
+    if (phone.length != 10) {
+      showSnackBar(context: context, message: Strings.pleaseEnterValidMobileNumber);
+      return;
+    }
+    if (!isCheckboxChecked.value) {
+      showSnackBar(context: context, message: Strings.pleaseCheckTermsAndConditions);
+      return;
+    }
+    if (state.isPhoneNumberExists == true) {
+      stepper.value = 1;
+      context.read<TimerCubit>().startTimer(seconds: 60);
+    } else {
+      await authCubit.initiateSignUp(phoneNumber: phone, referCode: referCode);
+    }
+  }
+
+  void _onVerifyOtp(BuildContext context, AuthCubit authCubit) async {
+    final otp = otpController.text.trim();
+    if (otp.length != 4) {
+      showSnackBar(context: context, message: Strings.pleaseEnter4DigitOTP);
+      return;
+    }
+    await authCubit.verifyOtp(
+      phoneNumber: mobileNoController.text.trim(),
+      otp: otp,
+      isUserExists: authCubit.state.isPhoneNumberExists ?? false,
+    );
+  }
+
+  Widget _buildPhoneInputStep(BuildContext context, AuthCubit authCubit) {
+    return Column(
+      children: [
+        BlocSelector<AuthCubit, AuthState, ApiStatus>(
+          bloc: authCubit,
+          selector: (state) => state.checkPhoneApiStatus,
+          builder: (context, state) {
+            return CommonTextfield(
+              focusNode: mobileFocusNode,
+              controller: mobileNoController,
+              title: Strings.mobileNumber.toUpperCase(),
+              prefixText: "+91   ",
+              maxLength: 10,
+              onChanged: (value) {
+                if (value.length == 10) {
+                  authCubit.checkPhoneNumber(value);
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    referralFocusNode.requestFocus();
+                  });
+                }
+              },
+              suffix:
+                  state.isLoading
+                      ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(color: AppColors.gradient3, strokeWidth: 2),
+                      )
+                      : const SizedBox.shrink(),
+              keyboardType: TextInputType.number,
+            );
+          },
+        ),
+        Gap(10.h),
+        BlocSelector<AuthCubit, AuthState, bool>(
+          bloc: authCubit,
+          selector: (state) => state.isPhoneNumberExists ?? true,
+          builder: (context, phoneExists) {
+            return !phoneExists
+                ? CommonTextfield(
+                  controller: referralIdController,
+                  hintText: Strings.onlyRequiredForNewUsers,
+                  title: Strings.referralId,
+                  keyboardType: TextInputType.text,
+                  focusNode: referralFocusNode,
+                  maxLength: 8,
+                  textCapitalization: TextCapitalization.characters,
+                  inputFormatters: [UpperCaseTextFormatter(), LengthLimitingTextInputFormatter(8)],
+                )
+                : const SizedBox.shrink();
+          },
+        ),
+        Row(
+          children: [
+            Transform.scale(
+              scale: 0.8,
+              child: ValueListenableBuilder(
+                valueListenable: isCheckboxChecked,
+                builder: (context, check, _) {
+                  return Checkbox(
+                    value: check,
+                    checkColor: AppColors.white,
+                    activeColor: AppColors.blue3200,
+                    onChanged: (value) {
+                      isCheckboxChecked.value = value!;
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      side: const BorderSide(color: AppColors.black40),
+                    ),
+                    visualDensity: VisualDensity.compact,
+                  );
+                },
+              ),
+            ),
+            Expanded(child: TextView(text: Strings.iCertifyThatIAmAbove18Years, fontSize: 13.sp)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtpStep(BuildContext context, AuthCubit authCubit) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextView(text: Strings.code),
+            BlocBuilder<TimerCubit, TimerState>(
+              builder: (context, state) {
+                if (state.isRunning) {
+                  return Text.rich(
+                    TextSpan(
+                      text: Strings.resendIn,
+                      style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500, fontSize: 14),
+                      children: [
+                        TextSpan(
+                          text: '${state.secondsRemaining}s',
+                          style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return GestureDetector(
+                    onTap: () async {
+                      await authCubit.initiateSignUp(
+                        phoneNumber: mobileNoController.text.trim(),
+                        referCode: referralIdController.text.trim(),
+                      );
+                      context.read<TimerCubit>().startTimer(seconds: 60);
+                    },
+                    child: Text(
+                      'Resend OTP',
+                      style: TextStyle(
+                        color: Colors.green.shade600,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+        Gap(5.h),
+        SizedBox(
+          height: 45.h,
+          child: Pinput(
+            length: 4,
+            controller: otpController,
+            onCompleted: (value) async {
+              final state = context.read<AuthCubit>().state;
+              await authCubit.verifyOtp(
+                phoneNumber: mobileNoController.text,
+                otp: value,
+                isUserExists: state.isPhoneNumberExists ?? false,
+              );
+            },
+            separatorBuilder: (index) => SizedBox(width: 30),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+        ),
+        Gap(20.h),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) {
-          return;
-        }
-        if (stepper.value == 1) {
-          stepper.value--;
-        }
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: ValueListenableBuilder(
-            valueListenable: stepper,
-            builder: (context, step, _) {
-              return SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.07,
+    return BlocProvider(
+      create: (_) => AuthCubit(authRepository: sl()),
+      child: Builder(
+        builder: (context) {
+          final authCubit = context.read<AuthCubit>();
+          return PopScope(
+            canPop: false,
+            onPopInvokedWithResult: (didPop, result) {
+              if (didPop) return;
+              if (stepper.value == 1) stepper.value--;
+            },
+            child: Scaffold(
+              body: BlocListener<AuthCubit, AuthState>(
+                listener: (context, state) {
+                  final errorMessage = state.errorMessage ?? 'Something went wrong';
+                  if (state.checkPhoneApiStatus.isSuccess && state.isPhoneNumberExists == true) {
+                    stepper.value = 1;
+                    context.read<TimerCubit>().startTimer(seconds: 60);
+                  }
+                  if (state.verifyOtpStatus.isSuccess) {
+                    if (state.isOTPVerified == true) {
+                      if (state.isPhoneNumberExists == true) {
+                        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
+                        return;
+                      } else {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.signUpPage,
+                          arguments: AuthParamsModel(
+                            phoneNumber: mobileNoController.text,
+                            referralCode: referralIdController.text,
                           ),
-                          Stack(
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: Image.asset(
-                                  AppAssets.lightSplashStrokes,
-                                  fit:
-                                      BoxFit
-                                          .cover, // Ensure it covers the whole area
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.center,
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: 100.h),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                        );
+                      }
+                    } else {
+                      showSnackBar(context: context, message: Strings.otpInvalid);
+                    }
+                  }
+                  if (state.initiateSignUpStatus.isSuccess) {
+                    if (state.isVerified == true) {
+                      stepper.value = 1;
+                      context.read<TimerCubit>().startTimer(seconds: 60);
+                    } else {
+                      showSnackBar(context: context, message: Strings.referCodeInvalid);
+                    }
+                  }
+                  if (state.verifyOtpStatus.isFailed || state.initiateSignUpStatus.isFailed) {
+                    showSnackBar(context: context, message: errorMessage);
+                  }
+                },
+                child: SingleChildScrollView(
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: stepper,
+                    builder: (context, step, _) {
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: MediaQuery.of(context).size.height * 0.07),
+                                  Stack(
                                     children: [
-                                      CommonStoxplayIcon(
-                                        iconHeight: 55.h,
-                                        iconWidth: 55.w,
-                                        shadowHeight: 15.h,
-                                        shadowWidth: 80.w,
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: Image.asset(AppAssets.lightSplashStrokes, fit: BoxFit.cover),
                                       ),
-                                      CommonStoxplayText(fontSize: 50.sp),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(top: 100.h),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              CommonStoxplayIcon(
+                                                iconHeight: 55.h,
+                                                iconWidth: 55.w,
+                                                shadowHeight: 15.h,
+                                                shadowWidth: 80.w,
+                                              ),
+                                              CommonStoxplayText(fontSize: 50.sp),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Gap(30.h),
-                          TextView(
-                            text: Strings.login,
-                            fontSize: 40.sp,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          TextView(
-                            text:
-                                stepper.value == 0
-                                    ? Strings.weWillSendYouOTP
-                                    : Strings.pleaseSignInToExistingAccount,
-                            fontColor: AppColors.black39,
-                            fontWeight: FontWeight.w300,
-                          ),
-                          SizedBox(height: 40.h),
-                          ShadowContainer(
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 30.w,
-                                vertical: 28.h,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  stepper.value == 0
-                                      ? Column(
+                                  Gap(30.h),
+                                  TextView(text: Strings.login, fontSize: 40.sp, fontWeight: FontWeight.w700),
+                                  TextView(
+                                    text: step == 0 ? Strings.weWillSendYouOTP : Strings.pleaseSignInToExistingAccount,
+                                    fontColor: AppColors.black39,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                  SizedBox(height: 40.h),
+                                  ShadowContainer(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 28.h),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          CommonTextfield(
-                                            controller: mobileNoController,
-                                            title:
-                                                Strings.mobileNumber
-                                                    .toUpperCase(),
-                                            prefixText: "+91  ",
-                                            maxLength: 10,
-                                            keyboardType: TextInputType.number,
+                                          step == 0
+                                              ? _buildPhoneInputStep(context, authCubit)
+                                              : _buildOtpStep(context, authCubit),
+                                          BlocBuilder<AuthCubit, AuthState>(
+                                            builder: (context, state) {
+                                              final isLoading =
+                                                  state.initiateSignUpStatus.isLoading ||
+                                                  state.verifyOtpStatus.isLoading;
+                                              final isOtpStep = step == 1;
+                                              return AppButton(
+                                                text: isOtpStep ? Strings.verifyOTP : Strings.sendOTP,
+                                                isLoading: isLoading,
+                                                onPressed: () {
+                                                  if (!isOtpStep) {
+                                                    _onSendOtp(context, authCubit, state);
+                                                  } else {
+                                                    _onVerifyOtp(context, authCubit);
+                                                  }
+                                                },
+                                              );
+                                            },
                                           ),
-                                          Gap(10.h),
-                                          CommonTextfield(
-                                            controller: referralIdController,
-                                            hintText:
-                                                "Only required for new users",
-                                            title: Strings.referralId,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Transform.scale(
-                                                scale: 0.8,
-                                                child: ValueListenableBuilder(
-                                                  valueListenable:
-                                                      isCheckboxChecked,
-                                                  builder: (context, check, _) {
-                                                    return Checkbox(
-                                                      value: check,
-                                                      checkColor:
-                                                          AppColors.white,
-                                                      activeColor:
-                                                          AppColors.blue3200,
-                                                      onChanged: (value) {
-                                                        isCheckboxChecked
-                                                            .value = value!;
-                                                      },
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              5,
-                                                            ),
-                                                        side: BorderSide(
-                                                          color:
-                                                              AppColors.black40,
-                                                        ),
-                                                      ),
-                                                      visualDensity:
-                                                          VisualDensity.compact,
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: TextView(
-                                                  text:
-                                                      Strings
-                                                          .iCertifyThatIAmAbove18Years,
-                                                  fontSize: 13.sp,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      )
-                                      : Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              TextView(text: Strings.code),
-                                              Row(
-                                                children: [
-                                                  TextView(
-                                                    text: Strings.resendIn,
-                                                    fontWeight: FontWeight.w600,
-                                                    textDecoration:
-                                                        TextDecoration
-                                                            .underline,
-                                                  ),
-                                                  TextView(text: "59 sec"),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          Gap(5.h),
-                                          SizedBox(
-                                            height: 45.h,
-                                            child: Pinput(
-                                              controller: otpController,
-                                              separatorBuilder:
-                                                  (index) =>
-                                                      SizedBox(width: 30),
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                            ),
-                                          ),
-                                          Gap(20.h),
                                         ],
                                       ),
-                                  AppButton(
-                                    text: Strings.verifyOTP,
-                                    onPressed: () {
-                                      if (stepper.value == 0) {
-                                        // if (mobileNoController.text.length !=
-                                        //     10) {
-                                        //   showSnackBar(
-                                        //     context: context,
-                                        //     message:
-                                        //         Strings
-                                        //             .pleaseEnterValidMobileNumber,
-                                        //   );
-                                        // } else if (!isCheckboxChecked.value) {
-                                        //   showSnackBar(
-                                        //     context: context,
-                                        //     message:
-                                        //         Strings
-                                        //             .pleaseCheckTermsAndConditions,
-                                        //   );
-                                        // } else {
-                                        stepper.value = 1;
-                                        // }
-                                      } else {
-                                        // if (otpController.text.length == 4) {
-                                        Navigator.pushNamed(
-                                          context,
-                                          AppRoutes.signUpPage,
-                                        );
-                                        // } else {
-                                        //   showSnackBar(
-                                        //     context: context,
-                                        //     message:
-                                        //         Strings.pleaseEnter4DigitOTP,
-                                        //   );
-                                        // }
-                                      }
-                                    },
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TermsConditionWidget(),
-                    Gap(20.h),
-                  ],
+                            TermsConditionWidget(),
+                            Gap(20.h),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

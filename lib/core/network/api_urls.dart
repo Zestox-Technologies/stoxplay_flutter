@@ -1,0 +1,20 @@
+class ApiUrls {
+  ApiUrls._();
+
+  static const String baseUrl = 'https://backend.stoxplay.com/v1/';
+  // static const String baseUrl = 'http://13.201.225.138:3000/v1/';
+
+  ///Live Server time
+  static const String liveServerTime = 'https://timeapi.io/api/time/current/zone?timeZone=Asia/Kolkata';
+
+  ///Auth Flow APIs
+  static const String checkPhone = 'auth/client/check-phone';
+  static const String initiateSignUp = 'auth/client/initiate-signup';
+  static const String verifyOTP = 'auth/client/verify-otp';
+  static const String loginWithOTP = 'auth/client/login-with-otp';
+  static const String completeSignUp = 'auth/client/complete-signup';
+
+  ///contest flow
+  static const String getSectorList = 'stock-management/sectors?page=1&limit=10&isActive=true';
+  static const String getContestStatus = 'client/contest-status';
+}

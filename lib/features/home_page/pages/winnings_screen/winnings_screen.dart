@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_details_widget.dart';
-import 'package:stoxplay/models/contest_model.dart';
+import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -43,7 +43,7 @@ class WinningsScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Gap(10.h),
-                  ContestDetailsWidget(data: data),
+                  ContestDetailsWidget(data: data,ignoreOnTap: true,),
                   Gap(20.h),
                   Container(
                     width: double.infinity,

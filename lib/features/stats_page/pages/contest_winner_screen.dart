@@ -26,10 +26,7 @@ class ContestWinnerPage extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Container(
                     color: AppColors.white,
-                    child: TextView(
-                      text: Strings.myContest,
-                      fontSize: 18.sp,
-                    ).paddingSymmetric(horizontal: 20.w),
+                    child: TextView(text: Strings.myContest, fontSize: 18.sp).paddingSymmetric(horizontal: 20.w),
                   ),
                 ),
               ],
@@ -37,24 +34,12 @@ class ContestWinnerPage extends StatelessWidget {
             Gap(20.h),
             ContestWinnerItemWidget(),
             Gap(40.h),
-            SizedBox(
-              height: 115.h,
-              width: 200.w,
-              child: Image.asset(AppAssets.celebrationStarImage),
-            ),
-            TextView(
-              text: Strings.topWinnersInTheMatch,
-              fontSize: 24.sp,
-              fontWeight: FontWeight.w700,
-            ),
+            SizedBox(height: 115.h, width: 200.w, child: Image.asset(AppAssets.celebrationStarImage)),
+            TextView(text: Strings.topWinnersInTheMatch, fontSize: 24.sp, fontWeight: FontWeight.w700),
             Gap(40.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                WinnersItemWidget(),
-                WinnersItemWidget(),
-                WinnersItemWidget(),
-              ],
+              children: [WinnersItemWidget(), WinnersItemWidget(), WinnersItemWidget()],
             ),
             Gap(30.h),
             Container(
@@ -66,10 +51,7 @@ class ContestWinnerPage extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 // <-- This keeps it tight to content
-                children: [
-                  TextView(text: "VIEW MORE"),
-                  Icon(Icons.arrow_forward_ios, size: 14),
-                ],
+                children: [TextView(text: "VIEW MORE"), Icon(Icons.arrow_forward_ios, size: 14)],
               ),
             ),
           ],

@@ -1,4 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:stoxplay/core/local_storage/storage_service.dart';
+import 'package:stoxplay/core/network/api_urls.dart';
+import 'package:stoxplay/utils/constants/db_keys.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -8,15 +11,26 @@ class ApiService {
     return _instance;
   }
 
+  final token = StorageService().read<String>(DBKeys.userTokenKey);
+
   ApiService._internal() {
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    if (token != null && token!.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
     _dio = Dio(
       BaseOptions(
-        baseUrl: 'YOUR_BASE_URL', // Replace with your actual base URL
+        baseUrl: ApiUrls.baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
+        headers: headers,
+        validateStatus: (status) {
+          return status! < 500;
         },
       ),
     );
@@ -50,7 +64,9 @@ class ApiService {
         options: options,
       );
       return response;
-    } catch (e) {
+    } on DioException catch (e) {
+      print('GET Request Error: ${e.message}');
+      print('Error Response: ${e.response?.data}');
       rethrow;
     }
   }
@@ -63,14 +79,23 @@ class ApiService {
     Options? options,
   }) async {
     try {
+      print('Making POST request to: $path');
+      print('Request data: $data');
+      
       final response = await _dio.post(
         path,
         data: data,
         queryParameters: queryParameters,
         options: options,
       );
+      
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+      
       return response;
-    } catch (e) {
+    } on DioException catch (e) {
+      print('POST Request Error: ${e.message}');
+      print('Error Response: ${e.response?.data}');
       rethrow;
     }
   }
@@ -90,7 +115,9 @@ class ApiService {
         options: options,
       );
       return response;
-    } catch (e) {
+    } on DioException catch (e) {
+      print('PUT Request Error: ${e.message}');
+      print('Error Response: ${e.response?.data}');
       rethrow;
     }
   }
@@ -110,7 +137,9 @@ class ApiService {
         options: options,
       );
       return response;
-    } catch (e) {
+    } on DioException catch (e) {
+      print('DELETE Request Error: ${e.message}');
+      print('Error Response: ${e.response?.data}');
       rethrow;
     }
   }

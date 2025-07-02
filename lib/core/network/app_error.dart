@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 abstract class AppError {
@@ -16,48 +17,19 @@ class NetworkError extends AppError {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return const NetworkError(
-          message: 'Connection timeout. Please try again.',
-          code: 'TIMEOUT',
-        );
+        return const NetworkError(message: AppErrorMessages.connectionTimeout, code: AppErrorMessages.timeoutCode);
       case DioExceptionType.badResponse:
         return NetworkError(
-          message: _getErrorMessage(error.response?.statusCode),
+          message: AppErrorMessages.getErrorMessage(error.response?.statusCode),
           code: error.response?.statusCode.toString(),
           data: error.response?.data,
         );
       case DioExceptionType.cancel:
-        return const NetworkError(
-          message: 'Request cancelled',
-          code: 'CANCELLED',
-        );
+        return const NetworkError(message: AppErrorMessages.requestCancelled, code: AppErrorMessages.cancelledCode);
       case DioExceptionType.connectionError:
-        return const NetworkError(
-          message: 'No internet connection',
-          code: 'NO_CONNECTION',
-        );
+        return const NetworkError(message: AppErrorMessages.noInternet, code: AppErrorMessages.noConnectionCode);
       default:
-        return const NetworkError(
-          message: 'Something went wrong',
-          code: 'UNKNOWN',
-        );
-    }
-  }
-
-  static String _getErrorMessage(int? statusCode) {
-    switch (statusCode) {
-      case 400:
-        return 'Bad request';
-      case 401:
-        return 'Unauthorized';
-      case 403:
-        return 'Forbidden';
-      case 404:
-        return 'Not found';
-      case 500:
-        return 'Internal server error';
-      default:
-        return 'Something went wrong';
+        return const NetworkError(message: AppErrorMessages.unknownError, code: AppErrorMessages.unknownCode);
     }
   }
 }
@@ -76,4 +48,46 @@ class AuthError extends AppError {
 
 class UnknownError extends AppError {
   const UnknownError({required super.message, super.code, super.data});
+}
+
+class AppErrorMessages {
+  static const String connectionTimeout = 'Connection timeout. Please try again.';
+  static const String requestCancelled = 'Request cancelled';
+  static const String noInternet = 'No internet connection';
+  static const String unknownError = 'Something went wrong';
+
+  static const String timeoutCode = 'TIMEOUT';
+  static const String cancelledCode = 'CANCELLED';
+  static const String noConnectionCode = 'NO_CONNECTION';
+  static const String unknownCode = 'UNKNOWN';
+
+  static const String badRequest = 'Bad request';
+  static const String unauthorized = 'Unauthorized';
+  static const String forbidden = 'Forbidden';
+  static const String notFound = 'Not found';
+  static const String internalServerError = 'Internal server error';
+
+  static String getErrorMessage(int? statusCode) {
+    switch (statusCode) {
+      case 400:
+        return badRequest;
+      case 401:
+        return unauthorized;
+      case 403:
+        return forbidden;
+      case 404:
+        return notFound;
+      case 500:
+        return internalServerError;
+      default:
+        return unknownError;
+    }
+  }
+}
+Either<AppError, T> handleException<T>(Object e) {
+  if (e is DioException) {
+    return Left(NetworkError.fromDioError(e));
+  } else {
+    return Left(NetworkError(message: e.toString()));
+  }
 }

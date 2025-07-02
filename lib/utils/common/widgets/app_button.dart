@@ -11,6 +11,7 @@ class AppButton extends StatelessWidget {
   final double? fontSize;
   final FontWeight? fontWeight;
   final Color? textColor;
+  final bool isLoading;
   final Color? backgroundColor;
   final EdgeInsetsGeometry? padding;
   final bool isExpanded;
@@ -18,11 +19,12 @@ class AppButton extends StatelessWidget {
   final Widget? suffixIcon;
 
   const AppButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.height,
     this.width,
+    this.isLoading = false,
     this.borderRadius,
     this.fontSize,
     this.fontWeight,
@@ -32,30 +34,34 @@ class AppButton extends StatelessWidget {
     this.isExpanded = false,
     this.prefixIcon,
     this.suffixIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     final button = GestureDetector(
-      onTap: onPressed,
+      onTap: isLoading ? null : onPressed,
       child: Container(
         height: height ?? 45.h,
         width: width ?? MediaQuery.of(context).size.width,
         padding: padding,
         decoration: BoxDecoration(
           color: backgroundColor ?? AppColors.purple661F,
+          border: Border.all(color: AppColors.purple661F),
           borderRadius: BorderRadius.circular(borderRadius ?? 8.r),
         ),
         child: Center(
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: textColor ?? AppColors.white,
-              fontSize: fontSize ?? 18.sp,
-              fontWeight: fontWeight ?? FontWeight.w800,
-            ),
-          ),
+          child:
+              isLoading
+                  ? SizedBox(height: 30, width: 30, child: CircularProgressIndicator())
+                  : Text(
+                    text,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: textColor ?? AppColors.white,
+                      fontSize: fontSize ?? 18.sp,
+                      fontWeight: fontWeight ?? FontWeight.w800,
+                    ),
+                  ),
         ),
       ),
     );

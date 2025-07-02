@@ -5,10 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
-import 'package:stoxplay/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/models/contest_model.dart';
 
 class StockSelectionWidget extends StatelessWidget {
   VoidCallback onUpPressed;
@@ -51,17 +51,12 @@ class StockSelectionWidget extends StatelessWidget {
                       BoxShadow(
                         color:
                             stepper.value == 1
-                                ? (state
-                                            .selectedStockList[index]
-                                            .stockPrediction ==
-                                        StockPrediction.up)
+                                ? (state.selectedStockList[index].stockPrediction == StockPrediction.up)
                                     ? AppColors.green0CAE
                                     : AppColors.red
-                                : (state.stockList[index].stockPrediction ==
-                                    StockPrediction.up)
+                                : (state.stockList[index].stockPrediction == StockPrediction.up)
                                 ? AppColors.green0CAE
-                                : (state.stockList[index].stockPrediction ==
-                                    StockPrediction.down)
+                                : (state.stockList[index].stockPrediction == StockPrediction.down)
                                 ? AppColors.red
                                 : AppColors.blue7E.withOpacity(0.5),
                         offset: const Offset(0, 0),
@@ -72,17 +67,12 @@ class StockSelectionWidget extends StatelessWidget {
                     border: Border.all(
                       color:
                           stepper.value == 1
-                              ? (state
-                                          .selectedStockList[index]
-                                          .stockPrediction ==
-                                      StockPrediction.up)
+                              ? (state.selectedStockList[index].stockPrediction == StockPrediction.up)
                                   ? AppColors.green0CAE
                                   : AppColors.red
-                              : (state.stockList[index].stockPrediction ==
-                                  StockPrediction.up)
+                              : (state.stockList[index].stockPrediction == StockPrediction.up)
                               ? AppColors.green0CAE
-                              : (state.stockList[index].stockPrediction ==
-                                  StockPrediction.down)
+                              : (state.stockList[index].stockPrediction == StockPrediction.down)
                               ? AppColors.red
                               : AppColors.blue7E.withOpacity(0.5),
                     ),
@@ -92,30 +82,20 @@ class StockSelectionWidget extends StatelessWidget {
                     margin: EdgeInsets.all(3.h),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(
-                        color: AppColors.black.withOpacity(0.1),
-                      ),
+                      border: Border.all(color: AppColors.black.withOpacity(0.1)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            SizedBox(
-                              height: 35.h,
-                              width: 35.w,
-                              child: Image.asset(AppAssets.appIcon),
-                            ),
+                            SizedBox(height: 35.h, width: 35.w, child: Image.asset(AppAssets.appIcon)),
                             SizedBox(width: 15.w),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 SizedBox(height: 25.h),
-                                TextView(
-                                  text: '₹1,629.40 (-1.05%) ',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12.sp,
-                                ),
+                                TextView(text: '₹1,629.40 (-1.05%) ', fontWeight: FontWeight.w500, fontSize: 12.sp),
                               ],
                             ),
                           ],
@@ -127,22 +107,14 @@ class StockSelectionWidget extends StatelessWidget {
                             child: Row(
                               children: [
                                 Icon(
-                                  index % 2 == 0
-                                      ? Icons.arrow_downward
-                                      : Icons.arrow_upward,
+                                  index % 2 == 0 ? Icons.arrow_downward : Icons.arrow_upward,
                                   size: 13.sp,
-                                  color:
-                                      index % 2 == 0
-                                          ? AppColors.red
-                                          : AppColors.green0CAE,
+                                  color: index % 2 == 0 ? AppColors.red : AppColors.green0CAE,
                                 ),
                                 TextView(
                                   text: "30%",
                                   fontSize: 13.sp,
-                                  fontColor:
-                                      index % 2 == 0
-                                          ? AppColors.red
-                                          : AppColors.green0CAE,
+                                  fontColor: index % 2 == 0 ? AppColors.red : AppColors.green0CAE,
                                 ),
                               ],
                             ),
@@ -153,15 +125,11 @@ class StockSelectionWidget extends StatelessWidget {
                               children: [
                                 CircularIconWidget(
                                   onPressed: () {
-                                    final oldStock =
-                                        state.selectedStockList[index];
+                                    final oldStock = state.selectedStockList[index];
                                     final isSelected = state.selectedStockList.any(
                                       (stock) =>
-                                          (stock.stockPosition ==
-                                                  StockPosition.leader &&
-                                              stock ==
-                                                  state
-                                                      .selectedStockList[index]),
+                                          (stock.stockPosition == StockPosition.leader &&
+                                              stock == state.selectedStockList[index]),
                                     );
                                     final updatedStock = Stock(
                                       stockName: oldStock.stockName,
@@ -170,10 +138,7 @@ class StockSelectionWidget extends StatelessWidget {
                                       percentage: oldStock.percentage,
                                       image: oldStock.image,
                                       stockPrediction: oldStock.stockPrediction,
-                                      stockPosition:
-                                          isSelected
-                                              ? StockPosition.none
-                                              : StockPosition.leader,
+                                      stockPosition: isSelected ? StockPosition.none : StockPosition.leader,
                                     );
                                     cubit.updateSelectedStock(
                                       stock: updatedStock,
@@ -184,25 +149,18 @@ class StockSelectionWidget extends StatelessWidget {
                                   shadowBlurRadius: 3,
                                   borderColor: AppColors.black9A9A,
                                   backgroundColor:
-                                      state
-                                                  .selectedStockList[index]
-                                                  .stockPosition ==
-                                              StockPosition.leader
-                                          ? AppColors.purple661F
+                                      state.selectedStockList[index].stockPosition == StockPosition.leader
+                                          ? AppColors.purple5A2F
                                           : AppColors.white,
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       TextView(
                                         text: "L",
                                         fontSize: 14.sp,
                                         fontColor:
-                                            state
-                                                        .selectedStockList[index]
-                                                        .stockPosition ==
-                                                    StockPosition.leader
+                                            state.selectedStockList[index].stockPosition == StockPosition.leader
                                                 ? AppColors.white
                                                 : AppColors.black9A9A,
                                         lineHeight: 0,
@@ -213,13 +171,10 @@ class StockSelectionWidget extends StatelessWidget {
                                         child: TextView(
                                           text: "45%",
                                           fontColor:
-                                              state
-                                                          .selectedStockList[index]
-                                                          .stockPosition ==
-                                                      StockPosition.leader
+                                              state.selectedStockList[index].stockPosition == StockPosition.leader
                                                   ? AppColors.white
                                                   : AppColors.black9A9A,
-                                          fontSize: 6.sp,
+                                          fontSize: 5.sp,
                                           fontWeight: FontWeight.w900,
                                         ),
                                       ),
@@ -228,15 +183,11 @@ class StockSelectionWidget extends StatelessWidget {
                                 ),
                                 CircularIconWidget(
                                   onPressed: () {
-                                    final oldStock =
-                                        state.selectedStockList[index];
+                                    final oldStock = state.selectedStockList[index];
                                     final isSelected = state.selectedStockList.any(
                                       (stock) =>
-                                          (stock.stockPosition ==
-                                                  StockPosition.coLeader &&
-                                              stock ==
-                                                  state
-                                                      .selectedStockList[index]),
+                                          (stock.stockPosition == StockPosition.coLeader &&
+                                              stock == state.selectedStockList[index]),
                                     );
                                     final updatedStock = Stock(
                                       stockName: oldStock.stockName,
@@ -245,10 +196,7 @@ class StockSelectionWidget extends StatelessWidget {
                                       percentage: oldStock.percentage,
                                       image: oldStock.image,
                                       stockPrediction: oldStock.stockPrediction,
-                                      stockPosition:
-                                          isSelected
-                                              ? StockPosition.none
-                                              : StockPosition.coLeader,
+                                      stockPosition: isSelected ? StockPosition.none : StockPosition.coLeader,
                                     );
                                     cubit.updateSelectedStock(
                                       stock: updatedStock,
@@ -259,25 +207,18 @@ class StockSelectionWidget extends StatelessWidget {
                                   shadowBlurRadius: 3,
                                   borderColor: AppColors.black9A9A,
                                   backgroundColor:
-                                      state
-                                                  .selectedStockList[index]
-                                                  .stockPosition ==
-                                              StockPosition.coLeader
-                                          ? AppColors.purple661F
+                                      state.selectedStockList[index].stockPosition == StockPosition.coLeader
+                                          ? AppColors.purple5A2F
                                           : AppColors.white,
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       TextView(
                                         text: "CL",
                                         fontSize: 14.sp,
                                         fontColor:
-                                            state
-                                                        .selectedStockList[index]
-                                                        .stockPosition ==
-                                                    StockPosition.coLeader
+                                            state.selectedStockList[index].stockPosition == StockPosition.coLeader
                                                 ? AppColors.white
                                                 : AppColors.black9A9A,
                                         lineHeight: 0,
@@ -288,10 +229,7 @@ class StockSelectionWidget extends StatelessWidget {
                                         child: TextView(
                                           text: "70%",
                                           fontColor:
-                                              state
-                                                          .selectedStockList[index]
-                                                          .stockPosition ==
-                                                      StockPosition.coLeader
+                                              state.selectedStockList[index].stockPosition == StockPosition.coLeader
                                                   ? AppColors.white
                                                   : AppColors.black9A9A,
                                           fontSize: 6.sp,
@@ -303,15 +241,11 @@ class StockSelectionWidget extends StatelessWidget {
                                 ),
                                 CircularIconWidget(
                                   onPressed: () {
-                                    final oldStock =
-                                        state.selectedStockList[index];
+                                    final oldStock = state.selectedStockList[index];
                                     final isSelected = state.selectedStockList.any(
                                       (stock) =>
-                                          (stock.stockPosition ==
-                                                  StockPosition.viceLeader &&
-                                              stock ==
-                                                  state
-                                                      .selectedStockList[index]),
+                                          (stock.stockPosition == StockPosition.viceLeader &&
+                                              stock == state.selectedStockList[index]),
                                     );
                                     final updatedStock = Stock(
                                       stockName: oldStock.stockName,
@@ -320,10 +254,7 @@ class StockSelectionWidget extends StatelessWidget {
                                       percentage: oldStock.percentage,
                                       image: oldStock.image,
                                       stockPrediction: oldStock.stockPrediction,
-                                      stockPosition:
-                                          isSelected
-                                              ? StockPosition.none
-                                              : StockPosition.viceLeader,
+                                      stockPosition: isSelected ? StockPosition.none : StockPosition.viceLeader,
                                     );
                                     cubit.updateSelectedStock(
                                       stock: updatedStock,
@@ -333,26 +264,19 @@ class StockSelectionWidget extends StatelessWidget {
                                   },
                                   borderColor: AppColors.black9A9A,
                                   backgroundColor:
-                                      state
-                                                  .selectedStockList[index]
-                                                  .stockPosition ==
-                                              StockPosition.viceLeader
-                                          ? AppColors.purple661F
+                                      state.selectedStockList[index].stockPosition == StockPosition.viceLeader
+                                          ? AppColors.purple5A2F
                                           : AppColors.white,
                                   shadowBlurRadius: 3,
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       TextView(
                                         text: "VL",
                                         fontSize: 14.sp,
                                         fontColor:
-                                            state
-                                                        .selectedStockList[index]
-                                                        .stockPosition ==
-                                                    StockPosition.viceLeader
+                                            state.selectedStockList[index].stockPosition == StockPosition.viceLeader
                                                 ? AppColors.white
                                                 : AppColors.black9A9A,
                                         lineHeight: 0,
@@ -363,10 +287,7 @@ class StockSelectionWidget extends StatelessWidget {
                                         child: TextView(
                                           text: "50%",
                                           fontColor:
-                                              state
-                                                          .selectedStockList[index]
-                                                          .stockPosition ==
-                                                      StockPosition.viceLeader
+                                              state.selectedStockList[index].stockPosition == StockPosition.viceLeader
                                                   ? AppColors.white
                                                   : AppColors.black9A9A,
                                           fontSize: 6.sp,
@@ -386,50 +307,37 @@ class StockSelectionWidget extends StatelessWidget {
                                   icon: Icons.arrow_upward,
                                   iconSize: 18.sp,
                                   borderColor:
-                                      (state.stockList[index].stockPrediction ==
-                                              StockPrediction.up)
+                                      (state.stockList[index].stockPrediction == StockPrediction.up)
                                           ? AppColors.white
                                           : AppColors.green0CAE,
                                   boxShadowColor: AppColors.green0CAE,
                                   shadowBlurRadius: 2,
                                   backgroundColor:
-                                      (state.stockList[index].stockPrediction ==
-                                              StockPrediction.up)
+                                      (state.stockList[index].stockPrediction == StockPrediction.up)
                                           ? AppColors.green0CAE
                                           : AppColors.white,
                                   iconColor:
-                                      (state.stockList[index].stockPrediction ==
-                                              StockPrediction.up)
+                                      (state.stockList[index].stockPrediction == StockPrediction.up)
                                           ? AppColors.white
                                           : AppColors.green0CAE,
                                 ),
                                 SizedBox(),
-                                // CircularIconWidget(
-                                //   borderColor: AppColors.black9A9A,
-                                //   boxShadowColor: AppColors.black9A9A,
-                                //   icon: Icons.more_horiz,
-                                //   onPressed: onMorePressed,
-                                //   shadowBlurRadius: 5,
-                                // ),
                                 CircularIconWidget(
                                   onPressed: onDownPressed,
                                   icon: Icons.arrow_downward_rounded,
                                   iconSize: 18.sp,
                                   borderColor:
-                                      (state.stockList[index].stockPrediction ==
-                                              StockPrediction.down)
+                                      (state.stockList[index].stockPrediction == StockPrediction.down)
                                           ? AppColors.white
                                           : AppColors.red,
                                   boxShadowColor: AppColors.red,
                                   shadowBlurRadius: 2,
                                   backgroundColor:
-                                      (state.stockList[index].stockPrediction ==
-                                              StockPrediction.down)
+                                      (state.stockList[index].stockPrediction == StockPrediction.down)
                                           ? AppColors.red
                                           : AppColors.white,
                                   iconColor:
-                                      (state.stockList[index].stockPrediction ==
-                                              StockPrediction.down)
+                                      (state.stockList[index].stockPrediction == StockPrediction.down)
                                           ? AppColors.white
                                           : AppColors.red,
                                 ),
@@ -442,30 +350,16 @@ class StockSelectionWidget extends StatelessWidget {
                 Positioned(
                   left: 60.w,
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: 75.w,
-                      maxWidth: 155.w,
-                    ),
+                    constraints: BoxConstraints(minWidth: 75.w, maxWidth: 155.w),
                     child: Container(
-                      padding: EdgeInsets.only(
-                        top: 8.h,
-                        left: 6.w,
-                        right: 6.w,
-                        bottom: 5.h,
-                      ),
+                      padding: EdgeInsets.only(top: 8.h, left: 6.w, right: 6.w, bottom: 5.h),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(6.r),
                           bottomRight: Radius.circular(6.r),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x66000000),
-                            offset: Offset(0, 1),
-                            blurRadius: 7.1,
-                          ),
-                        ],
+                        boxShadow: [BoxShadow(color: Color(0x66000000), offset: Offset(0, 1), blurRadius: 7.1)],
                       ),
                       child: TextView(
                         text: stock.stockName ?? 'State Bank Of India',
@@ -520,8 +414,8 @@ class CircularIconWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        height: height ?? 28.h,
-        width: width ?? 28.w,
+        height: height ?? 30.h,
+        width: width ?? 30.w,
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,
@@ -534,14 +428,7 @@ class CircularIconWidget extends StatelessWidget {
             ),
           ],
         ),
-        child:
-            child ??
-            Icon(
-              icon ?? Icons.circle,
-              color: iconColor,
-              size: iconSize,
-              opticalSize: 48,
-            ),
+        child: child ?? Icon(icon ?? Icons.circle, color: iconColor, size: iconSize, opticalSize: 48),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:stoxplay/models/contest_model.dart';
+import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -13,15 +13,27 @@ import 'package:stoxplay/utils/extensions/extensions.dart';
 
 class ContestDetailsWidget extends StatelessWidget {
   final ContestPrice data;
+  bool ignoreOnTap = false;
 
-  const ContestDetailsWidget({required this.data, super.key});
+  ContestDetailsWidget({
+    required this.data,
+    super.key,
+    required this.ignoreOnTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, AppRoutes.winningsScreen,arguments: data);
-      },
+      onTap:
+          ignoreOnTap
+              ? null
+              : () {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.winningsScreen,
+                  arguments: data,
+                );
+              },
       child: Container(
         decoration: primaryContainerDecoration,
         child: Container(

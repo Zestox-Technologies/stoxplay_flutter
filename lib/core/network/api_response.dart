@@ -1,38 +1,46 @@
-import 'app_error.dart';
+class ApiResponse<T> {
+  final bool success;
+  final String message;
+  final T? data;
+  final DateTime timestamp;
 
-abstract class ApiResponse<T> {
-  const ApiResponse();
+  ApiResponse({required this.success, required this.message, required this.data, required this.timestamp});
 
-  bool get isSuccess => this is Success<T>;
-
-  bool get isError => this is Error<T>;
-
-  T? get data => isSuccess ? (this as Success<T>).data : null;
-
-  AppError? get error => isError ? (this as Error<T>).error : null;
-
-  R fold<R>({
-    required R Function(T data) onSuccess,
-    required R Function(AppError error) onError,
-  }) {
-    if (isSuccess) {
-      return onSuccess(data!);
-    } else {
-      return onError(error!);
-    }
+  /// Factory constructor for parsing from JSON
+  factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(dynamic json) fromJsonT) {
+    return ApiResponse<T>(
+      success: json['success'] as bool,
+      message: json['message'] as String,
+      data: json['data'] != null ? fromJsonT(json['data']) : null,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+    );
   }
+
+  /// Convert back to JSON
+  Map<String, dynamic> toJson(dynamic Function(T value) toJsonT) {
+    return {
+      'success': success,
+      'message': message,
+      'data': data != null ? toJsonT(data as T) : null,
+      'timestamp': timestamp.toIso8601String(),
+    };
+  }
+
+  /// Computed properties
+  bool get isSuccess => success;
+
+  bool get isError => !success;
 }
 
-class Success<T> extends ApiResponse<T> {
-  @override
-  final T data;
+enum ApiStatus { initial, success, loading, failed }
 
-  const Success(this.data);
-}
+extension ApiStatusExtension on ApiStatus {
+  bool get isInitial => this == ApiStatus.initial;
 
-class Error<T> extends ApiResponse<T> {
-  @override
-  final AppError error;
+  bool get isSuccess => this == ApiStatus.success;
 
-  const Error(this.error);
+  bool get isLoading => this == ApiStatus.loading;
+
+
+  bool get isFailed => this == ApiStatus.failed;
 }

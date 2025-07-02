@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:stoxplay/features/auth/presentation/pages/auth_wrapper.dart';
 import 'package:stoxplay/features/auth/presentation/pages/login_page.dart';
 import 'package:stoxplay/features/auth/presentation/pages/singup_page.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/pages/battleground_page.dart';
@@ -9,7 +10,7 @@ import 'package:stoxplay/features/home_page/pages/winnings_screen/winnings_scree
 import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
 import 'package:stoxplay/features/main_navigation/main_navigation_page.dart';
 import 'package:stoxplay/features/profile_page/pages/profile_page.dart';
-import 'package:stoxplay/features/splash_page/splash_page.dart';
+import 'package:stoxplay/features/on_boarding_page/on_boarding_page.dart';
 import 'package:stoxplay/features/stats_page/pages/contest_winner_screen.dart';
 import 'package:stoxplay/features/stats_page/pages/stats_page.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
@@ -17,7 +18,8 @@ import 'package:stoxplay/utils/constants/app_routes.dart';
 
 class RouteList {
   static Map<String, WidgetBuilder> routes = {
-    AppRoutes.splashPage: (context) => const SplashPage(),
+    AppRoutes.onBoardingPage: (context) => const OnBoardingPage(),
+    AppRoutes.authWrapper: (context) => const AuthWrapper(),
     AppRoutes.loginPage: (context) =>  LoginPage(),
     AppRoutes.signUpPage: (context) =>  SignUpPage(),
     AppRoutes.homePage: (context) =>  HomePage(),

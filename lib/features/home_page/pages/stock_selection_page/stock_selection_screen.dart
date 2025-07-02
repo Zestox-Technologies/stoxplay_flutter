@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/widgets/stock_selection_widget.dart';
-import 'package:stoxplay/models/contest_model.dart';
+import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
 import 'package:stoxplay/utils/common/widgets/primary_container.dart';
@@ -44,36 +44,21 @@ class StockSelectionScreen extends StatelessWidget {
               bloc: cubit,
               builder: (context, state) {
                 final isFirstStep = stepper.value == 0;
-                final isStockSelectionComplete =
-                    state.selectedStockList.length == 11;
-                final hasLeader = state.selectedStockList.any(
-                  (e) => e.stockPosition.isLeader,
-                );
-                final hasCoLeader = state.selectedStockList.any(
-                  (e) => e.stockPosition.isCoLeader,
-                );
-                final hasViceLeader = state.selectedStockList.any(
-                  (e) => e.stockPosition.isViceLeader,
-                );
+                final isStockSelectionComplete = state.selectedStockList.length == 11;
+                final hasLeader = state.selectedStockList.any((e) => e.stockPosition.isLeader);
+                final hasCoLeader = state.selectedStockList.any((e) => e.stockPosition.isCoLeader);
+                final hasViceLeader = state.selectedStockList.any((e) => e.stockPosition.isViceLeader);
 
-                final isPositionSelectionComplete =
-                    hasLeader && hasCoLeader && hasViceLeader;
+                final isPositionSelectionComplete = hasLeader && hasCoLeader && hasViceLeader;
                 final buttonColor =
                     isFirstStep
-                        ? (isStockSelectionComplete
-                            ? AppColors.purple661F
-                            : AppColors.black9A9A)
-                        : (isPositionSelectionComplete
-                            ? AppColors.purple661F
-                            : AppColors.black9A9A);
+                        ? (isStockSelectionComplete ? AppColors.purple661F : AppColors.black9A9A)
+                        : (isPositionSelectionComplete ? AppColors.purple661F : AppColors.black9A9A);
                 return Scaffold(
                   backgroundColor: Colors.white,
                   bottomNavigationBar: CommonBottomNavbar(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 40.w,
-                        vertical: 15.h,
-                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 15.h),
                       child: GestureDetector(
                         onTap: () {
                           if (stepper.value == 0) {
@@ -111,13 +96,7 @@ class StockSelectionScreen extends StatelessWidget {
                   ),
                   body: Stack(
                     children: [
-                      Positioned(
-                        top: 0.0,
-                        child: Image.asset(
-                          AppAssets.lightSplashStrokes,
-                          height: 250.h,
-                        ),
-                      ),
+                      Positioned(top: 0.0, child: Image.asset(AppAssets.lightSplashStrokes, height: 250.h)),
                       SafeArea(
                         child: Column(
                           children: [
@@ -131,16 +110,13 @@ class StockSelectionScreen extends StatelessWidget {
                               child:
                                   stepper.value == 0
                                       ? Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           IconButton(
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            icon: Icon(
-                                              Icons.arrow_back_ios_new,
-                                            ),
+                                            icon: Icon(Icons.arrow_back_ios_new),
                                           ),
                                           Center(
                                             child: Text(
@@ -151,27 +127,17 @@ class StockSelectionScreen extends StatelessWidget {
                                           ),
                                           Gap(10.h),
                                           Padding(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 40.w,
-                                            ),
+                                            padding: EdgeInsets.symmetric(horizontal: 40.w),
                                             child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
                                                 Text(
                                                   Strings.pick11StocksFrom30,
-                                                  style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500),
                                                 ),
                                                 Text(
                                                   'Time Left (09:10:59)',
-                                                  style: TextStyle(
-                                                    fontSize: 13.sp,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                                  style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500),
                                                 ),
                                               ],
                                             ),
@@ -183,52 +149,30 @@ class StockSelectionScreen extends StatelessWidget {
                                               child: ListView.builder(
                                                 itemCount: 11,
                                                 shrinkWrap: true,
-                                                scrollDirection:
-                                                    Axis.horizontal,
+                                                scrollDirection: Axis.horizontal,
                                                 itemBuilder: (context, index) {
                                                   return Container(
                                                     width: 23.w,
-                                                    margin:
-                                                        EdgeInsets.symmetric(
-                                                          horizontal: 3.w,
-                                                        ),
+                                                    margin: EdgeInsets.symmetric(horizontal: 3.w),
                                                     decoration: BoxDecoration(
                                                       color:
-                                                          index >=
-                                                                  state
-                                                                      .selectedStockList
-                                                                      .length
-                                                              ? AppColors
-                                                                  .black9A9A
-                                                                  .withOpacity(
-                                                                    0.5,
-                                                                  )
-                                                              : AppColors
-                                                                  .purple661F,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            4.r,
-                                                          ),
+                                                          index >= state.selectedStockList.length
+                                                              ? AppColors.black9A9A.withOpacity(0.5)
+                                                              : AppColors.purple661F,
+                                                      borderRadius: BorderRadius.circular(4.r),
                                                     ),
                                                     child: Center(
                                                       child: Text(
                                                         '${index + 1}',
                                                         style: TextStyle(
                                                           fontSize: 10.sp,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                                          fontWeight: FontWeight.bold,
                                                           color:
-                                                              index >=
-                                                                      state
-                                                                          .selectedStockList
-                                                                          .length
-                                                                  ? AppColors
-                                                                      .black
-                                                                  : AppColors
-                                                                      .white,
+                                                              index >= state.selectedStockList.length
+                                                                  ? AppColors.black
+                                                                  : AppColors.white,
                                                         ),
-                                                        textAlign:
-                                                            TextAlign.center,
+                                                        textAlign: TextAlign.center,
                                                       ),
                                                     ),
                                                   );
@@ -240,26 +184,19 @@ class StockSelectionScreen extends StatelessWidget {
                                         ],
                                       )
                                       : Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: EdgeInsets.only(
-                                              left: 10.w,
-                                            ),
+                                            padding: EdgeInsets.only(left: 10.w),
                                             child: Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
                                               children: [
                                                 GestureDetector(
                                                   onTap: () {
                                                     stepper.value--;
                                                   },
-                                                  child: Icon(
-                                                    Icons.arrow_back_ios_new,
-                                                  ),
+                                                  child: Icon(Icons.arrow_back_ios_new),
                                                 ),
                                                 Gap(5.w),
                                                 TextView(
@@ -270,12 +207,9 @@ class StockSelectionScreen extends StatelessWidget {
                                                 ),
                                                 Gap(2.w),
                                                 Padding(
-                                                  padding: EdgeInsets.only(
-                                                    top: 3.h,
-                                                  ),
+                                                  padding: EdgeInsets.only(top: 3.h),
                                                   child: TextView(
-                                                    text:
-                                                        "(Pick your 3 dominating stocks)",
+                                                    text: "(Pick your 3 dominating stocks)",
                                                     textAlign: TextAlign.center,
                                                     fontSize: 10.sp,
                                                     fontWeight: FontWeight.w600,
@@ -286,30 +220,22 @@ class StockSelectionScreen extends StatelessWidget {
                                           ),
                                           IntrinsicHeight(
                                             child: Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 20.w,
-                                              ),
+                                              padding: EdgeInsets.symmetric(horizontal: 20.w),
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
                                                   Column(
                                                     children: [
                                                       TextView(
                                                         text: "Leader",
                                                         fontSize: 18.sp,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontColor:
-                                                            AppColors
-                                                                .purple661F,
+                                                        fontWeight: FontWeight.w600,
+                                                        fontColor: AppColors.purple661F,
                                                       ),
                                                       TextView(
                                                         text: "Get 10X Points",
                                                         fontSize: 12.sp,
-                                                        fontWeight:
-                                                            FontWeight.w400,
+                                                        fontWeight: FontWeight.w400,
                                                       ),
                                                     ],
                                                   ),
@@ -319,17 +245,13 @@ class StockSelectionScreen extends StatelessWidget {
                                                       TextView(
                                                         text: "Co-Leader",
                                                         fontSize: 18.sp,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontColor:
-                                                            AppColors
-                                                                .purple661F,
+                                                        fontWeight: FontWeight.w600,
+                                                        fontColor: AppColors.purple661F,
                                                       ),
                                                       TextView(
                                                         text: "Get 7.5X Points",
                                                         fontSize: 12.sp,
-                                                        fontWeight:
-                                                            FontWeight.w400,
+                                                        fontWeight: FontWeight.w400,
                                                       ),
                                                     ],
                                                   ),
@@ -339,17 +261,13 @@ class StockSelectionScreen extends StatelessWidget {
                                                       TextView(
                                                         text: "Vice-Leader",
                                                         fontSize: 18.sp,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontColor:
-                                                            AppColors
-                                                                .purple661F,
+                                                        fontWeight: FontWeight.w600,
+                                                        fontColor: AppColors.purple661F,
                                                       ),
                                                       TextView(
                                                         text: "Get 5X Points",
                                                         fontSize: 12.sp,
-                                                        fontWeight:
-                                                            FontWeight.w400,
+                                                        fontWeight: FontWeight.w400,
                                                       ),
                                                     ],
                                                   ),
@@ -371,12 +289,9 @@ class StockSelectionScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(5.r),
                                 ),
                                 child: Table(
-                                  defaultVerticalAlignment:
-                                      TableCellVerticalAlignment.middle,
+                                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                                   columnWidths: {
-                                    0: FixedColumnWidth(
-                                      60.w,
-                                    ), // ID or Icon space
+                                    0: FixedColumnWidth(60.w), // ID or Icon space
                                     1: FixedColumnWidth(150.w), // Stock name
                                     2: FixedColumnWidth(60.w), // Sel %
                                     3: FixedColumnWidth(100.w), // Analysis
@@ -385,18 +300,9 @@ class StockSelectionScreen extends StatelessWidget {
                                     TableRow(
                                       children: [
                                         TextView(text: "", fontSize: 11.sp),
-                                        TextView(
-                                          text: "Stock",
-                                          fontSize: 11.sp,
-                                        ),
-                                        TextView(
-                                          text: "Sel %",
-                                          fontSize: 11.sp,
-                                        ),
-                                        TextView(
-                                          text: "Analysis",
-                                          fontSize: 11.sp,
-                                        ),
+                                        TextView(text: "Stock", fontSize: 11.sp),
+                                        TextView(text: "Sel %", fontSize: 11.sp),
+                                        TextView(text: "Analysis", fontSize: 11.sp),
                                       ],
                                     ),
                                   ],
@@ -412,8 +318,7 @@ class StockSelectionScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(5.r),
                                 ),
                                 child: Table(
-                                  defaultVerticalAlignment:
-                                      TableCellVerticalAlignment.middle,
+                                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                                   columnWidths: {
                                     0: FixedColumnWidth(50.w),
                                     1: FixedColumnWidth(160.w),
@@ -425,10 +330,7 @@ class StockSelectionScreen extends StatelessWidget {
                                     TableRow(
                                       children: [
                                         TextView(text: "", fontSize: 11.sp),
-                                        TextView(
-                                          text: "Stock",
-                                          fontSize: 11.sp,
-                                        ),
+                                        TextView(text: "Stock", fontSize: 11.sp),
                                         TextView(text: "L%", fontSize: 11.sp),
                                         TextView(text: "CL%", fontSize: 11.sp),
                                         TextView(text: "VL%", fontSize: 11.sp),
@@ -442,165 +344,94 @@ class StockSelectionScreen extends StatelessWidget {
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 0.w),
                                 child: ListView.separated(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 15.w,
-                                    vertical: 10.h,
-                                  ),
-                                  separatorBuilder:
-                                      (context, index) => Gap(8.h),
+                                  padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+                                  separatorBuilder: (context, index) => Gap(8.h),
                                   itemCount:
-                                      stepper.value == 0
-                                          ? state.stockList.length
-                                          : state.selectedStockList.length,
+                                      stepper.value == 0 ? state.stockList.length : state.selectedStockList.length,
                                   itemBuilder:
                                       (context, index) => StockSelectionWidget(
                                         cubit: cubit,
                                         stock:
                                             stepper.value == 0
                                                 ? state.stockList[index]
-                                                : state
-                                                    .selectedStockList[index],
+                                                : state.selectedStockList[index],
                                         stepper: stepper,
                                         index: index,
                                         onMorePressed: () {},
                                         onUpPressed: () {
-                                          final oldStock =
-                                              state.stockList[index];
-                                          final isSelected = state
-                                              .selectedStockList
-                                              .any(
-                                                (stock) =>
-                                                    stock.id == oldStock.id,
-                                              );
-                                          if (state.selectedStockList.length >=
-                                                  11 &&
-                                              !isSelected) {
+                                          final oldStock = state.stockList[index];
+                                          final isSelected = state.selectedStockList.any(
+                                            (stock) => stock.id == oldStock.id,
+                                          );
+                                          if (state.selectedStockList.length >= 11 && !isSelected) {
                                             return;
                                           }
-                                          final currentPrediction =
-                                              oldStock.stockPrediction;
+                                          final currentPrediction = oldStock.stockPrediction;
                                           if (isSelected) {
-                                            if (currentPrediction ==
-                                                StockPrediction.up) {
-                                              cubit.removeSelectedStock(
+                                            if (currentPrediction == StockPrediction.up) {
+                                              cubit.removeSelectedStock(stock: oldStock);
+                                              final updatedStock = oldStock.copyWith(
+                                                stockPrediction: StockPrediction.none,
+                                              );
+                                              cubit.updateStock(stock: updatedStock, index: index);
+                                            } else if (currentPrediction == StockPrediction.down) {
+                                              cubit.updateSelectedStockPrediction(
+                                                stockPrediction: StockPrediction.up,
                                                 stock: oldStock,
                                               );
-                                              final updatedStock = oldStock
-                                                  .copyWith(
-                                                    stockPrediction:
-                                                        StockPrediction.none,
-                                                  );
-                                              cubit.updateStock(
-                                                stock: updatedStock,
-                                                index: index,
+                                              final updatedStock = oldStock.copyWith(
+                                                stockPrediction: StockPrediction.up,
                                               );
-                                            } else if (currentPrediction ==
-                                                StockPrediction.down) {
-                                              cubit
-                                                  .updateSelectedStockPrediction(
-                                                    stockPrediction:
-                                                        StockPrediction.up,
-                                                    stock: oldStock,
-                                                  );
-                                              final updatedStock = oldStock
-                                                  .copyWith(
-                                                    stockPrediction:
-                                                        StockPrediction.up,
-                                                  );
-                                              cubit.updateStock(
-                                                stock: updatedStock,
-                                                index: index,
-                                              );
+                                              cubit.updateStock(stock: updatedStock, index: index);
                                             }
                                           } else {
                                             if (!isSelected) {
-                                              final updatedStock = oldStock
-                                                  .copyWith(
-                                                    stockPrediction:
-                                                        StockPrediction.up,
-                                                  );
-                                              cubit.addSelectedStock(
-                                                stock: updatedStock,
+                                              final updatedStock = oldStock.copyWith(
+                                                stockPrediction: StockPrediction.up,
                                               );
+                                              cubit.addSelectedStock(stock: updatedStock);
                                             }
-                                            final updatedStock = oldStock
-                                                .copyWith(
-                                                  stockPrediction:
-                                                      StockPrediction.up,
-                                                );
-                                            cubit.updateStock(
-                                              stock: updatedStock,
-                                              index: index,
-                                            );
+                                            final updatedStock = oldStock.copyWith(stockPrediction: StockPrediction.up);
+                                            cubit.updateStock(stock: updatedStock, index: index);
                                           }
                                         },
                                         onDownPressed: () {
-                                          final oldStock =
-                                              state.stockList[index];
+                                          final oldStock = state.stockList[index];
 
-                                          final isSelected = state
-                                              .selectedStockList
-                                              .any(
-                                                (stock) =>
-                                                    stock.id == oldStock.id,
-                                              );
+                                          final isSelected = state.selectedStockList.any(
+                                            (stock) => stock.id == oldStock.id,
+                                          );
 
-                                          final currentPrediction =
-                                              oldStock.stockPrediction;
+                                          final currentPrediction = oldStock.stockPrediction;
 
-                                          if (state.selectedStockList.length >=
-                                                  11 &&
-                                              !isSelected) {
+                                          if (state.selectedStockList.length >= 11 && !isSelected) {
                                             return;
                                           }
 
                                           if (isSelected) {
-                                            if (currentPrediction ==
-                                                StockPrediction.down) {
-                                              cubit.removeSelectedStock(
+                                            if (currentPrediction == StockPrediction.down) {
+                                              cubit.removeSelectedStock(stock: oldStock);
+
+                                              final updatedStock = oldStock.copyWith(
+                                                stockPrediction: StockPrediction.none,
+                                              );
+                                              cubit.updateStock(stock: updatedStock, index: index);
+                                            } else if (currentPrediction == StockPrediction.up) {
+                                              cubit.updateSelectedStockPrediction(
+                                                stockPrediction: StockPrediction.down,
                                                 stock: oldStock,
                                               );
-
-                                              final updatedStock = oldStock
-                                                  .copyWith(
-                                                    stockPrediction:
-                                                        StockPrediction.none,
-                                                  );
-                                              cubit.updateStock(
-                                                stock: updatedStock,
-                                                index: index,
+                                              final updatedStock = oldStock.copyWith(
+                                                stockPrediction: StockPrediction.down,
                                               );
-                                            } else if (currentPrediction ==
-                                                StockPrediction.up) {
-                                              cubit
-                                                  .updateSelectedStockPrediction(
-                                                    stockPrediction:
-                                                        StockPrediction.down,
-                                                    stock: oldStock,
-                                                  );
-                                              final updatedStock = oldStock
-                                                  .copyWith(
-                                                    stockPrediction:
-                                                        StockPrediction.down,
-                                                  );
-                                              cubit.updateStock(
-                                                stock: updatedStock,
-                                                index: index,
-                                              );
+                                              cubit.updateStock(stock: updatedStock, index: index);
                                             }
                                           } else {
-                                            final updatedStock = oldStock
-                                                .copyWith(
-                                                  stockPrediction:
-                                                      StockPrediction.down,
-                                                );
-                                            cubit.addSelectedStock(
-                                              stock: updatedStock,
+                                            final updatedStock = oldStock.copyWith(
+                                              stockPrediction: StockPrediction.down,
                                             );
-                                            cubit.updateStock(
-                                              stock: updatedStock,
-                                              index: index,
-                                            );
+                                            cubit.addSelectedStock(stock: updatedStock);
+                                            cubit.updateStock(stock: updatedStock, index: index);
                                           }
                                         },
                                       ),
@@ -662,21 +493,14 @@ class ConfirmationBs extends StatelessWidget {
           spacing: 20.h,
           children: [
             SizedBox(),
-            Text(
-              "Confirmation",
-              style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-            ),
+            Text("Confirmation", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Entry", style: TextStyle(fontSize: 16.sp)),
                 Row(
                   children: [
-                    Image.asset(
-                      AppAssets.stoxplayCoin,
-                      height: 18.h,
-                      width: 18.w,
-                    ),
+                    Image.asset(AppAssets.stoxplayCoin, height: 18.h, width: 18.w),
                     Text("500", style: TextStyle(fontSize: 16.sp)),
                   ],
                 ),
@@ -687,11 +511,7 @@ class ConfirmationBs extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
                 cubit.getReorderedStockList(cubit.state.selectedStockList);
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.battleGroundScreen,
-                  arguments: cubit,
-                );
+                Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: cubit);
               },
             ),
             SizedBox(),

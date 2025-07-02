@@ -29,38 +29,57 @@ class _StatsPageState extends State<StatsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          forceMaterialTransparency: true,
-          title: CommonAppbarTitle(),
-          centerTitle: true,
-          backgroundColor: AppColors.white,
-          leading:
-              selectedIndexNotifier.value == 1
-                  ? IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new),
-                    color: AppColors.black,
-                    onPressed: () {
-                      selectedIndexNotifier.value--;
-                    },
-                  )
-                  : null,
-        ),
-        body: ValueListenableBuilder(
-          valueListenable: selectedIndexNotifier,
-          builder: (context, selectedIndex, _) {
-            return ValueListenableBuilder(
-              valueListenable: completedIndexNotifier,
-              builder: (context, completedIndex, _) {
+    return ValueListenableBuilder(
+      valueListenable: completedIndexNotifier,
+      builder: (context, completeIndex, _) {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) {
+              return;
+            }
+            if (completedIndexNotifier.value == 1) {
+              completedIndexNotifier.value--;
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              forceMaterialTransparency: true,
+              backgroundColor: AppColors.white,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              // prevent default leading behavior
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  if (completedIndexNotifier.value == 1) ...[
+                    const SizedBox(width: 0), // space to balance the back button
+                  ],
+                  Expanded(child: Center(child: CommonAppbarTitle())),
+                  if (completedIndexNotifier.value == 1) ...[
+                    const SizedBox(width: 48), // matching the left space
+                  ],
+                ],
+              ),
+              leading:
+                  completedIndexNotifier.value == 1
+                      ? IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new),
+                        color: AppColors.black,
+                        onPressed: () {
+                          completedIndexNotifier.value--;
+                        },
+                      )
+                      : null,
+            ),
+
+            body: ValueListenableBuilder(
+              valueListenable: selectedIndexNotifier,
+              builder: (context, selectedIndex, _) {
                 return Column(
                   children: [
-                    Container(
-                      height: 1.h,
-                      width: double.maxFinite,
-                      color: Colors.grey,
-                    ),
+                    Container(height: 1.h, width: double.maxFinite, color: Colors.grey),
                     Gap(15.h),
                     completedIndexNotifier.value == 0
                         ? Padding(
@@ -80,19 +99,15 @@ class _StatsPageState extends State<StatsPage> {
                                         borderRadius: 5.r,
                                         borderColor:
                                             selectedIndexNotifier.value == 0
-                                                ? AppColors.blue7E.withOpacity(
-                                                  0.5,
-                                                )
-                                                : AppColors.black9A9A
-                                                    .withOpacity(0.5),
+                                                ? AppColors.blue7E.withOpacity(0.5)
+                                                : AppColors.black9A9A.withOpacity(0.5),
                                         child: Center(
                                           child: Text(
                                             "Upcoming",
                                             style: TextStyle(
                                               fontSize: 18.sp,
                                               color:
-                                                  selectedIndexNotifier.value ==
-                                                          0
+                                                  selectedIndexNotifier.value == 0
                                                       ? AppColors.black
                                                       : AppColors.black9A9A,
                                             ),
@@ -111,19 +126,15 @@ class _StatsPageState extends State<StatsPage> {
                                         borderRadius: 5.r,
                                         borderColor:
                                             selectedIndexNotifier.value == 1
-                                                ? AppColors.blue7E.withOpacity(
-                                                  0.5,
-                                                )
-                                                : AppColors.black9A9A
-                                                    .withOpacity(0.5),
+                                                ? AppColors.blue7E.withOpacity(0.5)
+                                                : AppColors.black9A9A.withOpacity(0.5),
                                         child: Center(
                                           child: Text(
                                             "Live",
                                             style: TextStyle(
                                               fontSize: 18.sp,
                                               color:
-                                                  selectedIndexNotifier.value ==
-                                                          1
+                                                  selectedIndexNotifier.value == 1
                                                       ? AppColors.black
                                                       : AppColors.black9A9A,
                                             ),
@@ -142,19 +153,15 @@ class _StatsPageState extends State<StatsPage> {
                                         borderRadius: 5.r,
                                         borderColor:
                                             selectedIndexNotifier.value == 2
-                                                ? AppColors.blue7E.withOpacity(
-                                                  0.5,
-                                                )
-                                                : AppColors.black9A9A
-                                                    .withOpacity(0.5),
+                                                ? AppColors.blue7E.withOpacity(0.5)
+                                                : AppColors.black9A9A.withOpacity(0.5),
                                         child: Center(
                                           child: Text(
                                             "Completed",
                                             style: TextStyle(
                                               fontSize: 18.sp,
                                               color:
-                                                  selectedIndexNotifier.value ==
-                                                          2
+                                                  selectedIndexNotifier.value == 2
                                                       ? AppColors.black
                                                       : AppColors.black9A9A,
                                             ),
@@ -194,10 +201,10 @@ class _StatsPageState extends State<StatsPage> {
                   ],
                 );
               },
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

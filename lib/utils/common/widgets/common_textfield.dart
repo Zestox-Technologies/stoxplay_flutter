@@ -28,9 +28,12 @@ class CommonTextfield extends StatelessWidget {
     this.enableInteractiveSelection,
     this.onChanged,
     this.prefixText,
+    this.focusNode,
     this.textColor,
+    this.textCapitalization,
     this.readOnly,
     this.onTap,
+    this.suffix,
     this.isCompulsory = false,
     this.inputFormatters,
   }) : super(key: key);
@@ -40,20 +43,23 @@ class CommonTextfield extends StatelessWidget {
   final IconData? secondIcon;
   final String title;
   final String? hintText;
+  final TextCapitalization? textCapitalization;
   final bool? isCompulsory;
   final String? prefixText;
   final bool? enableInteractiveSelection;
   final double? horizontalPadding;
   final VoidCallback? onIconTap;
+  final Widget? suffix;
   final void Function()? onTap;
   final VoidCallback? onSecondIconTap;
   final TextInputType? keyboardType;
   final int? maxlines;
   final double? height;
+  final FocusNode? focusNode;
   final bool? obscureText;
   final TextInputAction? textInputAction;
-  final void Function(String)? onSubmitted;
-  final void Function(String)? onChanged;
+  final void Function(String value)? onSubmitted;
+  final void Function(String value)? onChanged;
   final int? maxLength;
   final bool? readOnly;
   final Color? focusColor;
@@ -66,10 +72,7 @@ class CommonTextfield extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        TextView(
-          text: '$title${isCompulsory ?? false ? '*' : ''}',
-          fontColor: AppColors.black,
-        ),
+        TextView(text: '$title${isCompulsory ?? false ? '*' : ''}', fontColor: AppColors.black),
         SizedBox(height: 5.h),
         Container(
           height: 45.h,
@@ -78,41 +81,29 @@ class CommonTextfield extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(10.r)),
             color: AppColors.whiteF9F9,
             boxShadow: [
-              BoxShadow(
-                color: AppColors.blue7E.withOpacity(0.2),
-                blurRadius: 1,
-                spreadRadius: 0,
-              ),
-              BoxShadow(
-                color: AppColors.black40,
-                blurRadius: 4.0,
-                spreadRadius: 0.0,
-                offset: const Offset(0, 0),
-              ),
+              BoxShadow(color: AppColors.blue7E.withOpacity(0.2), blurRadius: 1, spreadRadius: 0),
+              BoxShadow(color: AppColors.black40, blurRadius: 4.0, spreadRadius: 0.0, offset: const Offset(0, 0)),
             ],
           ),
           child: Row(
             children: [
-              prefixText != null
-                  ? TextView(text: prefixText!, fontSize: 17.sp)
-                  : SizedBox.shrink(),
+              prefixText != null ? TextView(text: prefixText!, fontSize: 17.sp) : SizedBox.shrink(),
               Expanded(
                 child: TextField(
                   onTap: onTap,
+                  focusNode: focusNode,
                   cursorColor: AppColors.blue7E,
                   controller: controller,
+                  onChanged: onChanged,
+                  textCapitalization: textCapitalization ?? TextCapitalization.none,
                   readOnly: readOnly ?? false,
                   textAlignVertical: TextAlignVertical.center,
                   keyboardType: keyboardType,
                   cursorHeight: 18.h,
                   maxLength: maxLength,
+                  inputFormatters: inputFormatters,
                   buildCounter:
-                      (
-                        context, {
-                        required currentLength,
-                        required isFocused,
-                        required maxLength,
-                      }) => SizedBox.shrink(),
+                      (context, {required currentLength, required isFocused, required maxLength}) => SizedBox.shrink(),
                   decoration: InputDecoration.collapsed(
                     hintText: hintText ?? title,
                     hintStyle: TextStyle(color: AppColors.black40),
@@ -120,6 +111,7 @@ class CommonTextfield extends StatelessWidget {
                   ),
                 ),
               ),
+              if (suffix != null) ...[SizedBox(width: 8.w), GestureDetector(onTap: onSecondIconTap, child: suffix!)],
             ],
           ),
         ),

@@ -11,7 +11,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/widgets/battleground_item_widget.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
-import 'package:stoxplay/models/contest_model.dart';
+import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';

@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/leaderboard_page/widgets/leaderboard_item_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
-import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -122,184 +121,193 @@ class LeaderboardPage extends StatelessWidget {
                       ],
                     ),
                   )
-                  : Expanded(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Gap(10.h),
-                              Image.asset(
-                                AppAssets.celebrationStarImage,
-                                height: 120.h,
+                  : PopScope(
+                    canPop: false,
+                    onPopInvokedWithResult: (didPop, result) {
+                      if (didPop) return;
+                      selectedIndex.value--;
+                    },
+                    child: Expanded(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 24.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Gap(10.h),
+                                Image.asset(
+                                  AppAssets.celebrationStarImage,
+                                  height: 120.h,
+                                ),
+                                Stack(
+                                  children: [
+                                    Divider(
+                                      color: AppColors.black,
+                                    ).paddingTop(5.h),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Container(
+                                        color: AppColors.white,
+                                        child: TextView(
+                                          text: Strings.bankWars,
+                                          fontSize: 24.sp,
+                                        ).paddingSymmetric(horizontal: 20.w),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                TextView(
+                                  text: Strings.topPerformersInTheMatch,
+                                  fontSize: 24.sp,
+                                ),
+                                Gap(10.h),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color:
+                                    Colors
+                                        .white, // or your desired background color
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0x66000000),
+                                    offset: const Offset(0, -3),
+                                    blurRadius: 24.7,
+                                    spreadRadius: 0, // same as CSS
+                                  ),
+                                ],
+                                borderRadius: BorderRadius.circular(
+                                  10,
+                                ), // optional
                               ),
-                              Stack(
+                              child: Column(
                                 children: [
-                                  Divider(
-                                    color: AppColors.black,
-                                  ).paddingTop(5.h),
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                      color: AppColors.white,
-                                      child: TextView(
-                                        text: Strings.bankWars,
-                                        fontSize: 24.sp,
-                                      ).paddingSymmetric(horizontal: 20.w),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20.w,
+                                      vertical: 10.h,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextView(text: "Name"),
+                                        Row(
+                                          children: [
+                                            TextView(text: "Winnings"),
+                                            Gap(20.w),
+                                            TextView(text: "Points"),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 0.5.h,
+                                    color: AppColors.black6666,
+                                  ),
+                                  Expanded(
+                                    child: ListView.separated(
+                                      shrinkWrap: true,
+                                      separatorBuilder:
+                                          (context, index) => Container(
+                                            height: 0.5.h,
+                                            color: AppColors.black6666,
+                                          ),
+                                      itemCount: 10,
+                                      itemBuilder: (context, index) {
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  margin: EdgeInsets.symmetric(
+                                                    horizontal: 20.w,
+                                                    vertical: 10.h,
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        Colors
+                                                            .white, // Border color
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                      color: AppColors.blue7E
+                                                          .withOpacity(0.5),
+                                                      width:
+                                                          1, // Change border width here
+                                                    ),
+                                                  ),
+                                                  child: CircleAvatar(
+                                                    radius: 20.r,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    child: ClipOval(
+                                                      child: Image.asset(
+                                                        AppAssets.bankWars,
+                                                        height:
+                                                            40, // adjust if needed
+                                                        width: 40,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    TextView(
+                                                      text: "Rahul Soni",
+                                                      fontSize: 16.sp,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
+                                                    TextView(
+                                                      text: "Winnings-8,10,000",
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      fontColor:
+                                                          AppColors.black46464,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    TextView(text: "15k"),
+                                                    Image.asset(
+                                                      AppAssets.stoxplayCoin,
+                                                      height: 16.h,
+                                                      width: 16.w,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Gap(40.w),
+                                                TextView(text: "180"),
+                                                Gap(30.w),
+                                              ],
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],
                               ),
-                              TextView(
-                                text: Strings.topPerformersInTheMatch,
-                                fontSize: 24.sp,
-                              ),
-                              Gap(10.h),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color:
-                                  Colors
-                                      .white, // or your desired background color
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0x66000000),
-                                  offset: const Offset(0, -3),
-                                  blurRadius: 24.7,
-                                  spreadRadius: 0, // same as CSS
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(
-                                10,
-                              ), // optional
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 20.w,
-                                    vertical: 10.h,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      TextView(text: "Name"),
-                                      Row(
-                                        children: [
-                                          TextView(text: "Winnings"),
-                                          Gap(20.w),
-                                          TextView(text: "Points"),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  height: 0.5.h,
-                                  color: AppColors.black6666,
-                                ),
-                                Expanded(
-                                  child: ListView.separated(
-                                    shrinkWrap: true,
-                                    separatorBuilder:
-                                        (context, index) => Container(
-                                          height: 0.5.h,
-                                          color: AppColors.black6666,
-                                        ),
-                                    itemCount: 10,
-                                    itemBuilder: (context, index) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Container(
-                                                margin: EdgeInsets.symmetric(
-                                                  horizontal: 20.w,
-                                                  vertical: 10.h,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      Colors
-                                                          .white, // Border color
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                    color: AppColors.blue7E
-                                                        .withOpacity(0.5),
-                                                    width:
-                                                        1, // Change border width here
-                                                  ),
-                                                ),
-                                                child: CircleAvatar(
-                                                  radius: 20.r,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  child: ClipOval(
-                                                    child: Image.asset(
-                                                      AppAssets.bankWars,
-                                                      height:
-                                                          40, // adjust if needed
-                                                      width: 40,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  TextView(
-                                                    text: "Rahul Soni",
-                                                    fontSize: 16.sp,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    fontWeight: FontWeight.w700,
-                                                  ),
-                                                  TextView(
-                                                    text: "Winnings-8,10,000",
-                                                    fontWeight: FontWeight.w400,
-                                                    fontColor:
-                                                        AppColors.black46464,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  TextView(text: "15k"),
-                                                  Image.asset(
-                                                    AppAssets.stoxplayCoin,
-                                                    height: 16.h,
-                                                    width: 16.w,
-                                                  ),
-                                                ],
-                                              ),
-                                              Gap(40.w),
-                                              TextView(text: "180"),
-                                              Gap(30.w),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
             ],

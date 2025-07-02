@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stoxplay/features/profile_page/pages/profile_page.dart';
-import 'package:stoxplay/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/glow_icon.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/models/contest_model.dart';
 
 List<BottomNavigationBarItem> navBarList = [
   BottomNavigationBarItem(

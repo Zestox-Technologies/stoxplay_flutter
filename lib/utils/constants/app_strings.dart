@@ -1,5 +1,6 @@
 class Strings {
   Strings._();
+
   static const String stoxplay = "Stoxplay";
   static const String login = "Log In";
   static const String email = "Email";
@@ -21,7 +22,7 @@ class Strings {
   static const String rememberMe = "Remember me";
   static const String code = "Code";
   static const String referralId = "Referral ID";
-  static const String resendIn = "Resend in ";
+  static const String resendIn = "Resend OTP in ";
   static const String forgotPassword = "Forgot Password";
   static const String pleaseSignInToExistingAccount = "Please sign in to existing account";
   static const String pleaseEnter4DigitOTP = "Please enter 4 digit OTP";
@@ -30,6 +31,7 @@ class Strings {
   static const String signUp = "Sign Up";
   static const String signIn = "Sign In";
   static const String verifyOTP = "VERIFY OTP";
+  static const String sendOTP = "SEND OTP";
   static const String upload = "UPLOAD";
   static const String dontHaveAnAccount = "Don't have an account";
   static const String haveAnInviteCode = "Have an Invite Code?";
@@ -38,7 +40,10 @@ class Strings {
   static const String zestoxTechnologies = "@ZESTOX TECHNOLOGIES ";
   static const String pleaseCheckTermsAndConditions = "Please check terms and conditions";
   static const String pleaseEnterValidMobileNumber = "Please enter valid mobile number";
+  static const String referCodeInvalid = "Referral Code is Invalid";
+  static const String otpInvalid = "Entered OTP is Invalid";
   static const String uploadYourPhoto = "Upload your photo";
+  static const String onlyRequiredForNewUsers = "Only required for new users";
   static const String camera = "Camera";
   static const String gallery = "Gallery";
   static const String play = "Play";
@@ -66,17 +71,16 @@ class Strings {
   static const String tenX = "10x";
   static const String join = "Join";
   static const String prizePool = "Prize Pool";
-  static const String flexible  = "Flexible";
-  static const String winnersLeaderboard  = "Winners Leaderboard";
-  static const String bankWars  = "Bank Wars";
-  static const String topWinners  = "TOP WINNERS";
-  static const String team1  = "Team 1";
+  static const String flexible = "Flexible";
+  static const String winnersLeaderboard = "Winners Leaderboard";
+  static const String bankWars = "Bank Wars";
+  static const String topWinners = "TOP WINNERS";
+  static const String team1 = "Team 1";
   static const String myContest = "My Contest";
   static const String winnings = "Winnings";
   static const String entryFees = "Entry Fees";
   static const String topWinnersInTheMatch = "Top Winners in the Match";
   static const String topPerformersInTheMatch = "TOP PERFORMERS IN THE MATCH";
-
 
   // App Name
   static const String appName = 'StoxPlay';
