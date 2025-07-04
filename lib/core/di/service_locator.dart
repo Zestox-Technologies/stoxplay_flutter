@@ -25,4 +25,5 @@ Future<void> init() async {
   sl.registerLazySingleton(() => CheckPhoneNumberUseCase(repository: sl())); // Use cases
   sl.registerLazySingleton(() => SectorListUseCase(repo: sl()));
   sl.registerLazySingleton(() => ContestStatusUseCase(repo: sl()));
+  sl.registerLazySingleton(() => GetContestListUseCase(repo: sl()));
 }

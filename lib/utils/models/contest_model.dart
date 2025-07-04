@@ -1,6 +1,6 @@
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 
-class ContestModel {
+class ContestStaticModel {
   final String title;
   final String price;
   final String timeLeft;
@@ -8,7 +8,7 @@ class ContestModel {
   final List<ContestPrice> contestPriceList;
   final List<Stock> stocks;
 
-  ContestModel({
+  ContestStaticModel({
     required this.title,
     required this.price,
     required this.timeLeft,
@@ -17,8 +17,8 @@ class ContestModel {
     required this.stocks,
   });
 
-  factory ContestModel.fromJson(Map<String, dynamic> json) {
-    return ContestModel(
+  factory ContestStaticModel.fromJson(Map<String, dynamic> json) {
+    return ContestStaticModel(
       title: json['title'] as String,
       price: json['price'] as String,
       timeLeft: json['timeLeft'] as String,

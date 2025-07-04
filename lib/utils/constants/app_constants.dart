@@ -66,8 +66,8 @@ List<BottomNavigationBarItem> navBarList = [
   ),
 ];
 
-final List<ContestModel> contests = [
-  ContestModel(
+final List<ContestStaticModel> contests = [
+  ContestStaticModel(
     title: "Bank Wars",
     price: "10,50,000/-",
     timeLeft: "(09:10:59)",
@@ -234,7 +234,7 @@ final List<ContestModel> contests = [
       ),
     ],
   ),
-  ContestModel(
+  ContestStaticModel(
     title: "Battle of Energy",
     price: "10,50,000/-",
     timeLeft: "(09:10:59)",
@@ -401,7 +401,7 @@ final List<ContestModel> contests = [
       ),
     ],
   ),
-  ContestModel(
+  ContestStaticModel(
     title: "Tech Clash",
     price: "10,50,000/-",
     timeLeft: "(09:10:59)",

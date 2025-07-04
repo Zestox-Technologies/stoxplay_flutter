@@ -4,6 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/core/network/api_service.dart';
 import 'package:stoxplay/features/auth/data/models/auth_params_model.dart';
 import 'package:stoxplay/features/auth/data/models/check_phone_number_model.dart';
 import 'package:stoxplay/features/auth/data/models/user_model.dart';
@@ -69,7 +70,7 @@ class AuthCubit extends Cubit<AuthState> {
           StorageService().saveUserToken(data.data?.token ?? '');
           emit(state.copyWith(verifyOtpStatus: ApiStatus.success, isOTPVerified: data.isSuccess, user: data.data));
         } else {
-          emit(state.copyWith(verifyOtpStatus: ApiStatus.failed, isOTPVerified: data.isSuccess));
+          emit(state.copyWith(verifyOtpStatus: ApiStatus.success, isOTPVerified: data.isSuccess));
         }
       },
     );
@@ -97,13 +98,12 @@ class AuthCubit extends Cubit<AuthState> {
       (error) {
         emit(state.copyWith(completeSignUpStatus: ApiStatus.failed, errorMessage: error.message));
       },
-      (data) {
+      (data) async {
         // Set login status and save user data after successful signup
         StorageService().setLoggedIn(true);
         StorageService().write(DBKeys.user, data.data);
-        if (data.data?.token != null) {
-          StorageService().saveUserToken(data.data!.token!);
-        }
+        await StorageService().saveUserToken(data.data!.token!);
+        ApiService().updateAuthHeader(data.data!.token!);
         emit(state.copyWith(completeSignUpStatus: ApiStatus.success, user: data.data));
       },
     );

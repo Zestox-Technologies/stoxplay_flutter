@@ -15,6 +15,7 @@ class ApiUrls {
   static const String completeSignUp = 'auth/client/complete-signup';
 
   ///contest flow
-  static const String getSectorList = 'stock-management/sectors?page=1&limit=10&isActive=true';
+  static const String getSectorList = 'stock-management/sectors?isActive=true';
   static const String getContestStatus = 'client/contest-status';
+  static getContestList(String sectorId) => 'client/sectors/$sectorId/contests';
 }

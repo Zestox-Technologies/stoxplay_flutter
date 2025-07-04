@@ -11,13 +11,14 @@ class ApiService {
     return _instance;
   }
 
+  void updateAuthHeader(String token) {
+    _dio.options.headers['Authorization'] = 'Bearer $token';
+  }
+
   final token = StorageService().read<String>(DBKeys.userTokenKey);
 
   ApiService._internal() {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
+    final headers = {'Content-Type': 'application/json', 'Accept': 'application/json'};
 
     if (token != null && token!.isNotEmpty) {
       headers['Authorization'] = 'Bearer $token';
@@ -37,13 +38,17 @@ class ApiService {
 
     // Add interceptors for logging and error handling
     _dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: true,
-        responseBody: true,
-        error: true,
+      LogInterceptor(request: true, requestHeader: true, requestBody: true, responseBody: true, error: true),
+    );
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = StorageService().read<String>(DBKeys.userTokenKey);
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
       ),
     );
   }
@@ -52,17 +57,9 @@ class ApiService {
   Dio get dio => _dio;
 
   // Generic GET method
-  Future<Response> get(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters, Options? options}) async {
     try {
-      final response = await _dio.get(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-      );
+      final response = await _dio.get(path, queryParameters: queryParameters, options: options);
       return response;
     } on DioException catch (e) {
       print('GET Request Error: ${e.message}');
@@ -72,26 +69,16 @@ class ApiService {
   }
 
   // Generic POST method
-  Future<Response> post(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
+  Future<Response> post(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
     try {
       print('Making POST request to: $path');
       print('Request data: $data');
-      
-      final response = await _dio.post(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-      
+
+      final response = await _dio.post(path, data: data, queryParameters: queryParameters, options: options);
+
       print('Response status: ${response.statusCode}');
       print('Response data: ${response.data}');
-      
+
       return response;
     } on DioException catch (e) {
       print('POST Request Error: ${e.message}');
@@ -101,19 +88,9 @@ class ApiService {
   }
 
   // Generic PUT method
-  Future<Response> put(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
+  Future<Response> put(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
     try {
-      final response = await _dio.put(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
+      final response = await _dio.put(path, data: data, queryParameters: queryParameters, options: options);
       return response;
     } on DioException catch (e) {
       print('PUT Request Error: ${e.message}');
@@ -123,19 +100,9 @@ class ApiService {
   }
 
   // Generic DELETE method
-  Future<Response> delete(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
+  Future<Response> delete(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
     try {
-      final response = await _dio.delete(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
+      final response = await _dio.delete(path, data: data, queryParameters: queryParameters, options: options);
       return response;
     } on DioException catch (e) {
       print('DELETE Request Error: ${e.message}');

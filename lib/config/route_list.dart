@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:stoxplay/features/auth/presentation/pages/auth_wrapper.dart';
 import 'package:stoxplay/features/auth/presentation/pages/login_page.dart';
 import 'package:stoxplay/features/auth/presentation/pages/singup_page.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/pages/battleground_page.dart';
@@ -19,7 +18,6 @@ import 'package:stoxplay/utils/constants/app_routes.dart';
 class RouteList {
   static Map<String, WidgetBuilder> routes = {
     AppRoutes.onBoardingPage: (context) => const OnBoardingPage(),
-    AppRoutes.authWrapper: (context) => const AuthWrapper(),
     AppRoutes.loginPage: (context) =>  LoginPage(),
     AppRoutes.signUpPage: (context) =>  SignUpPage(),
     AppRoutes.homePage: (context) =>  HomePage(),

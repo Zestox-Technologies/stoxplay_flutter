@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:stoxplay/config/navigation/navigation_state.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
@@ -26,6 +27,7 @@ class ProfilePage extends StatelessWidget {
             StorageService().clearUserToken();
             StorageService().remove(DBKeys.user);
             Navigator.pushNamedAndRemoveUntil(context, AppRoutes.loginPage, (route) => false);
+            NavigationState().updateIndex(0);
           },
         );
       },

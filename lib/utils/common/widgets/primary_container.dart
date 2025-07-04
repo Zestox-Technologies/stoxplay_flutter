@@ -9,11 +9,13 @@ class PrimaryContainer extends StatelessWidget {
   final double? borderRadius;
   final double? borderWidth;
   final double? width;
+  final EdgeInsetsGeometry? padding;
 
   const PrimaryContainer({
     required this.child,
     this.borderColor,
     this.width,
+    this.padding,
     this.borderWidth,
     this.borderRadius,
     this.color,
@@ -23,15 +25,12 @@ class PrimaryContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width?? MediaQuery.of(context).size.width,
-      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
+      width: width ?? MediaQuery.of(context).size.width,
+      padding: padding ?? EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(borderRadius ?? 12.r),
-        border: Border.all(
-          color: borderColor ?? AppColors.blue7E.withOpacity(0.2),
-          width: borderWidth ?? 2,
-        ),
+        border: Border.all(color: borderColor ?? AppColors.blue7E.withOpacity(0.2), width: borderWidth ?? 2),
         boxShadow: [
           BoxShadow(
             color: color ?? AppColors.blue7E.withOpacity(0.3),

@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/core/network/use_case.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
 
@@ -23,5 +24,16 @@ class ContestStatusUseCase extends UseCase<bool, String> {
   @override
   Future<Either<AppError, bool>> call(String params) async {
     return await repo.getContestStatus();
+  }
+}
+
+class GetContestListUseCase extends UseCase<List<ContestModel>, String> {
+  final HomeRepo repo;
+
+  GetContestListUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, List<ContestModel>>> call(String params) async {
+    return await repo.getContestList(params);
   }
 }

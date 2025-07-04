@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/config/navigation/navigation_state.dart';
+import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_details_widget.dart';
 import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
 import 'package:stoxplay/features/profile_page/pages/profile_page.dart';
@@ -16,12 +17,34 @@ import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
 
-class ContestDetailsPage extends StatelessWidget {
+class ContestDetailsPage extends StatefulWidget {
   const ContestDetailsPage({super.key});
 
   @override
+  State<ContestDetailsPage> createState() => _ContestDetailsPageState();
+}
+
+class _ContestDetailsPageState extends State<ContestDetailsPage> {
+  late ContestStaticModel contest;
+  late HomeCubit cubit;
+  bool _isInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_isInitialized) {
+      final data = ModalRoute.of(context)!.settings.arguments as (ContestStaticModel, HomeCubit);
+      contest = data.$1;
+      cubit = data.$2;
+
+      cubit.getContestList('7bafc858-ffb0-452a-840c-f0a0e24a9a5f');
+      _isInitialized = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final data = ModalRoute.of(context)!.settings.arguments as ContestModel;
     return ValueListenableBuilder(
       valueListenable: NavigationState().currentIndex,
       builder: (context, selectedIndex, _) {
@@ -48,17 +71,14 @@ class ContestDetailsPage extends StatelessWidget {
                       backgroundColor: AppColors.white,
                       actions: [
                         SizedBox(
-                          width:
-                              kToolbarHeight, // Match the space of the leading icon
+                          width: kToolbarHeight, // Match the space of the leading icon
                         ),
                       ],
                     )
                     : null,
             body: Column(
               children: [
-                selectedIndex == 0
-                    ? Divider(color: AppColors.black.withOpacity(0.25))
-                    : SizedBox.shrink(),
+                selectedIndex == 0 ? Divider(color: AppColors.black.withOpacity(0.25)) : SizedBox.shrink(),
                 Expanded(
                   child: Stack(
                     children: [
@@ -68,35 +88,19 @@ class ContestDetailsPage extends StatelessWidget {
                           SingleChildScrollView(
                             child: Stack(
                               children: [
-                                Positioned(
-                                  child: Image.asset(
-                                    AppAssets.lightSplashStrokes,
-                                  ),
-                                ),
+                                Positioned(child: Image.asset(AppAssets.lightSplashStrokes)),
                                 Column(
                                   children: [
                                     Text(
                                       Strings.indianStockMarketChampionship,
-                                      style: TextStyle(
-                                        fontSize: 18.sp,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
                                     ),
                                     Gap(10.h),
-                                    Image.asset(
-                                      data.image,
-                                      height: 100.h,
-                                      width: 100.w,
-                                    ),
+                                    Image.asset(contest.image, height: 100.h, width: 100.w),
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Image.asset(
-                                          AppAssets.stoxplayCoin,
-                                          height: 40.h,
-                                          width: 40.w,
-                                        ),
+                                        Image.asset(AppAssets.stoxplayCoin, height: 40.h, width: 40.w),
                                         TextView(text: '1700', fontSize: 16.sp),
                                       ],
                                     ),
@@ -104,23 +108,17 @@ class ContestDetailsPage extends StatelessWidget {
                                       children: [
                                         Stack(
                                           children: [
-                                            Positioned.fill(
-                                              child: Divider(
-                                                color: AppColors.black,
-                                              ),
-                                            ),
+                                            Positioned.fill(child: Divider(color: AppColors.black)),
                                             Align(
                                               alignment: Alignment.center,
                                               child: Container(
                                                 color: AppColors.white,
                                                 child: TextView(
-                                                  text: data.title,
+                                                  text: contest.title,
                                                   fontSize: 30.sp,
                                                   fontWeight: FontWeight.bold,
                                                   letterSpacing: 2,
-                                                ).paddingSymmetric(
-                                                  horizontal: 10.w,
-                                                ),
+                                                ).paddingSymmetric(horizontal: 10.w),
                                               ),
                                             ),
                                           ],
@@ -131,13 +129,12 @@ class ContestDetailsPage extends StatelessWidget {
                                     ListView.separated(
                                       physics: NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
-                                      separatorBuilder:
-                                          (context, index) => Gap(15.h),
-                                      itemCount: data.contestPriceList.length,
+                                      separatorBuilder: (context, index) => Gap(15.h),
+                                      itemCount: contest.contestPriceList.length,
                                       itemBuilder: (context, index) {
                                         return ContestDetailsWidget(
                                           ignoreOnTap: false,
-                                          data: data.contestPriceList[index],
+                                          data: contest.contestPriceList[index],
                                         ).paddingSymmetric(horizontal: 20.w);
                                       },
                                     ),

@@ -235,42 +235,49 @@ class LoginPage extends StatelessWidget {
             child: Scaffold(
               body: BlocListener<AuthCubit, AuthState>(
                 listener: (context, state) {
-                  final errorMessage = state.errorMessage ?? 'Something went wrong';
-                  if (state.checkPhoneApiStatus.isSuccess && state.isPhoneNumberExists == true) {
-                    stepper.value = 1;
-                    context.read<TimerCubit>().startTimer(seconds: 60);
-                  }
-                  if (state.verifyOtpStatus.isSuccess) {
-                    if (state.isOTPVerified == true) {
+                  if (stepper.value == 0) {
+                    // Step 1: Handle check phone response
+                    if (state.checkPhoneApiStatus == ApiStatus.success) {
                       if (state.isPhoneNumberExists == true) {
-                        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
-                        return;
-                      } else {
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.signUpPage,
-                          arguments: AuthParamsModel(
-                            phoneNumber: mobileNoController.text,
-                            referralCode: referralIdController.text,
-                          ),
-                        );
+                        stepper.value = 1;
+                        context.read<TimerCubit>().startTimer(seconds: 60);
                       }
-                    } else {
-                      showSnackBar(context: context, message: Strings.otpInvalid);
                     }
-                  }
-                  if (state.initiateSignUpStatus.isSuccess) {
-                    if (state.isVerified == true) {
-                      stepper.value = 1;
-                      context.read<TimerCubit>().startTimer(seconds: 60);
-                    } else {
-                      showSnackBar(context: context, message: Strings.referCodeInvalid);
+
+                    // Step 2: Handle initiateSignUp response
+                    if (state.initiateSignUpStatus == ApiStatus.success) {
+                      if (state.isVerified == true) {
+                        stepper.value = 1;
+                        context.read<TimerCubit>().startTimer(seconds: 60);
+                      } else {
+                        showSnackBar(context: context, message: Strings.referCodeInvalid);
+                      }
                     }
-                  }
-                  if (state.verifyOtpStatus.isFailed || state.initiateSignUpStatus.isFailed) {
-                    showSnackBar(context: context, message: errorMessage);
+                  } else {
+                    // Step 3: Handle verify OTP response
+                    if (state.verifyOtpStatus == ApiStatus.success) {
+                      if (state.isOTPVerified == true) {
+                        if (state.isPhoneNumberExists == true) {
+                          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
+                        } else {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.signUpPage,
+                            arguments: AuthParamsModel(
+                              phoneNumber: mobileNoController.text,
+                              referralCode: referralIdController.text,
+                            ),
+                          );
+                        }
+                      } else {
+                        showSnackBar(context: context, message: Strings.otpInvalid);
+                      }
+                    } else if (state.verifyOtpStatus == ApiStatus.failed) {
+                      showSnackBar(context: context, message: state.errorMessage ?? 'Something went wrong');
+                    }
                   }
                 },
+
                 child: SingleChildScrollView(
                   child: ValueListenableBuilder<int>(
                     valueListenable: stepper,

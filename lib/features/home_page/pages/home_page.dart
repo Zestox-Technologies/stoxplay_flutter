@@ -25,7 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
-  HomeCubit homeCubit = HomeCubit(sectorListUseCase: sl(), contestStatusUseCase: sl());
+  HomeCubit homeCubit = HomeCubit(sectorListUseCase: sl(), getContestListUseCase: sl(), contestStatusUseCase: sl());
 
   List list = [Strings.play, Strings.learn];
 

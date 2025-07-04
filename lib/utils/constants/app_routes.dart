@@ -2,7 +2,6 @@ class AppRoutes {
   AppRoutes._();
 
   static const String onBoardingPage = '/';
-  static const String authWrapper = '/authWrapper';
   static const String loginPage = '/loginPage';
   static const String signUpPage = '/signUpPage';
   static const String otpScreen = '/otpScreen';
