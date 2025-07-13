@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/widgets/stock_selection_widget.dart';
+import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
@@ -15,11 +16,36 @@ import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
-class StockSelectionScreen extends StatelessWidget {
-  StockSelectionScreen({super.key});
+class StockSelectionScreen extends StatefulWidget {
+  @override
+  State<StockSelectionScreen> createState() => _StockSelectionScreenState();
+}
 
+class _StockSelectionScreenState extends State<StockSelectionScreen> {
   StockSelectionCubit cubit = StockSelectionCubit();
   ValueNotifier<int> stepper = ValueNotifier<int>(0);
+  late HomeCubit homeCubit;
+  String? contestId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get contestId from route arguments
+    contestId = ModalRoute.of(context)!.settings.arguments as String;
+    homeCubit = BlocProvider.of<HomeCubit>(context);
+    
+    // Fetch stock list from API
+    _fetchStockList();
+  }
+
+  Future<void> _fetchStockList() async {
+    if (contestId != null) {
+      final stockDataList = await homeCubit.getStockList(contestId!);
+      if (stockDataList != null) {
+        cubit.setStockListFromApi(stockDataList);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +80,24 @@ class StockSelectionScreen extends StatelessWidget {
                     isFirstStep
                         ? (isStockSelectionComplete ? AppColors.purple661F : AppColors.black9A9A)
                         : (isPositionSelectionComplete ? AppColors.purple661F : AppColors.black9A9A);
+
+                // Show loading if stock list is empty
+                if (state.stockList.isEmpty) {
+                  return Scaffold(
+                    backgroundColor: Colors.white,
+                    body: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          Gap(20.h),
+                          Text('Loading stocks...'),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 return Scaffold(
                   backgroundColor: Colors.white,
                   bottomNavigationBar: CommonBottomNavbar(

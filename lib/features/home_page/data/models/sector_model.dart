@@ -51,3 +51,23 @@ class SectorModel {
     "maxWin": maxWin,
   };
 }
+
+class SectorListResponse {
+  final String nextMatchDate;
+  final List<SectorModel> sectors;
+
+  SectorListResponse({
+    required this.nextMatchDate,
+    required this.sectors,
+  });
+
+  factory SectorListResponse.fromJson(Map<String, dynamic> json) {
+    final data = json['data'];
+    return SectorListResponse(
+      nextMatchDate: data['nextMatchDate'],
+      sectors: (data['data'] as List)
+          .map((e) => SectorModel.fromJson(e))
+          .toList(),
+    );
+  }
+}

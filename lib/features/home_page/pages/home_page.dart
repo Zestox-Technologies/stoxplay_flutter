@@ -25,13 +25,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
-  HomeCubit homeCubit = HomeCubit(sectorListUseCase: sl(), getContestListUseCase: sl(), contestStatusUseCase: sl());
+  late HomeCubit homeCubit;
 
   List list = [Strings.play, Strings.learn];
 
   @override
   void initState() {
     super.initState();
+    homeCubit = BlocProvider.of<HomeCubit>(context);
     homeCubit.getSectorList();
   }
 
@@ -140,11 +141,10 @@ class _HomePageState extends State<HomePage> {
                                   BlocBuilder<HomeCubit, HomeState>(
                                     bloc: homeCubit,
                                     builder: (context, state) {
-                                      final isFailed = state.apiStatus.isFailed;
                                       final isLoading = state.apiStatus.isLoading;
-                                      final sectorList = state.sectorList ?? [];
+                                      final sectorList = state.sectorModel?.sectors ?? [];
 
-                                      if (isFailed) {
+                                      if (sectorList.isEmpty) {
                                         return Column(children: [Gap(100.h), Text("No contest found")]);
                                       }
 
@@ -166,7 +166,11 @@ class _HomePageState extends State<HomePage> {
                                         itemCount: sectorList.length,
                                         separatorBuilder: (context, index) => Gap(10.h),
                                         itemBuilder: (context, index) {
-                                          return ContestWidget(data: sectorList[index], cubit: homeCubit);
+                                          return ContestWidget(
+                                            data: sectorList[index],
+                                            cubit: homeCubit,
+                                            nextMatchDate: state.sectorModel?.nextMatchDate ?? '',
+                                          );
                                         },
                                       );
                                     },

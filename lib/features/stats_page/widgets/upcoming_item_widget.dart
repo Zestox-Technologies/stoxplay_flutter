@@ -108,43 +108,35 @@ class UpcomingItemWidget extends StatelessWidget {
                                     children: [
                                       SizedBox(),
                                       TextView(text: "09:10:59", fontSize: 10.sp),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            AppRoutes.stockSelectionScreen,
-                                          );
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 14.w,
-                                            vertical: 5.h,
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 14.w,
+                                          vertical: 5.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.purple661F,
+                                          borderRadius: BorderRadius.circular(
+                                            8.r,
                                           ),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.purple661F,
-                                            borderRadius: BorderRadius.circular(
-                                              8.r,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              "500",
+                                              style: TextStyle(
+                                                color: AppColors.white,
+                                                fontSize: 13.sp,
+                                                fontWeight: FontWeight.w800,
+                                              ),
                                             ),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                "500",
-                                                style: TextStyle(
-                                                  color: AppColors.white,
-                                                  fontSize: 13.sp,
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
-                                              Image.asset(
-                                                AppAssets.stoxplayCoin,
-                                                height: 16.h,
-                                                width: 16.w,
-                                              ),
-                                            ],
-                                          ),
+                                            Image.asset(
+                                              AppAssets.stoxplayCoin,
+                                              height: 16.h,
+                                              width: 16.w,
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],

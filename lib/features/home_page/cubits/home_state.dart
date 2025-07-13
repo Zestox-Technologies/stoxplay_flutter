@@ -3,31 +3,35 @@ part of 'home_cubit.dart';
 @immutable
 class HomeState extends Equatable {
   final ApiStatus apiStatus;
-  List<SectorModel>? sectorList;
+  SectorListResponse? sectorModel;
   List<ContestModel>? contestList;
+  List<StockDataModel>? stockList;
   final bool isContestEnabled;
 
   HomeState({
-    this.sectorList = const [],
+    this.sectorModel,
     this.apiStatus = ApiStatus.initial,
     this.isContestEnabled = false,
     this.contestList = const [],
+    this.stockList = const [],
   });
 
   HomeState copyWith({
-    List<SectorModel>? sectorList,
+    SectorListResponse? sectorModel,
     List<ContestModel>? contestList,
+    List<StockDataModel>? stockList,
     ApiStatus? apiStatus,
     bool? isContestEnabled,
   }) {
     return HomeState(
-      sectorList: sectorList ?? this.sectorList,
+      sectorModel: sectorModel ?? this.sectorModel,
       apiStatus: apiStatus ?? this.apiStatus,
       isContestEnabled: isContestEnabled ?? this.isContestEnabled,
       contestList: contestList ?? this.contestList,
+      stockList: stockList ?? this.stockList,
     );
   }
 
   @override
-  List<Object?> get props => [sectorList, apiStatus, isContestEnabled, contestList];
+  List<Object?> get props => [sectorModel, apiStatus, stockList, isContestEnabled, contestList];
 }

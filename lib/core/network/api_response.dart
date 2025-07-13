@@ -41,6 +41,5 @@ extension ApiStatusExtension on ApiStatus {
 
   bool get isLoading => this == ApiStatus.loading;
 
-
   bool get isFailed => this == ApiStatus.failed;
 }

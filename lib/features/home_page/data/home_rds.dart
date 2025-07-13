@@ -4,16 +4,19 @@ import 'package:stoxplay/core/network/api_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
+import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/utils/models/QueryParams.dart';
 
 import 'models/sector_model.dart';
 
 abstract class HomeRds {
-  Future<List<SectorModel>> getSectorList();
+  Future<SectorListResponse> getSectorList();
 
   Future<List<ContestModel>> getContestList(String sectorId);
 
   Future<bool> getContestStatus();
+
+  Future<List<StockDataModel>> getStockList(String contestId);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -24,14 +27,11 @@ class HomeRdsImpl extends HomeRds {
   QueryParams queryParams = QueryParams(10, 1);
 
   @override
-  Future<List<SectorModel>> getSectorList() async {
+  Future<SectorListResponse> getSectorList() async {
     try {
       final response = await client.get(ApiUrls.getSectorList, queryParameters: queryParams.toMap());
 
-      final List<dynamic> jsonList = response.data['data']['data'];
-      final sectorList = jsonList.map((json) => SectorModel.fromJson(json)).toList();
-
-      return sectorList;
+      return SectorListResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {
@@ -63,6 +63,22 @@ class HomeRdsImpl extends HomeRds {
       final sectorList = jsonList.map((json) => ContestModel.fromJson(json)).toList();
 
       return sectorList;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: 'An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<List<StockDataModel>> getStockList(String contestId) async {
+    try {
+      final response = await client.get(ApiUrls.getStocksList(contestId), queryParameters: queryParams.toMap());
+
+      final List<dynamic> jsonList = response.data['data']['data'];
+      final stockList = jsonList.map((json) => StockDataModel.fromJson(json)).toList();
+
+      return stockList;
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

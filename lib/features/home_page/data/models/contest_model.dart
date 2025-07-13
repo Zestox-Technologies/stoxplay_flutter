@@ -16,6 +16,7 @@ class ContestModel {
   final DateTime? endTime;
   final int? entryFee;
   final int? totalSpots;
+  final int? spotsFilled;
   final int? teamsPerUser;
   final int? prizePool;
   final String? status;
@@ -25,6 +26,7 @@ class ContestModel {
   final DateTime? updatedAt;
   final int? totalCollection;
   final int? spotsLeft;
+  final int? winningChancePercentage;
 
   ContestModel({
     this.id,
@@ -34,6 +36,7 @@ class ContestModel {
     this.endTime,
     this.entryFee,
     this.totalSpots,
+    this.spotsFilled,
     this.teamsPerUser,
     this.prizePool,
     this.status,
@@ -43,6 +46,7 @@ class ContestModel {
     this.updatedAt,
     this.totalCollection,
     this.spotsLeft,
+    this.winningChancePercentage,
   });
 
   factory ContestModel.fromJson(Map<String, dynamic> json) => ContestModel(
@@ -53,6 +57,7 @@ class ContestModel {
     endTime: json["endTime"] == null ? null : DateTime.parse(json["endTime"]),
     entryFee: json["entryFee"],
     totalSpots: json["totalSpots"],
+    spotsFilled: json["spotsFilled"],
     teamsPerUser: json["teamsPerUser"],
     prizePool: json["prizePool"],
     status: json["status"],
@@ -62,6 +67,7 @@ class ContestModel {
     updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
     totalCollection: json["totalCollection"],
     spotsLeft: json["spotsLeft"],
+    winningChancePercentage: json["winningChancePercentage"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -72,6 +78,7 @@ class ContestModel {
     "endTime": endTime?.toIso8601String(),
     "entryFee": entryFee,
     "totalSpots": totalSpots,
+    "spotsFilled": spotsFilled,
     "teamsPerUser": teamsPerUser,
     "prizePool": prizePool,
     "status": status,
@@ -81,5 +88,6 @@ class ContestModel {
     "updatedAt": updatedAt?.toIso8601String(),
     "totalCollection": totalCollection,
     "spotsLeft": spotsLeft,
+    "winningChancePercentage": winningChancePercentage,
   };
 }

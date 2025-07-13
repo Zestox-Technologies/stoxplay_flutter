@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:intl/intl.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -12,14 +14,10 @@ import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
 
 class ContestDetailsWidget extends StatelessWidget {
-  final ContestPrice data;
+  final ContestModel data;
   bool ignoreOnTap = false;
 
-  ContestDetailsWidget({
-    required this.data,
-    super.key,
-    required this.ignoreOnTap,
-  });
+  ContestDetailsWidget({required this.data, super.key, required this.ignoreOnTap});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +26,7 @@ class ContestDetailsWidget extends StatelessWidget {
           ignoreOnTap
               ? null
               : () {
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.winningsScreen,
-                  arguments: data,
-                );
+                Navigator.pushNamed(context, AppRoutes.winningsScreen, arguments: data);
               },
       child: Container(
         decoration: primaryContainerDecoration,
@@ -49,24 +43,12 @@ class ContestDetailsWidget extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextView(
-                        text: Strings.prizePool,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      TextView(text: Strings.prizePool, fontSize: 16.sp, fontWeight: FontWeight.w500),
                       Row(
                         children: [
-                          Image.asset(
-                            AppAssets.flexibleIcon,
-                            height: 15.h,
-                            width: 15.w,
-                          ),
+                          Image.asset(AppAssets.flexibleIcon, height: 15.h, width: 15.w),
                           SizedBox(width: 5.w),
-                          TextView(
-                            text: Strings.flexible,
-                            fontColor: AppColors.black6666,
-                            fontSize: 12.sp,
-                          ),
+                          TextView(text: Strings.flexible, fontColor: AppColors.black6666, fontSize: 12.sp),
                         ],
                       ),
                     ],
@@ -78,23 +60,16 @@ class ContestDetailsWidget extends StatelessWidget {
                       Row(
                         children: [
                           TextView(
-                            text: data.prizePool,
+                            text: (data.totalCollection ?? 0).toString(),
                             fontSize: 18.sp,
                             fontColor: AppColors.black,
                           ),
-                          Image.asset(
-                            AppAssets.stoxplayCoin,
-                            height: 22.h,
-                            width: 22.w,
-                          ),
+                          Image.asset(AppAssets.stoxplayCoin, height: 22.h, width: 22.w),
                         ],
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.stockSelectionScreen,
-                          );
+                          Navigator.pushNamed(context, AppRoutes.stockSelectionScreen, arguments: data.id.toString());
                         },
                         child: Container(
                           width: 75.w,
@@ -107,19 +82,11 @@ class ContestDetailsWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                data.contestPrice.toString(),
+                                data.entryFee.toString(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: AppColors.white,
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                                style: TextStyle(color: AppColors.white, fontSize: 13.sp, fontWeight: FontWeight.w800),
                               ),
-                              Image.asset(
-                                AppAssets.stoxplayCoin,
-                                height: 20.h,
-                                width: 20.w,
-                              ),
+                              Image.asset(AppAssets.stoxplayCoin, height: 20.h, width: 20.w),
                             ],
                           ),
                         ),
@@ -127,24 +94,32 @@ class ContestDetailsWidget extends StatelessWidget {
                     ],
                   ),
                   Gap(10.h),
-                  Container(
-                    height: 5.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.purple661F,
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 5.h,
+                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(20.r)),
+                      ),
+                      FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: data.spotsFilled! / data.totalSpots!,
+                        child: Container(
+                          height: 5.h,
+                          decoration: BoxDecoration(
+                            color: AppColors.purple661F,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Gap(5.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      TextView(text: "${data.spotsLeft} spots left", fontColor: AppColors.black, fontSize: 12.sp),
                       TextView(
-                        text: "1,000 spots left",
-                        fontColor: AppColors.black,
-                        fontSize: 12.sp,
-                      ),
-                      TextView(
-                        text: "${data.spots} spots",
+                        text: "${data.totalSpots} spots",
                         fontColor: AppColors.black,
                         lineHeight: 1.5,
                         letterSpacing: 0,
@@ -169,14 +144,18 @@ class ContestDetailsWidget extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Image.asset(
-                              AppAssets.medalIcon,
-                              height: 10.h,
-                              width: 10.w,
-                            ),
+                            Image.asset(AppAssets.medalIcon, height: 10.h, width: 10.w),
+                            SizedBox(width: 5.w),
+                            TextView(text: "50k", fontColor: AppColors.black6666, fontSize: 12.sp),
+                          ],
+                        ),
+                        SizedBox(width: 20.w),
+                        Row(
+                          children: [
+                            Image.asset(AppAssets.cupIcon, height: 10.h, width: 10.w),
                             SizedBox(width: 5.w),
                             TextView(
-                              text: "50k",
+                              text: "${data.winningChancePercentage.toString()}%",
                               fontColor: AppColors.black6666,
                               fontSize: 12.sp,
                             ),
@@ -185,30 +164,10 @@ class ContestDetailsWidget extends StatelessWidget {
                         SizedBox(width: 20.w),
                         Row(
                           children: [
-                            Image.asset(
-                              AppAssets.cupIcon,
-                              height: 10.h,
-                              width: 10.w,
-                            ),
+                            Image.asset(AppAssets.mIcon, height: 10.h, width: 10.w),
                             SizedBox(width: 5.w),
                             TextView(
-                              text: "55%",
-                              fontColor: AppColors.black6666,
-                              fontSize: 12.sp,
-                            ),
-                          ],
-                        ),
-                        SizedBox(width: 20.w),
-                        Row(
-                          children: [
-                            Image.asset(
-                              AppAssets.mIcon,
-                              height: 10.h,
-                              width: 10.w,
-                            ),
-                            SizedBox(width: 5.w),
-                            TextView(
-                              text: "10",
+                              text: data.teamsPerUser.toString(),
                               fontColor: AppColors.black6666,
                               fontSize: 12.sp,
                             ),
@@ -217,7 +176,7 @@ class ContestDetailsWidget extends StatelessWidget {
                       ],
                     ),
                     TextView(
-                      text: "Start @9:00am",
+                      text: "Start @${DateFormat('hh:mm a').format(data.startTime!)}",
                       fontColor: AppColors.black6666,
                       fontSize: 12.sp,
                     ),

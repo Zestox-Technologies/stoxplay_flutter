@@ -3,15 +3,16 @@ import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/core/network/use_case.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
+import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
 
-class SectorListUseCase extends UseCase<List<SectorModel>, String> {
+class SectorListUseCase extends UseCase<SectorListResponse, String> {
   final HomeRepo repo;
 
   SectorListUseCase({required this.repo});
 
   @override
-  Future<Either<AppError, List<SectorModel>>> call(String params) async {
+  Future<Either<AppError, SectorListResponse>> call(String params) async {
     return await repo.getSectorList();
   }
 }
@@ -35,5 +36,15 @@ class GetContestListUseCase extends UseCase<List<ContestModel>, String> {
   @override
   Future<Either<AppError, List<ContestModel>>> call(String params) async {
     return await repo.getContestList(params);
+  }
+}
+class GetStockListUseCase extends UseCase<List<StockDataModel>, String> {
+  final HomeRepo repo;
+
+  GetStockListUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, List<StockDataModel>>> call(String params) async {
+    return await repo.getStockList(params);
   }
 }

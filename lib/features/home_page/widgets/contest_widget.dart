@@ -21,8 +21,9 @@ import 'package:stoxplay/utils/extensions/extensions.dart';
 class ContestWidget extends StatelessWidget {
   final SectorModel data;
   final HomeCubit cubit;
+  final String nextMatchDate;
 
-  ContestWidget({super.key, required this.cubit, required this.data});
+  ContestWidget({super.key, required this.cubit, required this.nextMatchDate, required this.data});
 
   final GlobalKey _buttonKey = GlobalKey();
 
@@ -114,11 +115,7 @@ class ContestWidget extends StatelessWidget {
                       onPressed: () async {
                         final isContestEnabled = await cubit.getContestStatus();
                         if (isContestEnabled) {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.contestDetailsPage,
-                            arguments: (contests.first, cubit),
-                          );
+                          Navigator.pushNamed(context, AppRoutes.contestDetailsPage, arguments: data);
                         } else {
                           showOverlay(context);
                           return;
@@ -146,7 +143,7 @@ class ContestWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Expanded(child: Center(child: Text(DateFormat('dd-MM-yyyy').format(DateTime.now())))),
+                    Expanded(child: Center(child: Text(nextMatchDate))),
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,

@@ -2,6 +2,7 @@ class ApiUrls {
   ApiUrls._();
 
   static const String baseUrl = 'https://backend.stoxplay.com/v1/';
+
   // static const String baseUrl = 'http://13.201.225.138:3000/v1/';
 
   ///Live Server time
@@ -18,4 +19,7 @@ class ApiUrls {
   static const String getSectorList = 'stock-management/sectors?isActive=true';
   static const String getContestStatus = 'client/contest-status';
   static getContestList(String sectorId) => 'client/sectors/$sectorId/contests';
+
+  ///Stock List Flow
+  static getStocksList(String contestId) => '/client/contests/$contestId/stocks';
 }

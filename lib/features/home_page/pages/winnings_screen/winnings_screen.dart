@@ -43,7 +43,7 @@ class WinningsScreen extends StatelessWidget {
               child: Column(
                 children: [
                   Gap(10.h),
-                  ContestDetailsWidget(data: data,ignoreOnTap: true,),
+                  // ContestDetailsWidget(data: data,ignoreOnTap: true,),
                   Gap(20.h),
                   Container(
                     width: double.infinity,
