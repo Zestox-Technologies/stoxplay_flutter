@@ -58,7 +58,7 @@ class BattlegroundPage extends StatelessWidget {
                   bloc: cubit,
                   builder: (context, state) {
                     final fallbackStock = Stock(
-                      id: 0,
+                      id: '0',
                       stockName: '',
                       stockPrice: '0',
                       percentage: '0',

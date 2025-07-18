@@ -67,6 +67,7 @@ class AppColors {
   // Green Shades
   static const Color green0CAE = Color(0xff0CAE3C); // upButtonColor
   static const Color green38EE = Color(0x6638EE06); // upButtonColor
+  static const Color green9FFF= Color(0xff9FFF84); // upButtonColor
   static const Color green0CAELight = Color(0x260CAE3C); // colorOnlineLight
   static const Color green0CAELighter = Color(
     0x1A0CAE3C,

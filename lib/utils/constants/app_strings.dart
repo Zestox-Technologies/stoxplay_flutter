@@ -69,7 +69,7 @@ class Strings {
   static const String rank = "Rank";
   static const String bhavesh = "Bhavesh.Stoxplay";
   static const String tenX = "10x";
-  static const String join = "Join";
+  static const String join = "Join Now";
   static const String prizePool = "Prize Pool";
   static const String flexible = "Flexible";
   static const String winnersLeaderboard = "Winners Leaderboard";
@@ -78,6 +78,7 @@ class Strings {
   static const String team1 = "Team 1";
   static const String myContest = "My Contest";
   static const String winnings = "Winnings";
+  static const String leaderBoard = "Leaderboard";
   static const String entryFees = "Entry Fees";
   static const String topWinnersInTheMatch = "Top Winners in the Match";
   static const String topPerformersInTheMatch = "TOP PERFORMERS IN THE MATCH";

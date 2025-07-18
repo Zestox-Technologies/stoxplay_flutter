@@ -23,10 +23,7 @@ class ContestStaticModel {
       price: json['price'] as String,
       timeLeft: json['timeLeft'] as String,
       image: json['image'] as String,
-      contestPriceList:
-          (json['contestPriceList'] as List)
-              .map((e) => ContestPrice.fromJson(e))
-              .toList(),
+      contestPriceList: (json['contestPriceList'] as List).map((e) => ContestPrice.fromJson(e)).toList(),
       stocks: (json['stocks'] as List).map((e) => Stock.fromJson(e)).toList(),
     );
   }
@@ -48,11 +45,7 @@ class ContestPrice {
   final String spots;
   final String prizePool;
 
-  ContestPrice({
-    required this.contestPrice,
-    required this.spots,
-    required this.prizePool,
-  });
+  ContestPrice({required this.contestPrice, required this.spots, required this.prizePool});
 
   factory ContestPrice.fromJson(Map<String, dynamic> json) {
     return ContestPrice(
@@ -63,22 +56,20 @@ class ContestPrice {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'contestPrice': contestPrice,
-      'spots': spots,
-      'prizePool': prizePool,
-    };
+    return {'contestPrice': contestPrice, 'spots': spots, 'prizePool': prizePool};
   }
 }
 
 class Stock {
   String? stockName;
-  int? id;
+  String? id;
   String? stockPrice;
   String? percentage;
   String? image;
   StockPrediction stockPrediction;
   StockPosition stockPosition;
+  String? currentPrice;
+  String? netChange;
 
   Stock({
     this.stockName,
@@ -86,18 +77,21 @@ class Stock {
     this.stockPrice,
     this.percentage,
     this.image,
+    this.currentPrice,
+    this.netChange,
     this.stockPrediction = StockPrediction.none,
     this.stockPosition = StockPosition.none,
   });
 
-
   factory Stock.fromJson(Map<String, dynamic> json) {
     return Stock(
       stockName: json['stockName'] as String?,
-      id: json['id'] as int?,
+      id: json['id'] as String?,
       stockPrice: json['stockPrice'] as String?,
       percentage: json['percentage'] as String?,
       image: json['image'] as String?,
+      currentPrice: json['currentPrice'] as String?,
+      netChange: json['netChange'] as String?,
       stockPrediction: _parseStockPrediction(json['prediction']),
       stockPosition: _parseStockPosition(json['stockPosition']),
     );
@@ -130,20 +124,25 @@ class Stock {
       'stockPrice': stockPrice,
       'percentage': percentage,
       'image': image,
+      'currentPrice': currentPrice,
+      'netChange': netChange,
       'prediction': stockPrediction.toString().split('.').last,
       'stockPosition': stockPosition.toString().split('.').last,
     };
   }
 }
+
 extension StockCopyWith on Stock {
   Stock copyWith({
     String? stockName,
-    int? id,
+    String? id,
     String? stockPrice,
     String? percentage,
     String? image,
     StockPrediction? stockPrediction,
     StockPosition? stockPosition,
+    String? currentPrice,
+    String? netChange,
   }) {
     return Stock(
       stockName: stockName ?? this.stockName,
@@ -153,7 +152,8 @@ extension StockCopyWith on Stock {
       image: image ?? this.image,
       stockPrediction: stockPrediction ?? this.stockPrediction,
       stockPosition: stockPosition ?? this.stockPosition,
+      currentPrice: currentPrice ?? this.currentPrice,
+      netChange: netChange ?? this.netChange,
     );
   }
 }
-

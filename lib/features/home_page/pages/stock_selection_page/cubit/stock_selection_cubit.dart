@@ -1,6 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meta/meta.dart';
+import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
+import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
@@ -10,16 +14,82 @@ import 'package:stoxplay/utils/models/contest_model.dart';
 part 'stock_selection_state.dart';
 
 class StockSelectionCubit extends Cubit<StockSelectionState> {
-  StockSelectionCubit()
+  GetStockListUseCase stockListUseCase;
+  JoinContestUseCase joinContestUseCase;
+
+  StockSelectionCubit({required this.stockListUseCase, required this.joinContestUseCase})
     : super(StockSelectionState());
 
+  ///APIs
+  Future<List<Stock>?> getStockList(String contestId) async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading));
+
+    final sectorList = await stockListUseCase.call(contestId);
+
+    return sectorList.fold(
+      (l) {
+        emit(state.copyWith(apiStatus: ApiStatus.failed));
+        return null;
+      },
+      (r) {
+        final stockList = r.map(_convertToStockModel).toList();
+        emit(state.copyWith(stockList: stockList, apiStatus: ApiStatus.success));
+        return stockList;
+      },
+    );
+  }
+
+  Future<void> joinContest(String contestId) async {
+    emit(state.copyWith(joinContestApiStatus: ApiStatus.loading));
+    await getReorderedStockList(state.selectedStockList);
+
+    final params = JoinContestParamsModel(
+      contestId: contestId,
+      teamName: "Username-T2",
+      selectedStocks:
+          state.selectedStockList
+              .map((e) => SelectedStock(stockId: e.id.toString(), prediction: e.stockPrediction.toName))
+              .toList(),
+      captainStockId:
+          state.selectedStockList.where((element) => element.stockPosition == StockPosition.leader).first.id.toString(),
+      viceCaptainStockId:
+          state.selectedStockList
+              .where((element) => element.stockPosition == StockPosition.viceLeader)
+              .first
+              .id
+              .toString(),
+      flexStockId:
+          state.selectedStockList
+              .where((element) => element.stockPosition == StockPosition.coLeader)
+              .first
+              .id
+              .toString(),
+    );
+
+    final result = await joinContestUseCase.call(params);
+
+    return result.fold(
+      (l) {
+        Fluttertoast.showToast(msg: "Join contest failed please try again later");
+        emit(state.copyWith(joinContestApiStatus: ApiStatus.failed));
+        return null;
+      },
+      (r) {
+        emit(state.copyWith(joinContestApiStatus: ApiStatus.success));
+        return r;
+      },
+    );
+  }
+
+  ///Functionalities
   // Convert StockDataModel to Stock model
   Stock _convertToStockModel(StockDataModel stockData) {
     return Stock(
       stockName: stockData.name,
-      id: int.tryParse(stockData.id ?? '0'),
+      id: stockData.id.toString(),
       stockPrice: stockData.currentPrice?.toString() ?? '0',
-      percentage: '0', // You might want to calculate this from API data
+      currentPrice: stockData.currentPrice?.toString() ?? '0',
+      netChange: stockData.netChange?.toString() ?? '0',
       image: stockData.logoUrl,
       stockPrediction: StockPrediction.none,
       stockPosition: StockPosition.none,
@@ -38,11 +108,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
     emit(state.copyWith(stockList: [...list]));
   }
 
-  void updateSelectedStock({
-    required Stock stock,
-    required int index,
-    required StockPosition stockPosition,
-  }) {
+  void updateSelectedStock({required Stock stock, required int index, required StockPosition stockPosition}) {
     List<Stock> list = List<Stock>.from(state.selectedStockList);
 
     for (int i = 0; i < list.length; i++) {
@@ -90,10 +156,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
     );
   }
 
-  void updateSelectedStockPrediction({
-    required Stock stock,
-    required StockPrediction stockPrediction,
-  }) {
+  void updateSelectedStockPrediction({required Stock stock, required StockPrediction stockPrediction}) {
     final list = List<Stock>.from(state.selectedStockList);
 
     final selectedIndex = list.indexWhere((s) => s.id == stock.id);
@@ -111,8 +174,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
   }
 
   void removeSelectedStock({required Stock stock}) {
-    final updatedList =
-        state.selectedStockList.where((s) => s.id != stock.id).toList();
+    final updatedList = state.selectedStockList.where((s) => s.id != stock.id).toList();
     emit(state.copyWith(selectedStockList: updatedList));
   }
 }

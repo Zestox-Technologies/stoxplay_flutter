@@ -6,6 +6,9 @@ import 'package:stoxplay/features/auth/domain/auth_usecase.dart';
 import 'package:stoxplay/features/home_page/data/home_rds.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
+import 'package:stoxplay/features/profile_page/data/profile_rds.dart';
+import 'package:stoxplay/features/profile_page/domain/profile_repo.dart';
+import 'package:stoxplay/features/profile_page/domain/profile_usecase.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -27,4 +30,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ContestStatusUseCase(repo: sl()));
   sl.registerLazySingleton(() => GetContestListUseCase(repo: sl()));
   sl.registerLazySingleton(() => GetStockListUseCase(repo: sl()));
+  sl.registerLazySingleton(() => JoinContestUseCase(repo: sl()));
+
+  // Profile Feature
+  sl.registerLazySingleton<ProfileRds>(() => ProfileRdsImpl(apiService: sl()));
+  sl.registerLazySingleton<ProfileRepo>(() => ProfileRepoImpl(sl()));
+  sl.registerLazySingleton(() => GetProfileUseCase(sl()));
 }

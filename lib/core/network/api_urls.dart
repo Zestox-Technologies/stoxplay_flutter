@@ -22,4 +22,6 @@ class ApiUrls {
 
   ///Stock List Flow
   static getStocksList(String contestId) => '/client/contests/$contestId/stocks';
+  static joinContest(String contestId) => '/client/contests/$contestId/join';
+  static const String getProfile = 'users/profile';
 }

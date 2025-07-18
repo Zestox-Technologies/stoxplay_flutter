@@ -56,115 +56,118 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(bottom: 220.h, child: Image.asset(AppAssets.lightSplashStrokes)),
-          CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    Image.asset(AppAssets.carouselImage, height: 150.h, width: MediaQuery.of(context).size.width),
-                    Gap(10.h), // Some spacing before the sticky tab
-                  ],
-                ),
-              ),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                Image.asset(AppAssets.carouselImage, height: 150.h, width: MediaQuery.of(context).size.width),
+                Gap(10.h), // Some spacing before the sticky tab
+              ],
+            ),
+          ),
 
-              // Sticky Tab Bar (Horizontal ListView)
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _StickyTabDelegate(
-                  child: Container(
-                    color: AppColors.white, // Important for sticking effect
-                    padding: EdgeInsets.symmetric(horizontal: 22.w),
-                    child: ValueListenableBuilder(
-                      valueListenable: selectedIndex,
-                      builder: (context, selected, _) {
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: CommonTabWidget(
-                                onTap: () {
-                                  selectedIndex.value = 0;
-                                },
-                                isSelected: selectedIndex.value == 0,
-                                title: Strings.play,
-                              ),
-                            ),
-                            Gap(10.w),
-                            Expanded(
-                              child: CommonTabWidget(
-                                onTap: () {
-                                  selectedIndex.value = 1;
-                                },
-                                isSelected: selectedIndex.value == 1,
-                                title: Strings.learn,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
+          // Sticky Tab Bar (Horizontal ListView)
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _StickyTabDelegate(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.white, // Important for sticking effect
+                  border: Border.all(color: AppColors.blue7E.withValues(alpha: 0.1)),
+                  borderRadius: BorderRadius.circular(999),
                 ),
-              ),
-
-              // Content based on selected index
-              SliverToBoxAdapter(
+                padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
                 child: ValueListenableBuilder(
                   valueListenable: selectedIndex,
                   builder: (context, selected, _) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 22.w),
-                      child: Column(
-                        children: [
-                          Gap(15.h),
-                          selected == 0
-                              ? Column(
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: CommonTabWidget(
+                            onTap: () {
+                              selectedIndex.value = 0;
+                            },
+                            isSelected: selectedIndex.value == 0,
+                            title: Strings.play,
+                          ),
+                        ),
+                        Gap(10.w),
+                        Expanded(
+                          child: CommonTabWidget(
+                            onTap: () {
+                              selectedIndex.value = 1;
+                            },
+                            isSelected: selectedIndex.value == 1,
+                            title: Strings.learn,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+
+          // Content based on selected index
+          SliverToBoxAdapter(
+            child: ValueListenableBuilder(
+              valueListenable: selectedIndex,
+              builder: (context, selected, _) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 22.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Gap(15.h),
+                      selected == 0
+                          ? Column(
+                            children: [
+                              Stack(
                                 children: [
-                                  Stack(
-                                    children: [
-                                      Divider(color: AppColors.black).paddingTop(5.h),
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: Container(
-                                          color: AppColors.white,
-                                          child: TextView(
-                                            text: Strings.sectorsPlay,
-                                            fontSize: 18.sp,
-                                          ).paddingSymmetric(horizontal: 20.w),
-                                        ),
-                                      ),
-                                    ],
+                                  Divider(color: AppColors.black).paddingTop(5.h),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      color: AppColors.white,
+                                      child: TextView(
+                                        text: Strings.sectorsPlay,
+                                        fontSize: 18.sp,
+                                      ).paddingSymmetric(horizontal: 20.w),
+                                    ),
                                   ),
-                                  Gap(15.h),
-                                  BlocBuilder<HomeCubit, HomeState>(
-                                    bloc: homeCubit,
-                                    builder: (context, state) {
-                                      final isLoading = state.apiStatus.isLoading;
-                                      final sectorList = state.sectorModel?.sectors ?? [];
+                                ],
+                              ),
+                              Gap(15.h),
 
-                                      if (sectorList.isEmpty) {
-                                        return Column(children: [Gap(100.h), Text("No contest found")]);
-                                      }
+                              BlocBuilder<HomeCubit, HomeState>(
+                                bloc: homeCubit,
+                                builder: (context, state) {
+                                  final isLoading = state.apiStatus.isLoading;
+                                  final sectorList = state.sectorModel?.sectors ?? [];
 
-                                      if (isLoading) {
-                                        return Column(
-                                          children: List.generate(
-                                            3,
-                                            (index) => Padding(
-                                              padding: EdgeInsets.only(bottom: 10.h),
-                                              child: const ContestShimmerWidget(),
-                                            ),
-                                          ),
-                                        );
-                                      }
+                                  if (isLoading) {
+                                    return const HomePageShimmer();
+                                  }
 
-                                      return ListView.separated(
-                                        shrinkWrap: true,
-                                        physics: const NeverScrollableScrollPhysics(),
+                                  if (sectorList.isEmpty) {
+                                    return Column(children: [Gap(100.h), Text("No contest found")]);
+                                  }
+
+                                  return Column(
+                                    children: [
+                                      GridView.builder(
                                         itemCount: sectorList.length,
-                                        separatorBuilder: (context, index) => Gap(10.h),
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          childAspectRatio: 0.7,
+                                          crossAxisSpacing: 10,
+                                          mainAxisSpacing: 10,
+                                        ),
                                         itemBuilder: (context, index) {
                                           return ContestWidget(
                                             data: sectorList[index],
@@ -172,20 +175,84 @@ class _HomePageState extends State<HomePage> {
                                             nextMatchDate: state.sectorModel?.nextMatchDate ?? '',
                                           );
                                         },
-                                      );
-                                    },
-                                  ),
-                                ],
-                              )
-                              : Center(child: Text(Strings.learn)),
-                          Gap(10.h),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
+                                      ),
+                                      Gap(20.h),
+                                      TextView(
+                                        text: 'MOST PICKED STOCKS',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16.sp,
+                                      ),
+                                      Gap(10.h),
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.white,
+                                          borderRadius: BorderRadius.circular(12.r),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.green38EE.withOpacity(0.5),
+                                              offset: const Offset(0, 0),
+                                              blurRadius: 1,
+                                              spreadRadius: 0.5,
+                                            ),
+                                          ],
+                                          border: Border.all(color: AppColors.green9FFF, width: 0.5),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  height: 35.h,
+                                                  width: 35.w,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(color: AppColors.black6767, width: 0.5),
+                                                  ),
+                                                  child: Image.asset(AppAssets.appIcon),
+                                                ),
+                                                SizedBox(width: 15.w),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    TextView(
+                                                      text: 'HDFC BANK',
+                                                      fontWeight: FontWeight.w500,
+                                                      fontSize: 16.sp,
+                                                    ),
+                                                    TextView(
+                                                      text: '₹1340 (-1.05%) ',
+                                                      fontWeight: FontWeight.w500,
+                                                      fontSize: 12.sp,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            TextView(
+                                              text: 'Bank Wars',
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16.sp,
+                                              fontColor: AppColors.purple661F,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Gap(100.h),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
+                          )
+                          : Center(child: Text(Strings.learn)),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -206,9 +273,9 @@ class CommonTabWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xFFFFFFFF), //
-          borderRadius: BorderRadius.circular(12.r), // Background: #FFFFFF
-          border: Border.all(color: isSelected ? AppColors.blue7E.withOpacity(0.5) : AppColors.white70, width: 1.0),
+          color: isSelected ? AppColors.purple661F : AppColors.white, // Background:, //
+          borderRadius: BorderRadius.circular(999.r), // Background: #FFFFFF
+          border: Border.all(color: isSelected ? AppColors.black6767 : AppColors.purple661F, width: 1.0),
           boxShadow: [
             BoxShadow(
               color: AppColors.blue7E.withOpacity(0.25),
@@ -220,8 +287,23 @@ class CommonTabWidget extends StatelessWidget {
         ),
         child: Center(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 12.h),
-            child: Text(title, style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w700)),
+            padding: EdgeInsets.symmetric(vertical: 0.h),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: 'Sofia Sans',
+                fontWeight: FontWeight.w600,
+                // 600 = SemiBold
+                fontStyle: FontStyle.normal,
+                // SemiBold is handled via fontWeight
+                fontSize: 16,
+                color: isSelected ? AppColors.white : AppColors.purple661F,
+                height: 26 / 16,
+                // line-height divided by font-size
+                letterSpacing: 0.0,
+                textBaseline: TextBaseline.alphabetic, // vertical-align: middle approximation
+              ),
+            ),
           ),
         ),
       ),

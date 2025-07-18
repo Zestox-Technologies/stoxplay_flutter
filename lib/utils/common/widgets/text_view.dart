@@ -6,6 +6,7 @@ class TextView extends StatelessWidget {
   final double? fontSize;
   final double? letterSpacing;
   final double? lineHeight;
+  final int? maxLines;
   final Color? fontColor;
   final FontWeight? fontWeight;
   final TextAlign? textAlign;
@@ -21,6 +22,7 @@ class TextView extends StatelessWidget {
     this.textDecoration,
     this.letterSpacing,
     this.textAlign,
+    this.maxLines,
     this.fontSize,
     this.fontColor,
   });
@@ -29,6 +31,7 @@ class TextView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
+      maxLines: maxLines ?? 1,
       textAlign: textAlign ?? TextAlign.left,
       style: TextStyle(
         fontSize: fontSize,

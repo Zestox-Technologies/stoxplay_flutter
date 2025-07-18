@@ -13,11 +13,9 @@ class HomeCubit extends Cubit<HomeState> {
   SectorListUseCase sectorListUseCase;
   ContestStatusUseCase contestStatusUseCase;
   GetContestListUseCase getContestListUseCase;
-  GetStockListUseCase stockListUseCase;
 
   HomeCubit({
     required this.sectorListUseCase,
-    required this.stockListUseCase,
     required this.getContestListUseCase,
     required this.contestStatusUseCase,
   }) : super(HomeState());
@@ -47,15 +45,5 @@ class HomeCubit extends Cubit<HomeState> {
       (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
       (r) => emit(state.copyWith(contestList: r, apiStatus: ApiStatus.success)),
     );
-  }
-
-  Future<List<StockDataModel>?> getStockList(String contestId) async {
-    emit(state.copyWith(apiStatus: ApiStatus.loading));
-    final sectorList = await stockListUseCase.call(contestId);
-    sectorList.fold(
-      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
-      (r) => emit(state.copyWith(stockList: r, apiStatus: ApiStatus.success)),
-    );
-    return state.stockList;
   }
 }

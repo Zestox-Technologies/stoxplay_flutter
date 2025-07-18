@@ -6,6 +6,7 @@ import 'package:stoxplay/config/route_list.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
+import 'package:stoxplay/features/profile_page/presentation/profile_cubit.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
@@ -24,14 +25,11 @@ class MyApp extends StatelessWidget {
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (context) => TimerCubit()),
+            BlocProvider(create: (context) => ProfileCubit(sl())),
             BlocProvider(
               create:
-                  (context) => HomeCubit(
-                    sectorListUseCase: sl(),
-                    stockListUseCase: sl(),
-                    getContestListUseCase: sl(),
-                    contestStatusUseCase: sl(),
-                  ),
+                  (context) =>
+                      HomeCubit(sectorListUseCase: sl(), getContestListUseCase: sl(), contestStatusUseCase: sl()),
             ),
           ],
           child: MaterialApp(

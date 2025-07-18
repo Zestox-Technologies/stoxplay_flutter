@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -13,7 +14,6 @@ import 'package:stoxplay/utils/models/contest_model.dart';
 class StockSelectionWidget extends StatelessWidget {
   VoidCallback onUpPressed;
   VoidCallback onDownPressed;
-  VoidCallback onMorePressed;
   StockSelectionCubit cubit;
   Stock stock;
   ValueNotifier<int> stepper;
@@ -23,7 +23,6 @@ class StockSelectionWidget extends StatelessWidget {
     required this.onUpPressed,
     required this.stepper,
     required this.onDownPressed,
-    required this.onMorePressed,
     required this.stock,
     required this.cubit,
     required this.index,
@@ -38,9 +37,6 @@ class StockSelectionWidget extends StatelessWidget {
         return ValueListenableBuilder(
           valueListenable: stepper,
           builder: (context, steps, _) {
-            if (stepper.value == 1) {
-              print(state.selectedStockList[index].toJson());
-            }
             return Stack(
               children: [
                 Container(
@@ -89,13 +85,18 @@ class StockSelectionWidget extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            SizedBox(height: 35.h, width: 35.w, child: Image.asset(AppAssets.appIcon)),
+                            SizedBox(height: 35.h, width: 35.w, child: SVGImageWidget(imageUrl: stock.image ?? '')),
                             SizedBox(width: 15.w),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 SizedBox(height: 25.h),
-                                TextView(text: '₹1,629.40 (-1.05%) ', fontWeight: FontWeight.w500, fontSize: 12.sp),
+                                TextView(
+                                  text: '₹${stock.stockPrice} (${stock.netChange}%) ',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12.sp,
+                                  fontColor: AppColors.green0CAE,
+                                ),
                               ],
                             ),
                           ],
@@ -362,7 +363,7 @@ class StockSelectionWidget extends StatelessWidget {
                         boxShadow: [BoxShadow(color: Color(0x66000000), offset: Offset(0, 1), blurRadius: 7.1)],
                       ),
                       child: TextView(
-                        text: stock.stockName ?? 'State Bank Of India',
+                        text: stock.stockName ?? '',
                         fontWeight: FontWeight.w500,
                         overflow: TextOverflow.ellipsis,
                         fontSize: 14.sp,

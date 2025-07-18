@@ -6,8 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:stoxplay/config/navigation/navigation_state.dart';
 import 'package:stoxplay/features/home_page/pages/home_page.dart';
 import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
-import 'package:stoxplay/features/profile_page/pages/profile_page.dart';
-import 'package:stoxplay/features/stats_page/pages/contest_winner_screen.dart';
+import 'package:stoxplay/features/profile_page/presentation/pages/profile_page.dart';
 import 'package:stoxplay/features/stats_page/pages/stats_page.dart';
 import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
 

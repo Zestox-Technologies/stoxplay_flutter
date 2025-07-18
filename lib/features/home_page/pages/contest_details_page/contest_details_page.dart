@@ -9,11 +9,9 @@ import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_details_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
-import 'package:stoxplay/features/profile_page/pages/profile_page.dart';
+import 'package:stoxplay/features/profile_page/presentation/pages/profile_page.dart';
 import 'package:stoxplay/features/stats_page/pages/stats_page.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
-import 'package:stoxplay/utils/models/contest_model.dart';
-import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -133,12 +131,12 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                                           ],
                                         ),
                                       ],
-                                    ).paddingSymmetric(horizontal: 24.w),
+                                    ).paddingSymmetric(horizontal: 16.w),
                                     Gap(20.h),
                                     BlocBuilder<HomeCubit, HomeState>(
                                       bloc: cubit,
                                       builder: (context, state) {
-                                        final isFailed = state.apiStatus.isFailed;
+                                        final isSuccess = state.apiStatus.isSuccess;
                                         final isLoading = state.apiStatus.isLoading;
 
                                         if (isLoading) {
@@ -146,8 +144,8 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                                             children: List.generate(
                                               3,
                                               (index) => Padding(
-                                                padding: EdgeInsets.only(bottom: 10.h),
-                                                child: const ContestShimmerWidget(),
+                                                padding: EdgeInsets.symmetric(horizontal: 15.w,vertical: 5.h),
+                                                child: const ContestDetailsCardShimmer(),
                                               ),
                                             ),
                                           );
@@ -165,7 +163,7 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                                                   itemCount: state.contestList!.length,
                                                   itemBuilder: (context, index) {
                                                     return ContestDetailsWidget(
-                                                      ignoreOnTap: true,
+                                                      ignoreOnTap: false,
                                                       data: state.contestList![index],
                                                     ).paddingSymmetric(horizontal: 20.w);
                                                   },
