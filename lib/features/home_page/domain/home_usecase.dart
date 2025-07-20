@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/core/network/use_case.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
@@ -51,13 +52,13 @@ class GetStockListUseCase extends UseCase<List<StockDataModel>, String> {
 }
 
 
-class JoinContestUseCase extends UseCase<dynamic, JoinContestParamsModel> {
+class JoinContestUseCase extends UseCase<ApiResponse, JoinContestParamsModel> {
   final HomeRepo repo;
 
   JoinContestUseCase({required this.repo});
 
   @override
-  Future<Either<AppError, dynamic>> call(JoinContestParamsModel params) async {
+  Future<Either<AppError, ApiResponse>> call(JoinContestParamsModel params) async {
     return await repo.joinContest(params);
   }
 }

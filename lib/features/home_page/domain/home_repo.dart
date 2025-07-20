@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/features/home_page/data/home_rds.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
@@ -15,7 +16,7 @@ abstract class HomeRepo {
 
   Future<Either<AppError, List<StockDataModel>>> getStockList(String contestId);
 
-  Future<Either<AppError, dynamic>> joinContest(JoinContestParamsModel params);
+  Future<Either<AppError, ApiResponse>> joinContest(JoinContestParamsModel params);
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -64,7 +65,7 @@ class HomeRepoImpl extends HomeRepo {
   }
 
   @override
-  Future<Either<AppError, dynamic>> joinContest(JoinContestParamsModel params) async {
+  Future<Either<AppError, ApiResponse>> joinContest(JoinContestParamsModel params) async {
     try {
       final result = await homeRds.joinContest(params);
       return Right(result);

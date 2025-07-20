@@ -92,10 +92,13 @@ class StockSelectionWidget extends StatelessWidget {
                               children: [
                                 SizedBox(height: 25.h),
                                 TextView(
-                                  text: '₹${stock.stockPrice} (${stock.netChange}%) ',
+                                  text: '₹${stock.stockPrice} (${stock.netChange.toString()}%) ',
                                   fontWeight: FontWeight.w500,
                                   fontSize: 12.sp,
-                                  fontColor: AppColors.green0CAE,
+                                  fontColor:
+                                      (stock.netChange ?? 0.0) < 0
+                                          ? AppColors.red
+                                          : AppColors.green0CAE,
                                 ),
                               ],
                             ),
@@ -138,6 +141,8 @@ class StockSelectionWidget extends StatelessWidget {
                                       stockPrice: oldStock.stockPrice,
                                       percentage: oldStock.percentage,
                                       image: oldStock.image,
+                                      netChange: oldStock.netChange,
+                                      currentPrice: oldStock.currentPrice,
                                       stockPrediction: oldStock.stockPrediction,
                                       stockPosition: isSelected ? StockPosition.none : StockPosition.leader,
                                     );
@@ -196,6 +201,8 @@ class StockSelectionWidget extends StatelessWidget {
                                       stockPrice: oldStock.stockPrice,
                                       percentage: oldStock.percentage,
                                       image: oldStock.image,
+                                      netChange: oldStock.netChange,
+                                      currentPrice: oldStock.currentPrice,
                                       stockPrediction: oldStock.stockPrediction,
                                       stockPosition: isSelected ? StockPosition.none : StockPosition.coLeader,
                                     );
@@ -254,6 +261,8 @@ class StockSelectionWidget extends StatelessWidget {
                                       stockPrice: oldStock.stockPrice,
                                       percentage: oldStock.percentage,
                                       image: oldStock.image,
+                                      netChange: oldStock.netChange,
+                                      currentPrice: oldStock.currentPrice,
                                       stockPrediction: oldStock.stockPrediction,
                                       stockPosition: isSelected ? StockPosition.none : StockPosition.viceLeader,
                                     );

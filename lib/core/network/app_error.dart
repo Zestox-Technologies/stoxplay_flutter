@@ -7,6 +7,9 @@ abstract class AppError {
   final dynamic data;
 
   const AppError({required this.message, this.code, this.data});
+
+  @override
+  String toString() => message; // 👈 this is critical
 }
 
 class NetworkError extends AppError {

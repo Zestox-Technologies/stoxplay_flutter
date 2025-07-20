@@ -69,7 +69,7 @@ class Stock {
   StockPrediction stockPrediction;
   StockPosition stockPosition;
   String? currentPrice;
-  String? netChange;
+  double? netChange;
 
   Stock({
     this.stockName,
@@ -91,7 +91,7 @@ class Stock {
       percentage: json['percentage'] as String?,
       image: json['image'] as String?,
       currentPrice: json['currentPrice'] as String?,
-      netChange: json['netChange'] as String?,
+      netChange: json['netChange'],
       stockPrediction: _parseStockPrediction(json['prediction']),
       stockPosition: _parseStockPosition(json['stockPosition']),
     );
@@ -142,7 +142,7 @@ extension StockCopyWith on Stock {
     StockPrediction? stockPrediction,
     StockPosition? stockPosition,
     String? currentPrice,
-    String? netChange,
+    double? netChange,
   }) {
     return Stock(
       stockName: stockName ?? this.stockName,

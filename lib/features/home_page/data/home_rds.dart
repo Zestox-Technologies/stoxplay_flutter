@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/api_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/app_error.dart';
@@ -18,7 +19,7 @@ abstract class HomeRds {
 
   Future<List<StockDataModel>> getStockList(String contestId);
 
-  Future<dynamic> joinContest(JoinContestParamsModel contestId);
+  Future<ApiResponse> joinContest(JoinContestParamsModel contestId);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -88,14 +89,20 @@ class HomeRdsImpl extends HomeRds {
   }
 
   @override
-  Future<dynamic> joinContest(JoinContestParamsModel params) async {
+  Future<ApiResponse> joinContest(JoinContestParamsModel params) async {
     try {
       final response = await client.post(ApiUrls.joinContest(params.contestId), data: params.toJson());
-      return response.data;
+      final apiResponse = ApiResponse.fromJson(response.data, (json) => null);
+
+      if (!apiResponse.isSuccess) {
+        throw UnknownError(message: apiResponse.message ?? "Something went wrong");
+      }
+
+      return apiResponse;
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {
-      throw UnknownError(message: 'An unexpected error occurred: $e');
+      throw UnknownError(message: e.toString());
     }
   }
 }

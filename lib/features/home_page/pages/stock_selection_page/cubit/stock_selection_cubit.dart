@@ -39,7 +39,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
     );
   }
 
-  Future<void> joinContest(String contestId) async {
+  joinContest(String contestId) async {
     emit(state.copyWith(joinContestApiStatus: ApiStatus.loading));
     await getReorderedStockList(state.selectedStockList);
 
@@ -70,13 +70,13 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
 
     return result.fold(
       (l) {
-        Fluttertoast.showToast(msg: "Join contest failed please try again later");
-        emit(state.copyWith(joinContestApiStatus: ApiStatus.failed));
-        return null;
+        // Fluttertoast.showToast(msg: "Join contest failed please try again later");
+        emit(state.copyWith(joinContestApiStatus: ApiStatus.failed, message: l.message));
       },
       (r) {
-        emit(state.copyWith(joinContestApiStatus: ApiStatus.success));
-        return r;
+        emit(
+          state.copyWith(joinContestApiStatus: r.isSuccess ? ApiStatus.success : ApiStatus.failed, message: r.message),
+        );
       },
     );
   }
@@ -89,7 +89,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
       id: stockData.id.toString(),
       stockPrice: stockData.currentPrice?.toString() ?? '0',
       currentPrice: stockData.currentPrice?.toString() ?? '0',
-      netChange: stockData.netChange?.toString() ?? '0',
+      netChange: stockData.percentageChange,
       image: stockData.logoUrl,
       stockPrediction: StockPrediction.none,
       stockPosition: StockPosition.none,

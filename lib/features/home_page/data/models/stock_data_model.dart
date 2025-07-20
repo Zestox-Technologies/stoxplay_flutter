@@ -17,6 +17,7 @@ class StockDataModel {
   final DateTime? updatedAt;
   final double? previousDayClose;
   final double? netChange;
+  final double? percentageChange;
 
   StockDataModel({
     this.id,
@@ -31,6 +32,7 @@ class StockDataModel {
     this.updatedAt,
     this.previousDayClose,
     this.netChange,
+    this.percentageChange,
   });
 
   factory StockDataModel.fromJson(Map<String, dynamic> json) => StockDataModel(
@@ -46,6 +48,7 @@ class StockDataModel {
     netChange: json["netChange"]?.toDouble(),
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
     updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+    percentageChange: json["percentageChange"]?.toDouble(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -61,5 +64,6 @@ class StockDataModel {
     "netChange": netChange,
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
+    "percentageChange": percentageChange,
   };
 }

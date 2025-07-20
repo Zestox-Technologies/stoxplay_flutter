@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
@@ -541,20 +542,29 @@ class ConfirmationBs extends StatelessWidget {
                 ),
               ],
             ),
-            BlocSelector<StockSelectionCubit, StockSelectionState, ApiStatus>(
+            BlocListener<StockSelectionCubit, StockSelectionState>(
               bloc: cubit,
-              selector: (state) => state.joinContestApiStatus,
-              builder: (context, state) {
-                return AppButton(
-                  isLoading: state.isLoading,
-                  text: "Join Contest",
-                  onPressed: () async {
-                    await cubit.joinContest(contestId);
-                    Navigator.pop(context);
-                    if (state.isSuccess) Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: cubit);
-                  },
-                );
+              listener: (context, state) {
+                if (state.joinContestApiStatus.isSuccess) {
+                  Navigator.pop(context);
+                  Future.microtask(() {
+                    Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: cubit);
+                  });
+                } else if (state.joinContestApiStatus.isFailed) {
+                  Fluttertoast.showToast(msg: state.message ?? "Join contest failed please try again later");
+                }
               },
+              child: BlocSelector<StockSelectionCubit, StockSelectionState, ApiStatus>(
+                bloc: cubit,
+                selector: (state) => state.joinContestApiStatus,
+                builder: (context, state) {
+                  return AppButton(
+                    isLoading: state.isLoading,
+                    text: "Join Contest",
+                    onPressed: () => cubit.joinContest(contestId),
+                  );
+                },
+              ),
             ),
             SizedBox(),
           ],
