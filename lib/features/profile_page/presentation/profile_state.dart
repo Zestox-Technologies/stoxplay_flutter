@@ -3,32 +3,18 @@ part of 'profile_cubit.dart';
 @immutable
 class ProfileState {
   final bool isLoading;
-  final ProfileModel? profile;
   final String errorMessage;
+  final DateTime? dob;
+  final ProfileModel? profileModel;
 
-  const ProfileState({
-    required this.isLoading,
-    required this.profile,
-    required this.errorMessage,
-  });
+  const ProfileState({this.isLoading = false, this.errorMessage = '', this.dob, this.profileModel});
 
-  factory ProfileState.initial() {
-    return const ProfileState(
-      isLoading: false,
-      profile: null,
-      errorMessage: '',
-    );
-  }
-
-  ProfileState copyWith({
-    bool? isLoading,
-    ProfileModel? profile,
-    String? errorMessage,
-  }) {
+  ProfileState copyWith({bool? isLoading, String? errorMessage, DateTime? dob, ProfileModel? profileModel}) {
     return ProfileState(
       isLoading: isLoading ?? this.isLoading,
-      profile: profile ?? this.profile,
       errorMessage: errorMessage ?? this.errorMessage,
+      dob: dob ?? this.dob,
+      profileModel: profileModel ?? this.profileModel,
     );
   }
 }

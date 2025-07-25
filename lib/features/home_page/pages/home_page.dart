@@ -36,6 +36,15 @@ class _HomePageState extends State<HomePage> {
     homeCubit.getSectorList();
   }
 
+  void showWithdrawDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(child: WithdrawDialog());
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -330,5 +339,14 @@ class _StickyTabDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(covariant _StickyTabDelegate oldDelegate) {
     return oldDelegate.child != child;
+  }
+}
+
+class WithdrawDialog extends StatelessWidget {
+  const WithdrawDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(child: Column(children: [Text("Do you want to withdraw 10,000 coins?")]));
   }
 }

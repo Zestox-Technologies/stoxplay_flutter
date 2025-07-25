@@ -4,6 +4,7 @@ import 'profile_model.dart';
 
 abstract class ProfileRds {
   Future<ProfileModel> getProfile();
+  Future<ProfileModel> updateProfile(Map<String, dynamic> data);
 }
 
 class ProfileRdsImpl implements ProfileRds {
@@ -15,5 +16,12 @@ class ProfileRdsImpl implements ProfileRds {
     final response = await apiService.get(ApiUrls.getProfile);
     final data = response.data['data'];
     return ProfileModel.fromJson(data);
+  }
+
+  @override
+  Future<ProfileModel> updateProfile(Map<String, dynamic> data) async {
+    final response = await apiService.put(ApiUrls.getProfile, data: data);
+    final updatedData = response.data['data'];
+    return ProfileModel.fromJson(updatedData);
   }
 } 

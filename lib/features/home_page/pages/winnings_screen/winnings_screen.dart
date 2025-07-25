@@ -24,47 +24,98 @@ class _WinningsScreenState extends State<WinningsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new),
-          color: AppColors.black,
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: CommonAppbarTitle(),
-        centerTitle: true,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
         backgroundColor: AppColors.white,
-        actions: [SizedBox(width: kToolbarHeight)],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Gap(10.h),
-            _ContestSummaryCard(),
-            Gap(16.h),
-            _StatsGrid(),
-            Gap(12.h),
-            // _InviteBanner(),
-            // Gap(16.h),
-            _TabSwitcher(selectedIndex: selectedIndex),
-            Gap(10.h),
-            ValueListenableBuilder(
-              valueListenable: selectedIndex,
-              builder: (context, selected, _) {
-                return Expanded(
-                  child:
-                      selectedIndex.value == 0
-                          ? _LeaderboardList(leaderboard: leaderboard, currentUser: currentUser)
-                          : _WinningsList(),
-                );
-              },
-            ),
-          ],
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new),
+            color: AppColors.black,
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: CommonAppbarTitle(),
+          centerTitle: true,
+          backgroundColor: AppColors.white,
+          actions: [SizedBox(width: kToolbarHeight)],
+        ),
+        body: SafeArea(
+          child: ValueListenableBuilder(
+            valueListenable: selectedIndex,
+            builder: (context, selected, _) {
+              return CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(child: Gap(10.h)),
+                  SliverToBoxAdapter(child: _ContestSummaryCard()),
+                  SliverToBoxAdapter(child: Gap(16.h)),
+                  SliverToBoxAdapter(child: _StatsGrid()),
+                  SliverToBoxAdapter(child: Gap(12.h)),
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _StickyTabDelegate(child: _TabSwitcher(selectedIndex: selectedIndex)),
+                  ),
+                  SliverToBoxAdapter(child: Gap(10.h)),
+                  ..._buildTabContent(),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildTabContent() {
+    if (selectedIndex.value == 0) {
+      return [
+        SliverFillRemaining(
+          hasScrollBody: true,
+          child: _LeaderboardList(leaderboard: leaderboard, currentUser: currentUser),
+        ),
+      ];
+    } else {
+      return [
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _StickyTabDelegate(
+            child: Container(
+              color: Colors.white,
+              child: TabBar(
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.blue,
+                tabs: const [Tab(text: 'Starting Breakup'), Tab(text: 'Maximum Breakup')],
+              ),
+            ),
+          ),
+        ),
+        SliverFillRemaining(hasScrollBody: true, child: TabBarView(children: [_WinningsList(), _WinningsList()])),
+      ];
+    }
+  }
+}
+
+// Add StickyTabDelegate for sliver sticky tab effect
+class _StickyTabDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _StickyTabDelegate({required this.child});
+
+  @override
+  double get minExtent => 40;
+
+  @override
+  double get maxExtent => 40;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyTabDelegate oldDelegate) {
+    return oldDelegate.child != child;
   }
 }
 
@@ -242,41 +293,6 @@ class _StatCardBox extends StatelessWidget {
   }
 }
 
-// class _InviteBanner extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: double.infinity,
-//       margin: EdgeInsets.symmetric(horizontal: 16.w),
-//       padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
-//       decoration: BoxDecoration(
-//         gradient: LinearGradient(
-//           colors: [AppColors.purple5A2F, AppColors.purpleE46E],
-//           begin: Alignment.centerLeft,
-//           end: Alignment.centerRight,
-//         ),
-//         borderRadius: BorderRadius.circular(12.r),
-//         boxShadow: [BoxShadow(color: AppColors.purple5A2F.withOpacity(0.15), blurRadius: 8, offset: Offset(0, 2))],
-//       ),
-//       child: Row(
-//         children: [
-//           Icon(Icons.card_giftcard, color: Colors.white, size: 28),
-//           Gap(12.w),
-//           Expanded(
-//             child: TextView(
-//               text: 'Invite Friends & Earn ₹250',
-//               fontColor: Colors.white,
-//               fontWeight: FontWeight.bold,
-//               fontSize: 16.sp,
-//             ),
-//           ),
-//           Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
 class _TabSwitcher extends StatelessWidget {
   final ValueNotifier<int> selectedIndex;
 
@@ -321,32 +337,28 @@ class _TabSwitcher extends StatelessWidget {
   }
 }
 
-class _TabButton extends StatelessWidget {
-  final String text;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _TabButton({required this.text, required this.selected, required this.onTap});
+class WinningsTabList extends StatelessWidget {
+  const WinningsTabList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12.h),
-          decoration: BoxDecoration(
-            color: selected ? AppColors.purple5A2F.withOpacity(0.1) : Colors.transparent,
-            borderRadius: BorderRadius.circular(32.r),
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _StickyTabDelegate(
+              child: TabBar(
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.blue,
+                tabs: const [Tab(text: 'Starting Breakup'), Tab(text: 'Maximum Breakup')],
+              ),
+            ),
           ),
-          alignment: Alignment.center,
-          child: TextView(
-            text: text,
-            fontWeight: FontWeight.w600,
-            fontSize: 16.sp,
-            fontColor: selected ? AppColors.purple5A2F : AppColors.black6666,
-          ),
-        ),
+          SliverFillRemaining(child: Expanded(child: TabBarView(children: [_WinningsList(), _WinningsList()]))),
+        ],
       ),
     );
   }
@@ -360,7 +372,6 @@ class _LeaderboardList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Show top 5, and always show 'You' at the bottom if not in top 5
     final topN = 5;
     final youIndex = leaderboard.indexWhere((u) => u['isCurrentUser'] == true);
     final topList = leaderboard.take(topN).toList();
@@ -372,6 +383,7 @@ class _LeaderboardList extends StatelessWidget {
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             itemCount: topList.length,
+            physics: NeverScrollableScrollPhysics(),
             separatorBuilder: (_, __) => Gap(8.h),
             itemBuilder: (context, index) {
               final user = topList[index];
@@ -487,23 +499,28 @@ class _WinningsList extends StatelessWidget {
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       itemCount: winnings.length,
+      physics: NeverScrollableScrollPhysics(),
       separatorBuilder: (_, __) => Gap(8.h),
       itemBuilder: (context, index) {
         final item = winnings[index];
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(
-            color: AppColors.whiteF9F9,
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: AppColors.blackD7D7.withOpacity(0.1)),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: AppColors.blackD7D7.withOpacity(0.8)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextView(text: '${item['rank']}', fontWeight: FontWeight.w600, fontSize: 16.sp),
+              TextView(text: 'Rank - ${item['rank']}', fontWeight: FontWeight.w400, fontSize: 14.sp),
               Row(
                 children: [
-                  TextView(text: '${item['amount']}', fontWeight: FontWeight.w500, fontSize: 16.sp),
+                  TextView(
+                    text: '${item['amount']}',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16.sp,
+                    fontColor: AppColors.purple661F,
+                  ),
                   Gap(4.w),
                   Image.asset(AppAssets.stoxplayCoin, height: 18.h, width: 18.w),
                 ],

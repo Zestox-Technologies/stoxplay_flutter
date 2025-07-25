@@ -8,9 +8,12 @@ import 'package:gap/gap.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:stoxplay/core/local_storage/storage_service.dart';
+import 'package:stoxplay/features/auth/data/models/user_model.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/widgets/battleground_item_widget.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
+import 'package:stoxplay/utils/constants/db_keys.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -18,25 +21,39 @@ import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
-class BattlegroundPage extends StatelessWidget {
+class BattlegroundPage extends StatefulWidget {
   BattlegroundPage({super.key});
 
+  @override
+  State<BattlegroundPage> createState() => _BattlegroundPageState();
+}
+
+class _BattlegroundPageState extends State<BattlegroundPage> {
   final ScreenshotController screenshotController = ScreenshotController();
+  late UserModel userData;
+
+  void getUserData() {
+    dynamic data = StorageService().read(DBKeys.user);
+    userData = UserModel.fromJson(data);
+  }
+
+  @override
+  void initState() {
+    getUserData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    StockSelectionCubit cubit =
-        ModalRoute.of(context)!.settings.arguments as StockSelectionCubit;
+    StockSelectionCubit cubit = ModalRoute.of(context)!.settings.arguments as StockSelectionCubit;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           return;
         }
-        Navigator.popUntil(
-          context,
-          (route) => route.settings.name == AppRoutes.mainPage,
-        );
+        Navigator.popUntil(context, (route) => route.settings.name == AppRoutes.mainPage);
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
@@ -51,9 +68,7 @@ class BattlegroundPage extends StatelessWidget {
             backgroundColor: Colors.transparent,
             body: Stack(
               children: [
-                Positioned.fill(
-                  child: Image.asset(AppAssets.battleground, fit: BoxFit.cover),
-                ),
+                Positioned.fill(child: Image.asset(AppAssets.battleground, fit: BoxFit.cover)),
                 BlocBuilder<StockSelectionCubit, StockSelectionState>(
                   bloc: cubit,
                   builder: (context, state) {
@@ -69,9 +84,7 @@ class BattlegroundPage extends StatelessWidget {
 
                     final leaderStock = state.selectedStockList.firstWhere(
                       (s) => s.stockPosition == StockPosition.leader,
-                      orElse:
-                          () =>
-                              fallbackStock, // Provide a fallback if not found
+                      orElse: () => fallbackStock, // Provide a fallback if not found
                     );
 
                     final coLeaderStock = state.selectedStockList.firstWhere(
@@ -86,26 +99,17 @@ class BattlegroundPage extends StatelessWidget {
 
                     return Column(
                       children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).padding.top + 5,
-                        ),
+                        SizedBox(height: MediaQuery.of(context).padding.top + 5),
                         Row(
                           children: [
                             IconButton(
                               onPressed: () {
-                                Navigator.popUntil(
-                                  context,
-                                  (route) =>
-                                      route.settings.name == AppRoutes.mainPage,
-                                );
+                                Navigator.popUntil(context, (route) => route.settings.name == AppRoutes.mainPage);
                               },
-                              icon: Icon(
-                                Icons.arrow_back_ios_new,
-                                color: AppColors.white,
-                              ),
+                              icon: Icon(Icons.arrow_back_ios_new, color: AppColors.white),
                             ),
                             Text(
-                              "Suresh.1102",
+                              userData.user?.firstName ?? 'Stoxplay',
                               style: TextStyle(
                                 color: AppColors.white,
                                 fontWeight: FontWeight.w700,
@@ -117,15 +121,11 @@ class BattlegroundPage extends StatelessWidget {
                             Spacer(),
                             IconButton(
                               onPressed: () async {
-                                final image =
-                                    await screenshotController.capture();
+                                final image = await screenshotController.capture();
                                 if (image == null) return;
 
                                 final directory = await getTemporaryDirectory();
-                                final imagePath =
-                                    await File(
-                                      '${directory.path}/screenshot.png',
-                                    ).create();
+                                final imagePath = await File('${directory.path}/screenshot.png').create();
                                 await imagePath.writeAsBytes(image);
 
                                 final share = SharePlus.instance;
@@ -150,10 +150,7 @@ class BattlegroundPage extends StatelessWidget {
                           children: [
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.22,
-                              child: Divider(
-                                color: AppColors.white,
-                                thickness: 2,
-                              ),
+                              child: Divider(color: AppColors.white, thickness: 2),
                             ),
                             Container(
                               padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -166,10 +163,7 @@ class BattlegroundPage extends StatelessWidget {
                             ),
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.22,
-                              child: Divider(
-                                color: AppColors.white,
-                                thickness: 2,
-                              ),
+                              child: Divider(color: AppColors.white, thickness: 2),
                             ),
                           ],
                         ),
@@ -201,27 +195,17 @@ class BattlegroundPage extends StatelessWidget {
                                 children: [
                                   GestureDetector(
                                     onTap: () {},
-                                    child: Icon(
-                                      Icons.refresh,
-                                      color: AppColors.white,
-                                      size: 22.sp,
-                                    ),
+                                    child: Icon(Icons.refresh, color: AppColors.white, size: 22.sp),
                                   ),
                                   SizedBox(width: 10.w),
                                   GestureDetector(
                                     onTap: () {
                                       Navigator.popUntil(
                                         context,
-                                        (route) =>
-                                            route.settings.name ==
-                                            AppRoutes.stockSelectionScreen,
+                                        (route) => route.settings.name == AppRoutes.stockSelectionScreen,
                                       );
                                     },
-                                    child: Image.asset(
-                                      AppAssets.editIcon,
-                                      height: 18.h,
-                                      width: 18.w,
-                                    ),
+                                    child: Image.asset(AppAssets.editIcon, height: 18.h, width: 18.w),
                                   ),
                                 ],
                               ),
@@ -232,15 +216,9 @@ class BattlegroundPage extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList.first,
-                            ),
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList[1],
-                            ),
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList[2],
-                            ),
+                            BattlegroundItemWidget(data: state.selectedStockList.first),
+                            BattlegroundItemWidget(data: state.selectedStockList[1]),
+                            BattlegroundItemWidget(data: state.selectedStockList[2]),
                           ],
                         ),
                         Spacer(),
@@ -249,9 +227,7 @@ class BattlegroundPage extends StatelessWidget {
                           children: [
                             SizedBox(width: 20.w),
                             BattlegroundItemWidget(data: coLeaderStock),
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList[3],
-                            ),
+                            BattlegroundItemWidget(data: state.selectedStockList[3]),
                             SizedBox(width: 20.w),
                           ],
                         ),
@@ -262,9 +238,7 @@ class BattlegroundPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(width: 20.w),
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList[4],
-                            ),
+                            BattlegroundItemWidget(data: state.selectedStockList[4]),
                             BattlegroundItemWidget(data: viceLeaderStock),
                             SizedBox(width: 20.w),
                           ],
@@ -273,15 +247,9 @@ class BattlegroundPage extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList[5],
-                            ),
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList[6],
-                            ),
-                            BattlegroundItemWidget(
-                              data: state.selectedStockList[7],
-                            ),
+                            BattlegroundItemWidget(data: state.selectedStockList[5]),
+                            BattlegroundItemWidget(data: state.selectedStockList[6]),
+                            BattlegroundItemWidget(data: state.selectedStockList[7]),
                           ],
                         ),
                         Spacer(),
@@ -294,11 +262,7 @@ class BattlegroundPage extends StatelessWidget {
                             letterSpacing: 0.0,
                             color: Colors.white.withOpacity(0.3),
                             shadows: [
-                              Shadow(
-                                offset: Offset(1, 7),
-                                blurRadius: 4,
-                                color: AppColors.black.withOpacity(0.3),
-                              ),
+                              Shadow(offset: Offset(1, 7), blurRadius: 4, color: AppColors.black.withOpacity(0.3)),
                             ],
                           ),
                         ),

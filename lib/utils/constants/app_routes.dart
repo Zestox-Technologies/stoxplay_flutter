@@ -17,4 +17,5 @@ class AppRoutes {
   static const String contestDetailsPage = '/contestDetailsPage';
   static const String contestWinnerPage = '/contestWinnerPage';
   static const String winningsScreen = '/winningsScreen';
+  static const String personalInfoPage = '/personalInfoPage';
 }

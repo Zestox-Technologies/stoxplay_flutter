@@ -1,18 +1,20 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
-import 'package:stoxplay/utils/common/widgets/primary_container.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
+
+import '../../../utils/common/functions/get_current_time.dart';
 
 class ContestWidget extends StatelessWidget {
   final SectorModel data;
@@ -22,37 +24,6 @@ class ContestWidget extends StatelessWidget {
   ContestWidget({super.key, required this.cubit, required this.nextMatchDate, required this.data});
 
   final GlobalKey _buttonKey = GlobalKey();
-
-  void showOverlay(BuildContext context) {
-    final renderBox = _buttonKey.currentContext!.findRenderObject() as RenderBox;
-    final size = renderBox.size;
-    final offset = renderBox.localToGlobal(Offset.zero);
-
-    final overlayEntry = OverlayEntry(
-      builder:
-          (context) => Positioned(
-            top: offset.dy + size.height, // Position below the widget
-            left: offset.dx - 200,
-            child: Material(
-              color: AppColors.white,
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.black.withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text('Market is live!!! please join after 4 PM', style: TextStyle(color: AppColors.white)),
-              ),
-            ),
-          ),
-    );
-
-    Overlay.of(context).insert(overlayEntry);
-
-    Future.delayed(Duration(seconds: 3), () {
-      overlayEntry.remove();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +102,7 @@ class ContestWidget extends StatelessWidget {
               ),
             ),
             Gap(20.h),
-            TextView(text: '💰Win ${data.maxWin.toString()}', fontSize: 12.sp, fontWeight: FontWeight.w600),
+            TextView(text: '💰Win ${formatMaxWinIntl(data.maxWin ?? 0)}', fontSize: 12.sp, fontWeight: FontWeight.w600),
             TextView(text: '👥${data.maxWin.toString()} joined', fontSize: 12.sp, fontWeight: FontWeight.w600),
             Spacer(),
             AppButton(
@@ -147,7 +118,7 @@ class ContestWidget extends StatelessWidget {
                 if (isContestEnabled) {
                   Navigator.pushNamed(context, AppRoutes.contestDetailsPage, arguments: data);
                 } else {
-                  showOverlay(context);
+                  Fluttertoast.showToast(msg: "Market is live!!! please join after 4 PM");
                   return;
                 }
               },

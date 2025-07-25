@@ -15,14 +15,14 @@ class ApiService {
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
-  final token = StorageService().read<String>(DBKeys.userTokenKey);
+  // final token = StorageService().read<String>(DBKeys.userTokenKey);
 
   ApiService._internal() {
     final headers = {'Content-Type': 'application/json', 'Accept': 'application/json'};
-
-    if (token != null && token!.isNotEmpty) {
-      headers['Authorization'] = 'Bearer $token';
-    }
+    //
+    // if (token != null && token!.isNotEmpty) {
+    //   headers['Authorization'] = 'Bearer $token';
+    // }
 
     _dio = Dio(
       BaseOptions(
@@ -45,6 +45,7 @@ class ApiService {
         onRequest: (options, handler) async {
           final token = StorageService().read<String>(DBKeys.userTokenKey);
           if (token != null && token.isNotEmpty) {
+            print('Token: $token');
             options.headers['Authorization'] = 'Bearer $token';
           }
           return handler.next(options);

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:shimmer/shimmer.dart' show Shimmer;
 import 'package:stoxplay/config/navigation/navigation_state.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
+import 'package:stoxplay/features/profile_page/data/profile_model.dart';
 import 'package:stoxplay/features/profile_page/presentation/profile_cubit.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -21,12 +23,29 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late ProfileCubit profileCubit;
+  late final ValueNotifier<int> navIndex;
+  late final VoidCallback navListener;
 
   @override
   void initState() {
     profileCubit = BlocProvider.of<ProfileCubit>(context);
-    profileCubit.fetchProfile();
+    navIndex = NavigationState().currentIndex;
+    navListener = () {
+      if (navIndex.value == 3 && mounted) {
+        profileCubit.fetchProfile();
+      }
+    };
+    navIndex.addListener(navListener);
+    if (navIndex.value == 3) {
+      profileCubit.fetchProfile();
+    }
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    navIndex.removeListener(navListener);
+    super.dispose();
   }
 
   void logout(BuildContext context) {
@@ -48,120 +67,124 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => profileCubit,
-      child: BlocBuilder<ProfileCubit, ProfileState>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state.profile != null) {
-            final profile = state.profile;
-            return SafeArea(
-              child: Scaffold(
-                backgroundColor: Colors.white,
-                body: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Container(
-                        padding: EdgeInsets.all(5.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.r),
-                          border: Border.all(color: Colors.grey.shade200),
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 20.r,
-                              backgroundImage: AssetImage(AppAssets.profileIcon), // Replace with network if available
-                            ),
-                            Gap(16.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextView(
-                                  text: "${profile?.firstName} ${profile?.lastName}",
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                TextView(
-                                  text: profile?.username ?? '',
-                                  fontSize: 15.sp,
-                                  fontColor: Colors.grey.shade600,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Gap(18.h),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Container(
-                        height: 50.h,
-                        decoration: BoxDecoration(
-                          color: AppColors.purple661F,
-                          borderRadius: BorderRadius.circular(10.r),
-                          image: DecorationImage(
-                            image: AssetImage(AppAssets.splashStrokes),
-                            fit: BoxFit.cover,
-                            alignment: Alignment.centerRight,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Column(
+          children: [
+            BlocBuilder<ProfileCubit, ProfileState>(
+              builder: (context, state) {
+                if (state.isLoading) {
+                  return Center(child: ProfileShimmer());
+                } else if (state.profileModel != null) {
+                  final profile = state.profileModel;
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(5.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.r),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20.r,
+                                backgroundImage: AssetImage(AppAssets.profileIcon), // Replace with network if available
+                              ),
+                              Gap(16.w),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  TextView(
+                                    text: "${profile?.firstName} ${profile?.lastName}",
+                                    fontSize: 18.sp,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                  TextView(
+                                    text: profile?.username ?? '',
+                                    fontSize: 12.sp,
+                                    fontColor: Colors.grey.shade600,
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Gap(18.w),
-                            Image.asset(AppAssets.stoxplayCoin, height: 40.h, width: 40.w),
-                            Gap(5.w),
-                            Text(
-                              "${profile?.walletBalance}",
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),
+                        Gap(18.h),
+                        Container(
+                          height: 50.h,
+                          decoration: BoxDecoration(
+                            color: AppColors.purple661F,
+                            borderRadius: BorderRadius.circular(10.r),
+                            image: DecorationImage(
+                              image: AssetImage(AppAssets.splashStrokes),
+                              fit: BoxFit.cover,
+                              alignment: Alignment.centerRight,
                             ),
-                            Gap(6.w),
-                            Text(
-                              "coins",
-                              style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w400),
-                            ),
-                            Spacer(),
-                            Gap(18.w),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Gap(18.h),
-                    Expanded(
-                      child: ListView(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
-                        children: [
-                          _SectionHeader(title: "Account Overview"),
-                          _ProfileListTile(icon: "🎮", title: "Playing History", onTap: () {}),
-                          _ProfileListTile(icon: "👤", title: "Personal Info", onTap: () {}),
-                          _ProfileListTile(icon: "🔔", title: "Notification", onTap: () {}),
-                          _SectionHeader(title: "Support & Help"),
-                          _ProfileListTile(icon: "🎮", title: "How to Play", onTap: () {}),
-                          _ProfileListTile(icon: "❓", title: "Help Center", onTap: () {}),
-                          _SectionHeader(title: "Legal"),
-                          _ProfileListTile(icon: "📄", title: "Playing History", onTap: () {}),
-                          _ProfileListTile(icon: "👤", title: "T&C of Technologies Pvt Ltd", onTap: () {}),
-                          _ProfileListTile(
-                            icon: "⏻",
-                            title: "Logout",
-                            onTap: () {
-                              logout(context);
-                            },
                           ),
-                        ],
-                      ),
+                          child: Row(
+                            children: [
+                              Gap(18.w),
+                              Image.asset(AppAssets.stoxplayCoin, height: 40.h, width: 40.w),
+                              Gap(5.w),
+                              Text(
+                                "${profile?.walletBalance}",
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),
+                              ),
+                              Gap(6.w),
+                              Text(
+                                "coins",
+                                style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w400),
+                              ),
+                              Spacer(),
+                              Gap(18.w),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                }
+                return SizedBox.shrink();
+              },
+            ),
+
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(horizontal: 8.w),
+                children: [
+                  _SectionHeader(title: "Account Overview"),
+                  _ProfileListTile(icon: "🎮", title: "Playing History", onTap: () {}),
+                  _ProfileListTile(
+                    icon: "👤",
+                    title: "Personal Info",
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.personalInfoPage);
+                    },
+                  ),
+                  _ProfileListTile(icon: "🔔", title: "Notification", onTap: () {}),
+                  _SectionHeader(title: "Support & Help"),
+                  _ProfileListTile(icon: "🎮", title: "How to Play", onTap: () {}),
+                  _ProfileListTile(icon: "❓", title: "Help Center", onTap: () {}),
+                  _SectionHeader(title: "Legal"),
+                  _ProfileListTile(icon: "📄", title: "Playing History", onTap: () {}),
+                  _ProfileListTile(icon: "👤", title: "T&C of Technologies Pvt Ltd", onTap: () {}),
+                  _ProfileListTile(
+                    icon: "⏻",
+                    title: "Logout",
+                    onTap: () {
+                      logout(context);
+                    },
+                  ),
+                ],
               ),
-            );
-          }
-          return const SizedBox.shrink();
-        },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -262,6 +285,78 @@ class LogoutBS extends StatelessWidget {
           Gap(20.h),
         ],
       ),
+    );
+  }
+}
+
+class ProfileShimmer extends StatelessWidget {
+  const ProfileShimmer({super.key});
+
+  Widget shimmerItem({required double width, required double height, double radius = 4}) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(radius.r)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        /// Profile Card
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Container(
+            padding: EdgeInsets.all(5.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Row(
+              children: [
+                /// Avatar
+                shimmerItem(width: 40.r, height: 40.r, radius: 40),
+
+                SizedBox(width: 16.w),
+
+                /// Name and Username
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    shimmerItem(width: 140.w, height: 18.h),
+                    SizedBox(height: 8.h),
+                    shimmerItem(width: 100.w, height: 14.h),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        SizedBox(height: 10.h),
+
+        /// Wallet Card
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: Container(
+            height: 50.h,
+            padding: EdgeInsets.symmetric(horizontal: 0.w),
+            decoration: BoxDecoration(color: AppColors.whiteF9F9, borderRadius: BorderRadius.circular(15.r)),
+            child: Row(
+              children: [
+                /// Coin Icon
+                shimmerItem(width: MediaQuery.of(context).size.width.w - 80, height: 40.h),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

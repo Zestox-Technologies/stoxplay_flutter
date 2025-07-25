@@ -10,6 +10,7 @@ class ProfileModel {
   final int walletBalance;
   final String? state;
   final String? area;
+  final DateTime? dob;
 
   ProfileModel({
     required this.id,
@@ -23,6 +24,7 @@ class ProfileModel {
     required this.walletBalance,
     required this.state,
     required this.area,
+    this.dob,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,54 @@ class ProfileModel {
       walletBalance: json['walletBalance'],
       state: json['state'],
       area: json['area'],
+      dob: json['dob'] != null ? DateTime.tryParse(json['dob']) : null,
     );
+  }
+
+  ProfileModel copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? username,
+    String? phoneNumber,
+    String? roleName,
+    bool? active,
+    int? walletBalance,
+    String? state,
+    String? area,
+    DateTime? dob,
+  }) {
+    return ProfileModel(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      email: email ?? this.email,
+      username: username ?? this.username,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      roleName: roleName ?? this.roleName,
+      active: active ?? this.active,
+      walletBalance: walletBalance ?? this.walletBalance,
+      state: state ?? this.state,
+      area: area ?? this.area,
+      dob: dob ?? this.dob,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': email,
+      'username': username,
+      'phoneNumber': phoneNumber,
+      'roleName': roleName,
+      'active': active,
+      'walletBalance': walletBalance,
+      'state': state,
+      'area': area,
+      'dob': dob?.toIso8601String(),
+    };
   }
 } 

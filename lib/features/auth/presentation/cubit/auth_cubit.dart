@@ -60,7 +60,9 @@ class AuthCubit extends Cubit<AuthState> {
     ).call(AuthParamsModel(phoneNumber: phoneNumber, otp: otp, isUserExists: isUserExists));
     response.fold(
       (error) {
-        emit(state.copyWith(verifyOtpStatus: ApiStatus.failed, isOTPVerified: false, errorMessage: error.message));
+        emit(
+          state.copyWith(verifyOtpStatus: ApiStatus.failed, isOTPVerified: false, verifyOtpErrorMessage: error.message),
+        );
       },
       (data) {
         if (isUserExists) {

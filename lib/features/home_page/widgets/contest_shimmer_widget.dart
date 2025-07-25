@@ -105,95 +105,118 @@ class HomePageShimmer extends StatelessWidget {
 class ContestDetailsCardShimmer extends StatelessWidget {
   const ContestDetailsCardShimmer({super.key});
 
-  Widget _shimmerContainer({double? width, double? height, BorderRadius? borderRadius}) {
+  Widget _shimmerContainer({
+    double? width,
+    double? height,
+    BorderRadius? borderRadius,
+  }) {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
       child: Container(
         width: width,
         height: height,
-        decoration: BoxDecoration(color: Colors.white, borderRadius: borderRadius ?? BorderRadius.circular(4)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: borderRadius ?? BorderRadius.circular(4),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      padding: EdgeInsets.all(14),
+      margin:  EdgeInsets.symmetric(vertical: 5.h, horizontal: 8),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.purple.withOpacity(0.15)),
         boxShadow: [
-          BoxShadow(color: Colors.purple.withOpacity(0.08), blurRadius: 16, spreadRadius: 2, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.08),
+            blurRadius: 16,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          /// Title Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _shimmerContainer(width: 80, height: 18, borderRadius: BorderRadius.circular(4)),
-              _shimmerContainer(width: 60, height: 16, borderRadius: BorderRadius.circular(8)),
+              _shimmerContainer(width: screenWidth * 0.25, height: 18),
+              _shimmerContainer(width: screenWidth * 0.15, height: 16),
             ],
           ),
-          SizedBox(height: 10),
-          Divider(),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+          const Divider(),
+          const SizedBox(height: 10),
+
+          /// Status Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   _shimmerContainer(width: 50, height: 24, borderRadius: BorderRadius.circular(6)),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   _shimmerContainer(width: 20, height: 20, borderRadius: BorderRadius.circular(99)),
                 ],
               ),
               _shimmerContainer(width: 60, height: 28, borderRadius: BorderRadius.circular(10)),
             ],
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
+
           _shimmerContainer(width: double.infinity, height: 8, borderRadius: BorderRadius.circular(2)),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _shimmerContainer(width: 80, height: 14, borderRadius: BorderRadius.circular(4)),
-              _shimmerContainer(width: 60, height: 14, borderRadius: BorderRadius.circular(4)),
+              _shimmerContainer(width: screenWidth * 0.3, height: 14),
+              _shimmerContainer(width: screenWidth * 0.2, height: 14),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
+
+          /// Info Bar
           Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _shimmerContainer(width: 20, height: 16, borderRadius: BorderRadius.circular(4)),
-                    SizedBox(width: 6),
-                    _shimmerContainer(width: 30, height: 12, borderRadius: BorderRadius.circular(4)),
-                    SizedBox(width: 16),
-                    _shimmerContainer(width: 20, height: 16, borderRadius: BorderRadius.circular(4)),
-                    SizedBox(width: 6),
-                    _shimmerContainer(width: 30, height: 12, borderRadius: BorderRadius.circular(4)),
-                    SizedBox(width: 16),
-                    _shimmerContainer(width: 20, height: 16, borderRadius: BorderRadius.circular(4)),
-                    SizedBox(width: 6),
-                    _shimmerContainer(width: 30, height: 12, borderRadius: BorderRadius.circular(4)),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 8,
+                      children: List.generate(3, (i) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _shimmerContainer(width: 20, height: 16),
+                            const SizedBox(width: 6),
+                            _shimmerContainer(width: 30, height: 12),
+                          ],
+                        );
+                      }),
+                    ),
                   ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [_shimmerContainer(width: 80, height: 12, borderRadius: BorderRadius.circular(4))],
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],
@@ -201,3 +224,4 @@ class ContestDetailsCardShimmer extends StatelessWidget {
     );
   }
 }
+

@@ -4,6 +4,7 @@ import 'package:stoxplay/features/profile_page/data/profile_rds.dart';
 
 abstract class ProfileRepo {
   Future<ProfileModel> getProfile();
+  Future<ProfileModel> updateProfile(Map<String, dynamic> data);
 }
 
 class ProfileRepoImpl implements ProfileRepo {
@@ -12,4 +13,7 @@ class ProfileRepoImpl implements ProfileRepo {
 
   @override
   Future<ProfileModel> getProfile() => rds.getProfile();
+
+  @override
+  Future<ProfileModel> updateProfile(Map<String, dynamic> data) => rds.updateProfile(data);
 } 

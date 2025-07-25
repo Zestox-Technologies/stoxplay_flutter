@@ -8,4 +8,13 @@ class GetProfileUseCase {
   Future<ProfileModel> call() async {
     return await repo.getProfile();
   }
+}
+
+class UpdateProfileUseCase {
+  final ProfileRepo repo;
+  UpdateProfileUseCase(this.repo);
+
+  Future<ProfileModel> call(Map<String, dynamic> data) async {
+    return await repo.updateProfile(data);
+  }
 } 

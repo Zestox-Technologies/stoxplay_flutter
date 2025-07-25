@@ -38,6 +38,7 @@ class AppColors {
   static const Color black8686 = Color(0xff868686); // colorXxLightest
   static const Color black46464 = Color(0xff464646); // colorXxLightest
   static const Color black6767 = Color(0xff676767); // colorXxLightest
+  static const Color blackD8D8 = Color(0xffD8D8D8); // colorXxLightest
 
   // Blue Shades
   static const Color blue = Colors.blue;

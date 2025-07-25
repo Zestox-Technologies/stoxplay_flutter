@@ -1,0 +1,244 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:stoxplay/features/profile_page/presentation/profile_cubit.dart';
+import 'package:stoxplay/utils/common/widgets/app_button.dart';
+import 'package:stoxplay/utils/common/widgets/common_textfield.dart';
+import 'package:stoxplay/utils/common/widgets/text_view.dart';
+import 'package:stoxplay/utils/constants/app_assets.dart';
+import 'package:stoxplay/utils/constants/app_colors.dart';
+
+class PersonalInfoPage extends StatefulWidget {
+  const PersonalInfoPage({super.key});
+
+  @override
+  State<PersonalInfoPage> createState() => _PersonalInfoPageState();
+}
+
+class _PersonalInfoPageState extends State<PersonalInfoPage> {
+  ValueNotifier<XFile?> profileImage = ValueNotifier(null);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        final cubit = context.read<ProfileCubit>();
+        return Scaffold(
+          backgroundColor: AppColors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.blackD3D3, width: 1),
+                          ),
+                          child: Icon(Icons.arrow_back_ios_new, size: 20.w, color: AppColors.black),
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: TextView(
+                            text: 'Personal Info',
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1.5,
+                            lineHeight: 1,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 36.w),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    children: [
+                      SizedBox(height: 8.h),
+                      Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.blackD8D8),
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(5.w),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: AppColors.blackD8D8),
+                                shape: BoxShape.circle,
+                              ),
+                              child: ValueListenableBuilder(
+                                valueListenable: profileImage,
+                                builder: (context, image, _) {
+                                  return CircleAvatar(
+                                    radius: 45.r,
+                                    backgroundColor: AppColors.white,
+                                    backgroundImage:
+                                        profileImage.value == null
+                                            ? AssetImage(AppAssets.profileIcon)
+                                            : FileImage(File(profileImage.value!.path)) as ImageProvider,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          Gap(10.h),
+                          AppButton(
+                            text: 'Change Image',
+                            onPressed: () async {
+                              final imagePicker = ImagePicker();
+                              final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+                              if (pickedFile != null) {
+                                profileImage.value = pickedFile;
+                              }
+                            },
+                            height: 32.h,
+                            width: 110.w,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            borderRadius: 8.r,
+                            backgroundColor: AppColors.purple661F,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 32.h),
+                      _buildTextField(cubit.firstNameController, title: "First Name"),
+                      SizedBox(height: 16.h),
+                      _buildTextField(cubit.lastNameController, title: "Last Name"),
+                      SizedBox(height: 16.h),
+                      _buildTextField(cubit.usernameController, title: "UserName"),
+                      SizedBox(height: 16.h),
+                      _buildTextField(cubit.emailController, title: "Email"),
+                      SizedBox(height: 16.h),
+                      TextView(text: 'Gender', fontColor: AppColors.black),
+                      SizedBox(height: 5.h),
+                      _buildDropdownField('Select', (val) {}),
+                      SizedBox(height: 16.h),
+                      TextView(text: 'Date of birth', fontColor: AppColors.black),
+                      SizedBox(height: 5.h),
+                      _buildDateField(
+                        state.dob == null ? 'Select Date' : DateFormat('dd/MM/yyyy').format(state.dob!),
+                        context,
+                        () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: state.dob ?? DateTime.now(),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime(2100),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  dialogBackgroundColor: Colors.white,
+                                  colorScheme: ColorScheme.light(
+                                    primary: Colors.deepPurple,
+                                    onPrimary: Colors.white,
+                                    onSurface: Colors.black,
+                                  ),
+                                  textButtonTheme: TextButtonThemeData(
+                                    style: TextButton.styleFrom(foregroundColor: Colors.deepPurple),
+                                  ),
+                                  dialogTheme: DialogTheme(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+                          if (date != null) {
+                            cubit.updateDOB(date);
+                          }
+                        },
+                      ),
+                      SizedBox(height: 32.h),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(24.w, 10.h, 24.w, 0.h),
+                  child: AppButton(
+                    text: 'Update profile',
+                    onPressed: () {
+                      cubit.updateProfile();
+                    },
+                    height: 54.h,
+                    borderRadius: 28.r,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    backgroundColor: AppColors.purple661F,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, {required String title}) {
+    return CommonTextfield(controller: controller, title: title, hintText: '');
+  }
+
+  Widget _buildDropdownField(String value, ValueChanged<String> onChanged) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColors.blackD3D3, width: 1),
+        color: AppColors.white,
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: DropdownButtonFormField<String>(
+        value: value,
+        items: ['Select', 'Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        onChanged: (v) {
+          if (v != null) onChanged(v);
+        },
+        decoration: InputDecoration(border: InputBorder.none),
+        icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.purple661F),
+      ),
+    );
+  }
+
+  Widget _buildDateField(String hint, BuildContext context, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: AppColors.blackD3D3, width: 1),
+          color: AppColors.white,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                child: Text(hint, style: TextStyle(color: Colors.black, fontSize: 15.sp, fontWeight: FontWeight.w500)),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 12.w),
+              child: Icon(Icons.calendar_today_rounded, color: AppColors.purple661F, size: 22.w),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

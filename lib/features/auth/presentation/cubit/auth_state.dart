@@ -16,6 +16,7 @@ class AuthState extends Equatable {
 
   final UserModel? user;
   final String? errorMessage;
+  final String? verifyOtpErrorMessage;
   final bool? isPhoneNumberExists;
   final bool? isVerified;
   final bool? isOTPVerified;
@@ -27,6 +28,7 @@ class AuthState extends Equatable {
     this.completeSignUpStatus = ApiStatus.initial,
     this.user,
     this.errorMessage,
+    this.verifyOtpErrorMessage,
     this.isPhoneNumberExists,
     this.isVerified,
     this.isOTPVerified,
@@ -42,6 +44,7 @@ class AuthState extends Equatable {
     bool? isPhoneNumberExists,
     bool? isVerified,
     bool? isOTPVerified,
+    String? verifyOtpErrorMessage,
   }) {
     return AuthState(
       checkPhoneApiStatus: checkPhoneApiStatus ?? this.checkPhoneApiStatus,
@@ -53,6 +56,7 @@ class AuthState extends Equatable {
       isPhoneNumberExists: isPhoneNumberExists ?? this.isPhoneNumberExists,
       isVerified: isVerified ?? this.isVerified,
       isOTPVerified: isOTPVerified ?? this.isOTPVerified,
+      verifyOtpErrorMessage: verifyOtpErrorMessage ?? this.verifyOtpErrorMessage,
     );
   }
 
@@ -67,5 +71,6 @@ class AuthState extends Equatable {
     isPhoneNumberExists,
     isVerified,
     isOTPVerified,
+    verifyOtpErrorMessage,
   ];
 }

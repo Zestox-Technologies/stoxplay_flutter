@@ -65,6 +65,7 @@ class SVGImageWidget extends StatelessWidget {
       borderRadius: borderRadius ?? BorderRadius.zero,
       child: SvgPicture.network(
         imageUrl,
+
         height: height,
         width: width,
         placeholderBuilder: (context) => CircularProgressIndicator(),

@@ -36,4 +36,5 @@ Future<void> init() async {
   sl.registerLazySingleton<ProfileRds>(() => ProfileRdsImpl(apiService: sl()));
   sl.registerLazySingleton<ProfileRepo>(() => ProfileRepoImpl(sl()));
   sl.registerLazySingleton(() => GetProfileUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
 }

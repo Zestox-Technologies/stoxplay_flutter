@@ -144,7 +144,7 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                                             children: List.generate(
                                               3,
                                               (index) => Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: 15.w,vertical: 5.h),
+                                                padding: EdgeInsets.symmetric(horizontal: 15.w),
                                                 child: const ContestDetailsCardShimmer(),
                                               ),
                                             ),

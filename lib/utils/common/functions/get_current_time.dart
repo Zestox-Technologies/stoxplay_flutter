@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 
 final Dio _dio = Dio();
@@ -18,4 +19,12 @@ Future<DateTime?> getCurrentTime() async {
     print('Error fetching time: $e');
   }
   return  null;
+}
+String formatMaxWinIntl(int amount) {
+  final format = NumberFormat.compactCurrency(
+    decimalDigits: 1,
+    symbol: '₹',
+    locale: 'en_IN',
+  );
+  return format.format(amount);
 }

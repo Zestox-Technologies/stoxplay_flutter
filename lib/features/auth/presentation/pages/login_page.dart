@@ -249,7 +249,8 @@ class LoginPage extends StatelessWidget {
                       if (state.isVerified == true) {
                         stepper.value = 1;
                         context.read<TimerCubit>().startTimer(seconds: 60);
-                      } else {
+                      } else if (state.isVerified == false) {
+                        // Only show this when we are *sure* it's not verified
                         showSnackBar(context: context, message: Strings.referCodeInvalid);
                       }
                     }
@@ -273,7 +274,7 @@ class LoginPage extends StatelessWidget {
                         showSnackBar(context: context, message: Strings.otpInvalid);
                       }
                     } else if (state.verifyOtpStatus == ApiStatus.failed) {
-                      showSnackBar(context: context, message: state.errorMessage ?? 'Something went wrong');
+                      showSnackBar(context: context, message: state.verifyOtpErrorMessage ?? 'Something went wrong');
                     }
                   }
                 },
