@@ -7,6 +7,7 @@ class StockSelectionState extends Equatable {
   ApiStatus apiStatus;
   String? message;
   ApiStatus joinContestApiStatus;
+  JoinContestResponseModel? joinContestResponse;
 
   StockSelectionState({
     this.stockList = const [],
@@ -14,6 +15,7 @@ class StockSelectionState extends Equatable {
     this.joinContestApiStatus = ApiStatus.initial,
     this.apiStatus = ApiStatus.initial,
     this.message,
+    this.joinContestResponse,
   });
 
   StockSelectionState copyWith({
@@ -22,6 +24,7 @@ class StockSelectionState extends Equatable {
     ApiStatus? joinContestApiStatus,
     List<Stock>? selectedStockList,
     String? message,
+    JoinContestResponseModel? joinContestResponse,
   }) {
     return StockSelectionState(
       stockList: stockList ?? this.stockList,
@@ -29,9 +32,10 @@ class StockSelectionState extends Equatable {
       joinContestApiStatus: joinContestApiStatus ?? this.joinContestApiStatus,
       selectedStockList: selectedStockList ?? this.selectedStockList,
       message: message ?? this.message,
+      joinContestResponse: joinContestResponse ?? this.joinContestResponse,
     );
   }
 
   @override
-  List<Object?> get props => [stockList, joinContestApiStatus, selectedStockList, apiStatus, message];
+  List<Object?> get props => [stockList, joinContestApiStatus, selectedStockList, apiStatus, message, joinContestResponse];
 }

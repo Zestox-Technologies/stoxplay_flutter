@@ -63,7 +63,7 @@ class AppColors {
   static const Color purpleE46E = Color(0xffE46EFF); // colorE46EFF
   static const Color purpleA6D3 = Color(0xffA6D3FC); // colorA6D3FC
   static const Color purpleE1CC = Color(0xffe1ccf8); // percentageColor
-  static const Color purple661F = Color(0xff661FB1); // buttonColor
+  static const Color primaryPurple = Color(0xff661FB1); // buttonColor
 
   // Green Shades
   static const Color green0CAE = Color(0xff0CAE3C); // upButtonColor

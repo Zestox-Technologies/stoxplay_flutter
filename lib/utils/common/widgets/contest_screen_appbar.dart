@@ -11,7 +11,7 @@ class ContestScreenAppbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.purple661F,
+        color: AppColors.primaryPurple,
         border: Border.all(color: AppColors.whiteF6CC),
         borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(30.r),

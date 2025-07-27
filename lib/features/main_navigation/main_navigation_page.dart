@@ -49,7 +49,7 @@ class MainNavigationPage extends StatelessWidget {
           builder: (context, selectedIndex, _) {
             return IndexedStack(
               index: selectedIndex,
-              children: [HomePage(), StatsPage(), LeaderboardPage(), ProfilePage()],
+              children: [HomePage(), StatsPage(),ProfilePage()],
             );
           },
         ),

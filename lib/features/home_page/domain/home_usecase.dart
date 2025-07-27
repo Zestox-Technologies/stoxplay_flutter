@@ -4,6 +4,7 @@ import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/core/network/use_case.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
+import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
@@ -52,13 +53,13 @@ class GetStockListUseCase extends UseCase<List<StockDataModel>, String> {
 }
 
 
-class JoinContestUseCase extends UseCase<ApiResponse, JoinContestParamsModel> {
+class JoinContestUseCase extends UseCase<JoinContestResponseModel, JoinContestParamsModel> {
   final HomeRepo repo;
 
   JoinContestUseCase({required this.repo});
 
   @override
-  Future<Either<AppError, ApiResponse>> call(JoinContestParamsModel params) async {
+  Future<Either<AppError, JoinContestResponseModel>> call(JoinContestParamsModel params) async {
     return await repo.joinContest(params);
   }
 }

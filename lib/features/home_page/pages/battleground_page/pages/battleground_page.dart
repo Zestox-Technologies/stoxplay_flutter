@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,7 +10,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
+import 'package:stoxplay/core/network/api_urls.dart';
+import 'package:stoxplay/core/network/ws_service.dart';
 import 'package:stoxplay/features/auth/data/models/user_model.dart';
+import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
+import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/widgets/battleground_item_widget.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
@@ -20,6 +25,7 @@ import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
+import 'package:web_socket/web_socket.dart';
 
 class BattlegroundPage extends StatefulWidget {
   BattlegroundPage({super.key});
@@ -31,22 +37,77 @@ class BattlegroundPage extends StatefulWidget {
 class _BattlegroundPageState extends State<BattlegroundPage> {
   final ScreenshotController screenshotController = ScreenshotController();
   late UserModel userData;
+  late StockSelectionCubit cubit;
+  late JoinContestResponseModel joinData;
+  WebSocketService ws = WebSocketService();
+  late ValueNotifier<List<LiveStock>> liveStocksNotifier = ValueNotifier([]);
 
   void getUserData() {
-    dynamic data = StorageService().read(DBKeys.user);
-    userData = UserModel.fromJson(data);
+    final raw = StorageService().read(DBKeys.user);
+    if (raw == null) {
+      throw Exception('User not logged in');
+    } else if (raw is String) {
+      userData = UserModel.fromJson(jsonDecode(raw));
+    } else if (raw is Map<String, dynamic>) {
+      userData = UserModel.fromJson(raw);
+    } else {
+      throw Exception('Invalid user data in storage: $raw');
+    }
   }
 
   @override
   void initState() {
-    getUserData();
     super.initState();
+    getUserData(); // Safe here — doesn't depend on context
+  }
+
+  @override
+  void dispose() {
+    ws.close();
+    super.dispose();
+  }
+
+  bool _isInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_isInitialized) return;
+    _isInitialized = true;
+
+    final data = ModalRoute.of(context)?.settings.arguments as (StockSelectionCubit, JoinContestResponseModel);
+    cubit = data.$1;
+    joinData = data.$2;
+
+    ws.connect(ApiUrls.wsUrl).then((_) {
+      ws.sendJson({"type": "SUBSCRIBE_TEAM", "token": userData.token, "userTeamId": joinData.id});
+
+      ws.events.listen((event) {
+        switch (event) {
+          case TextDataReceived(:final text):
+            final decoded = jsonDecode(text);
+            if (decoded['type'] == 'SCORE_UPDATE') {
+              print("WebSocket data : $text");
+              final payload = ScoreUpdatePayload.fromJson(decoded['payload']);
+              if (payload.liveStocks.isNotEmpty) {
+                liveStocksNotifier.value = payload.liveStocks;
+              }
+            }
+            break;
+          case CloseReceived(:final code, :final reason):
+            print("WebSocket closed: $code - $reason");
+            break;
+          case BinaryDataReceived(:final data):
+            print("WebSocket binary received: $data");
+            break;
+        }
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    StockSelectionCubit cubit = ModalRoute.of(context)!.settings.arguments as StockSelectionCubit;
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -69,33 +130,21 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
             body: Stack(
               children: [
                 Positioned.fill(child: Image.asset(AppAssets.battleground, fit: BoxFit.cover)),
-                BlocBuilder<StockSelectionCubit, StockSelectionState>(
-                  bloc: cubit,
-                  builder: (context, state) {
-                    final fallbackStock = Stock(
-                      id: '0',
-                      stockName: '',
-                      stockPrice: '0',
-                      percentage: '0',
-                      image: '',
-                      stockPrediction: StockPrediction.none,
-                      stockPosition: StockPosition.none,
+                ValueListenableBuilder<List<LiveStock>>(
+                  valueListenable: liveStocksNotifier,
+                  builder: (context, stockList, _) {
+                    final fallbackStock = LiveStock(
+                      stockId: '0',
+                      symbol: '',
+                      currentPrice: 0,
+                      netChange: 0,
+                      points: 0,
+                      role: 'NORMAL',
+                      isPredictionCorrect: false,
                     );
 
-                    final leaderStock = state.selectedStockList.firstWhere(
-                      (s) => s.stockPosition == StockPosition.leader,
-                      orElse: () => fallbackStock, // Provide a fallback if not found
-                    );
-
-                    final coLeaderStock = state.selectedStockList.firstWhere(
-                      (s) => s.stockPosition == StockPosition.coLeader,
-                      orElse: () => fallbackStock,
-                    );
-
-                    final viceLeaderStock = state.selectedStockList.firstWhere(
-                      (s) => s.stockPosition == StockPosition.viceLeader,
-                      orElse: () => fallbackStock,
-                    );
+                    LiveStock? findByRole(String role) =>
+                        stockList.firstWhere((s) => s.role == role, orElse: () => fallbackStock);
 
                     return Column(
                       children: [
@@ -216,9 +265,9 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            BattlegroundItemWidget(data: state.selectedStockList.first),
-                            BattlegroundItemWidget(data: state.selectedStockList[1]),
-                            BattlegroundItemWidget(data: state.selectedStockList[2]),
+                            BattlegroundItemWidget(data: stockList.length > 0 ? stockList[0] : fallbackStock),
+                            BattlegroundItemWidget(data: stockList.length > 1 ? stockList[1] : fallbackStock),
+                            BattlegroundItemWidget(data: stockList.length > 2 ? stockList[2] : fallbackStock),
                           ],
                         ),
                         Spacer(),
@@ -226,20 +275,20 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(width: 20.w),
-                            BattlegroundItemWidget(data: coLeaderStock),
-                            BattlegroundItemWidget(data: state.selectedStockList[3]),
+                            BattlegroundItemWidget(data: findByRole("FLEX") ?? fallbackStock),
+                            BattlegroundItemWidget(data: stockList.length > 3 ? stockList[3] : fallbackStock),
                             SizedBox(width: 20.w),
                           ],
                         ),
                         Spacer(),
-                        BattlegroundItemWidget(data: leaderStock),
+                        BattlegroundItemWidget(data: findByRole("CAPTAIN") ?? fallbackStock),
                         Spacer(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(width: 20.w),
-                            BattlegroundItemWidget(data: state.selectedStockList[4]),
-                            BattlegroundItemWidget(data: viceLeaderStock),
+                            BattlegroundItemWidget(data: stockList.length > 4 ? stockList[4] : fallbackStock),
+                            BattlegroundItemWidget(data: findByRole("VICE_CAPTAIN") ?? fallbackStock),
                             SizedBox(width: 20.w),
                           ],
                         ),
@@ -247,9 +296,9 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            BattlegroundItemWidget(data: state.selectedStockList[5]),
-                            BattlegroundItemWidget(data: state.selectedStockList[6]),
-                            BattlegroundItemWidget(data: state.selectedStockList[7]),
+                            BattlegroundItemWidget(data: stockList.length > 5 ? stockList[5] : fallbackStock),
+                            BattlegroundItemWidget(data: stockList.length > 6 ? stockList[6] : fallbackStock),
+                            BattlegroundItemWidget(data: stockList.length > 7 ? stockList[7] : fallbackStock),
                           ],
                         ),
                         Spacer(),

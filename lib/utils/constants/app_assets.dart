@@ -40,4 +40,5 @@ class AppAssets {
   static const String personalInfoIcon = 'assets/icons/personal_info.png';
   static const String helpIcon = 'assets/icons/help_icon.png';
   static const String notificationBell = 'assets/icons/notification_bell.png';
+  static const String firstPrizeIcon = 'assets/icons/first_prize_icon.png';
 }

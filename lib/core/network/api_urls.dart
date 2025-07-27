@@ -3,7 +3,9 @@ class ApiUrls {
 
   static const String baseUrl = 'https://backend.stoxplay.com/v1/';
 
-  // static const String baseUrl = 'http://13.201.225.138:3000/v1/';
+
+  ///Websocket
+  static const String wsUrl = "wss://backend.stoxplay.com";
 
   ///Live Server time
   static const String liveServerTime = 'https://timeapi.io/api/time/current/zone?timeZone=Asia/Kolkata';

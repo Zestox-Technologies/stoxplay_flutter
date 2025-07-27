@@ -68,7 +68,7 @@ class AuthCubit extends Cubit<AuthState> {
         if (isUserExists) {
           StorageService().clearUserToken();
           StorageService().setLoggedIn(true);
-          StorageService().write(DBKeys.user, data.data);
+          StorageService().write(DBKeys.user, data.data?.toJson());
           StorageService().saveUserToken(data.data?.token ?? '');
           emit(state.copyWith(verifyOtpStatus: ApiStatus.success, isOTPVerified: data.isSuccess, user: data.data));
         } else {
@@ -103,7 +103,7 @@ class AuthCubit extends Cubit<AuthState> {
       (data) async {
         // Set login status and save user data after successful signup
         StorageService().setLoggedIn(true);
-        StorageService().write(DBKeys.user, data.data);
+        StorageService().write(DBKeys.user, data.data?.toJson());
         await StorageService().saveUserToken(data.data!.token!);
         ApiService().updateAuthHeader(data.data!.token!);
         emit(state.copyWith(completeSignUpStatus: ApiStatus.success, user: data.data));

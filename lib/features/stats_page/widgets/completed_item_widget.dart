@@ -1,117 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
-import 'package:stoxplay/utils/constants/app_constants.dart';
-import 'package:stoxplay/utils/constants/app_strings.dart' show Strings;
 
 class CompletedItemWidget extends StatelessWidget {
   const CompletedItemWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: primaryContainerDecoration,
-          child: Container(
-            margin: EdgeInsets.all(5.h),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: AppColors.blackC0C0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColors.blackD7D7, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Top Section - Event Header
+          Padding(
+            padding: EdgeInsets.all(10.w),
+            child: Row(
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 5.h,
-                  ),
+                // HDFC Bank Logo
+                _buildIcon(),
+                Gap(12.w),
+
+                // Event Information
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextView(
-                        text: Strings.indianStockMarketChampionship,
+                        text: "Stock Market Championship",
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
+                        fontColor: AppColors.black,
                       ),
-                      Container(height: 1.h, color: AppColors.black9A9A),
-                      SizedBox(height: 10.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            AppAssets.bankWars,
-                            height: 60.h,
-                            width: 60.w,
-                          ),
-                          TextView(
-                            text: Strings.bankWars,
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.w800,
-                          ),
-                          SizedBox(),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              TextView(
-                                text: "21 May",
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                                lineHeight: 0,
-                              ),
-                              TextView(
-                                text: "4:15 PM",
-                                fontSize: 14.sp,
-                                lineHeight: 0,
-                                fontWeight: FontWeight.w500,
-                                fontColor: AppColors.black6767,
-                              ),
-                            ],
-                          ),
-                          SizedBox(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.blackD7D7.withOpacity(0.30),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(12.r),
-                      bottomRight: Radius.circular(12.r),
-                    ),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 14.w,
-                    vertical: 5.h,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          TextView(
-                            text: "1  Team",
-                            fontColor: AppColors.black6666,
-                            fontSize: 10.sp,
-                          ),
-                          SizedBox(width: 20.w),
-                          TextView(
-                            text: "1  Contest",
-                            fontColor: AppColors.black6666,
-                            fontSize: 10.sp,
-                          ),
-                        ],
-                      ),
-                      Icon(
-                        Icons.remove_red_eye_outlined,
-                        color: AppColors.black46464,
-                        size: 20.sp,
+                      TextView(
+                        text: "Bank wars",
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        fontColor: AppColors.purple5A2F,
                       ),
                     ],
                   ),
@@ -119,14 +57,82 @@ class CompletedItemWidget extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        Positioned.fill(
-          child: Image.asset(
-            AppAssets.lightSplashStrokes,
-            fit: BoxFit.fitWidth,
+          
+          // Divider
+          Container(
+            height: 1.h,
+            color: AppColors.blackD7D7,
+            margin: EdgeInsets.symmetric(horizontal: 16.w),
           ),
-        ),
-      ],
+          
+          // Middle Section - Date and Time
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: TextView(
+                    text: "Date: 21 March,2025",
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                    fontColor: AppColors.black,
+                  ),
+                ),
+                TextView(
+                  text: "Time: 4:15 PM",
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  fontColor: AppColors.black,
+                ),
+              ],
+            ),
+          ),
+          
+          // Divider
+          Container(
+            height: 1.h,
+            color: AppColors.blackD7D7,
+            margin: EdgeInsets.symmetric(horizontal: 16.w),
+          ),
+          
+          // Bottom Section - Participation Details
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            child: Row(
+              children: [
+                TextView(
+                  text: "1-Team",
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  fontColor: AppColors.black9999,
+                ),
+                Gap(16.w),
+                TextView(
+                  text: "1-Contest",
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w500,
+                  fontColor: AppColors.black9999,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIcon() {
+    return Container(
+      width: 50.w,
+      height: 50.h,
+      padding: EdgeInsets.all(5.w),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.white,
+        border: Border.all(color: AppColors.blackD7D7, width: 1),
+      ),
+      child: Image.asset(AppAssets.appIcon),
     );
   }
 }

@@ -47,151 +47,120 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: NavigationState().currentIndex,
-      builder: (context, selectedIndex, _) {
-        return PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) {
-            if (didPop) return;
-            Navigator.pop(context);
-          },
-          child: Scaffold(
-            appBar:
-                selectedIndex == 0
-                    ? AppBar(
-                      forceMaterialTransparency: true,
-                      leading: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new),
-                        color: AppColors.black,
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      title: CommonAppbarTitle(),
-                      centerTitle: true,
-                      backgroundColor: AppColors.white,
-                      actions: [
-                        SizedBox(
-                          width: kToolbarHeight, // Match the space of the leading icon
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pop(context);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new),
+            color: AppColors.black,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: CommonAppbarTitle(),
+          centerTitle: true,
+          backgroundColor: AppColors.white,
+          actions: [
+            SizedBox(
+              width: kToolbarHeight, // Match the space of the leading icon
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            Divider(color: AppColors.black.withOpacity(0.25)),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text(
+                      Strings.indianStockMarketChampionship,
+                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
+                    ),
+                    Gap(10.h),
+                    CachedImageWidget(imageUrl: contest.sectorLogo, height: 100.h, width: 100.w, fit: BoxFit.cover),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(AppAssets.stoxplayCoin, height: 40.h, width: 40.w),
+                        TextView(text: '1700', fontSize: 16.sp),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Stack(
+                          children: [
+                            Positioned.fill(child: Divider(color: AppColors.black)),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                color: AppColors.white,
+                                child: TextView(
+                                  text: contest.name.toString(),
+                                  fontSize: 30.sp,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 2,
+                                ).paddingSymmetric(horizontal: 10.w),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    )
-                    : null,
-            body: Column(
-              children: [
-                selectedIndex == 0 ? Divider(color: AppColors.black.withOpacity(0.25)) : SizedBox.shrink(),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      IndexedStack(
-                        index: selectedIndex,
-                        children: [
-                          SingleChildScrollView(
-                            child: Stack(
-                              children: [
-                                Positioned(child: Image.asset(AppAssets.lightSplashStrokes)),
-                                Column(
-                                  children: [
-                                    Text(
-                                      Strings.indianStockMarketChampionship,
-                                      style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
-                                    ),
-                                    Gap(10.h),
-                                    CachedImageWidget(
-                                      imageUrl: contest.sectorLogo,
-                                      height: 100.h,
-                                      width: 100.w,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Image.asset(AppAssets.stoxplayCoin, height: 40.h, width: 40.w),
-                                        TextView(text: '1700', fontSize: 16.sp),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Stack(
-                                          children: [
-                                            Positioned.fill(child: Divider(color: AppColors.black)),
-                                            Align(
-                                              alignment: Alignment.center,
-                                              child: Container(
-                                                color: AppColors.white,
-                                                child: TextView(
-                                                  text: contest.name.toString(),
-                                                  fontSize: 30.sp,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 2,
-                                                ).paddingSymmetric(horizontal: 10.w),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ).paddingSymmetric(horizontal: 16.w),
-                                    Gap(20.h),
-                                    BlocBuilder<HomeCubit, HomeState>(
-                                      bloc: cubit,
-                                      builder: (context, state) {
-                                        final isSuccess = state.apiStatus.isSuccess;
-                                        final isLoading = state.apiStatus.isLoading;
+                    ).paddingSymmetric(horizontal: 16.w),
+                    Gap(20.h),
+                    BlocBuilder<HomeCubit, HomeState>(
+                      bloc: cubit,
+                      builder: (context, state) {
+                        final isSuccess = state.apiStatus.isSuccess;
+                        final isLoading = state.apiStatus.isLoading;
 
-                                        if (isLoading) {
-                                          return Column(
-                                            children: List.generate(
-                                              3,
-                                              (index) => Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: 15.w),
-                                                child: const ContestDetailsCardShimmer(),
-                                              ),
-                                            ),
-                                          );
-                                        } else {
-                                          return state.contestList!.isEmpty
-                                              ? Center(child: Text("There are no contest available"))
-                                              : RefreshIndicator(
-                                                onRefresh: () async {
-                                                  // await cubit.getContestList(contest.id.toString());
-                                                },
-                                                child: ListView.separated(
-                                                  physics: NeverScrollableScrollPhysics(),
-                                                  shrinkWrap: true,
-                                                  separatorBuilder: (context, index) => Gap(15.h),
-                                                  itemCount: state.contestList!.length,
-                                                  itemBuilder: (context, index) {
-                                                    return ContestDetailsWidget(
-                                                      ignoreOnTap: false,
-                                                      data: state.contestList![index],
-                                                    ).paddingSymmetric(horizontal: 20.w);
-                                                  },
-                                                ),
-                                              );
-                                        }
-                                      },
-                                    ),
-                                    Gap(10.h),
-                                  ],
-                                ),
-                              ],
+                        if (isLoading) {
+                          return Column(
+                            children: List.generate(
+                              3,
+                              (index) => Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 15.w),
+                                child: const ContestDetailsCardShimmer(),
+                              ),
                             ),
-                          ),
-                          StatsPage(),
-                          LeaderboardPage(),
-                          ProfilePage(),
-                        ],
-                      ),
-                    ],
-                  ),
+                          );
+                        } else {
+                          return state.contestList!.isEmpty
+                              ? Center(child: Text("There are no contest available"))
+                              : RefreshIndicator(
+                                onRefresh: () async {
+                                  // await cubit.getContestList(contest.id.toString());
+                                },
+                                child: ListView.separated(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  separatorBuilder: (context, index) => Gap(15.h),
+                                  itemCount: state.contestList!.length,
+                                  itemBuilder: (context, index) {
+                                    return ContestDetailsWidget(
+                                      ignoreOnTap: false,
+                                      data: state.contestList![index],
+                                    ).paddingSymmetric(horizontal: 20.w);
+                                  },
+                                ),
+                              );
+                        }
+                      },
+                    ),
+                    Gap(10.h),
+                  ],
                 ),
-              ],
+              ),
             ),
-            bottomNavigationBar: const CustomBottomNavbar(),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }

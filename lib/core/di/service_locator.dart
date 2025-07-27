@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:stoxplay/core/network/api_service.dart';
+import 'package:stoxplay/core/network/ws_service.dart';
 import 'package:stoxplay/features/auth/data/auth_rds.dart';
 import 'package:stoxplay/features/auth/domain/auth_repo.dart';
 import 'package:stoxplay/features/auth/domain/auth_usecase.dart';
@@ -15,6 +16,7 @@ final GetIt sl = GetIt.instance;
 Future<void> init() async {
   // Core
   sl.registerLazySingleton<ApiService>(() => ApiService());
+  sl.registerLazySingleton<WebSocketService>(() => WebSocketService());
 
   // Remote Data Sources
   sl.registerLazySingleton<AuthRds>(() => AuthRdsImpl(client: sl()));

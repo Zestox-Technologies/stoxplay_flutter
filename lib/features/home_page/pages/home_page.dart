@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
             CircleAvatar(child: Icon(Icons.person, size: 20.h)),
             CommonAppbarTitle(),
             Badge(
-              backgroundColor: AppColors.purple661F,
+              backgroundColor: AppColors.primaryPurple,
               smallSize: 8,
               alignment: Alignment.topLeft,
               child: Image.asset(AppAssets.notificationIcon, height: 24, width: 24),
@@ -174,8 +174,8 @@ class _HomePageState extends State<HomePage> {
                                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                           crossAxisCount: 2,
                                           childAspectRatio: 0.7,
-                                          crossAxisSpacing: 10,
-                                          mainAxisSpacing: 10,
+                                          crossAxisSpacing: 20,
+                                          mainAxisSpacing: 20,
                                         ),
                                         itemBuilder: (context, index) {
                                           return ContestWidget(
@@ -244,7 +244,7 @@ class _HomePageState extends State<HomePage> {
                                               text: 'Bank Wars',
                                               fontWeight: FontWeight.w600,
                                               fontSize: 16.sp,
-                                              fontColor: AppColors.purple661F,
+                                              fontColor: AppColors.primaryPurple,
                                             ),
                                           ],
                                         ),
@@ -282,9 +282,9 @@ class CommonTabWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.purple661F : AppColors.white, // Background:, //
+          color: isSelected ? AppColors.primaryPurple : AppColors.white, // Background:, //
           borderRadius: BorderRadius.circular(999.r), // Background: #FFFFFF
-          border: Border.all(color: isSelected ? AppColors.black6767 : AppColors.purple661F, width: 1.0),
+          border: Border.all(color: isSelected ? AppColors.black6767 : AppColors.primaryPurple, width: 1.0),
           boxShadow: [
             BoxShadow(
               color: AppColors.blue7E.withOpacity(0.25),
@@ -306,7 +306,7 @@ class CommonTabWidget extends StatelessWidget {
                 fontStyle: FontStyle.normal,
                 // SemiBold is handled via fontWeight
                 fontSize: 16,
-                color: isSelected ? AppColors.white : AppColors.purple661F,
+                color: isSelected ? AppColors.white : AppColors.primaryPurple,
                 height: 26 / 16,
                 // line-height divided by font-size
                 letterSpacing: 0.0,

@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/profile_page/data/profile_model.dart';
 import 'package:stoxplay/features/profile_page/domain/profile_usecase.dart';
 import 'package:flutter/material.dart';
@@ -31,18 +32,17 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> fetchProfile() async {
-    emit(state.copyWith(isLoading: true, errorMessage: ''));
+    emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
     try {
       final profile = await getProfileUseCase();
       // Set controllers
       firstNameController.text = profile.firstName;
-      lastNameController.text = profile.lastName;
       usernameController.text = profile.username;
       emailController.text = profile.email ?? '';
       phoneController.text = profile.phoneNumber;
-      emit(state.copyWith(isLoading: false, profileModel: profile));
+      emit(state.copyWith(apiStatus: ApiStatus.success, profileModel: profile));
     } catch (e) {
-      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }
   }
 
@@ -51,18 +51,19 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> updateProfile() async {
-    emit(state.copyWith(isLoading: true, errorMessage: ''));
+    emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
     try {
       final updatedProfile = {
         "firstName": firstNameController.text,
         "username": usernameController.text,
         "profilePictureUrl": "https://i.pravatar.cc/300",
         "dateOfBirth": state.dob?.toUtc().toIso8601String(),
+        "email": emailController.text
       };
       final profile = await updateProfileUseCase(updatedProfile);
-      emit(state.copyWith(isLoading: false));
+      emit(state.copyWith(apiStatus: ApiStatus.success));
     } catch (e) {
-      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }
   }
 }

@@ -10,6 +10,7 @@ import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
@@ -28,10 +29,7 @@ class ContestWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(color: AppColors.blackD7D7),
-      ),
+      decoration: boxDecorationForContestWidget,
       child: Padding(
         padding: EdgeInsets.all(5.w),
         child: Column(
@@ -59,7 +57,7 @@ class ContestWidget extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     lineHeight: 1,
                     overflow: TextOverflow.ellipsis,
-                    fontColor: AppColors.purple661F,
+                    fontColor: AppColors.primaryPurple,
                     text: data.name.toString(),
                   ),
                 ),
@@ -108,8 +106,8 @@ class ContestWidget extends StatelessWidget {
             AppButton(
               key: _buttonKey,
               borderRadius: 999.r,
-              fontSize: 16.sp,
-              height: 40.h,
+              fontSize: 14.sp,
+              height: 30.h,
               text: Strings.join,
               fontWeight: FontWeight.w800,
               textColor: AppColors.white,
@@ -123,6 +121,7 @@ class ContestWidget extends StatelessWidget {
                 }
               },
             ),
+            Gap(5.h)
             // Gap(5.h),
             // Container(width: MediaQuery.of(context).size.width.w, height: 1, color: AppColors.black.withOpacity(0.2)),
             // Gap(5.h),

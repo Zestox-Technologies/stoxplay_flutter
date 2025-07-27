@@ -45,8 +45,8 @@ class AppButton extends StatelessWidget {
         width: width ?? MediaQuery.of(context).size.width,
         padding: padding,
         decoration: BoxDecoration(
-          color: backgroundColor ?? AppColors.purple661F,
-          border: Border.all(color: AppColors.purple661F),
+          color: backgroundColor ?? AppColors.primaryPurple,
+          border: Border.all(color: AppColors.primaryPurple),
           borderRadius: BorderRadius.circular(borderRadius ?? 8.r),
         ),
         child: Center(

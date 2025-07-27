@@ -21,6 +21,8 @@ import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
 class StockSelectionScreen extends StatefulWidget {
+  const StockSelectionScreen({super.key});
+
   @override
   State<StockSelectionScreen> createState() => _StockSelectionScreenState();
 }
@@ -34,11 +36,9 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Delay argument retrieval to the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       contestId = ModalRoute.of(context)!.settings.arguments as String;
-      cubit.getStockList(contestId!); // ✅ Only called once
+      cubit.getStockList(contestId!);
     });
   }
 
@@ -73,8 +73,8 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                 final isPositionSelectionComplete = hasLeader && hasCoLeader && hasViceLeader;
                 final buttonColor =
                     isFirstStep
-                        ? (isStockSelectionComplete ? AppColors.purple661F : AppColors.black9A9A)
-                        : (isPositionSelectionComplete ? AppColors.purple661F : AppColors.black9A9A);
+                        ? (isStockSelectionComplete ? AppColors.primaryPurple : AppColors.black9A9A)
+                        : (isPositionSelectionComplete ? AppColors.primaryPurple : AppColors.black9A9A);
                 return Scaffold(
                   backgroundColor: Colors.white,
                   bottomNavigationBar: CommonBottomNavbar(
@@ -188,7 +188,7 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                               color:
                                                                   index >= state.selectedStockList.length
                                                                       ? AppColors.black9A9A.withOpacity(0.5)
-                                                                      : AppColors.purple661F,
+                                                                      : AppColors.primaryPurple,
                                                               borderRadius: BorderRadius.circular(4.r),
                                                             ),
                                                             child: Center(
@@ -260,7 +260,7 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                                 text: "Leader",
                                                                 fontSize: 18.sp,
                                                                 fontWeight: FontWeight.w600,
-                                                                fontColor: AppColors.purple661F,
+                                                                fontColor: AppColors.primaryPurple,
                                                               ),
                                                               TextView(
                                                                 text: "Get 10X Points",
@@ -276,7 +276,7 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                                 text: "Co-Leader",
                                                                 fontSize: 18.sp,
                                                                 fontWeight: FontWeight.w600,
-                                                                fontColor: AppColors.purple661F,
+                                                                fontColor: AppColors.primaryPurple,
                                                               ),
                                                               TextView(
                                                                 text: "Get 7.5X Points",
@@ -292,7 +292,7 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                                 text: "Vice-Leader",
                                                                 fontSize: 18.sp,
                                                                 fontWeight: FontWeight.w600,
-                                                                fontColor: AppColors.purple661F,
+                                                                fontColor: AppColors.primaryPurple,
                                                               ),
                                                               TextView(
                                                                 text: "Get 5X Points",
@@ -548,7 +548,11 @@ class ConfirmationBs extends StatelessWidget {
                 if (state.joinContestApiStatus.isSuccess) {
                   Navigator.pop(context);
                   Future.microtask(() {
-                    Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: cubit);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.battleGroundScreen,
+                      arguments: (cubit, state.joinContestResponse),
+                    );
                   });
                 } else if (state.joinContestApiStatus.isFailed) {
                   Fluttertoast.showToast(msg: state.message ?? "Join contest failed please try again later");

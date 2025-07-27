@@ -5,6 +5,7 @@ import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
+import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/utils/models/QueryParams.dart';
 
@@ -19,7 +20,7 @@ abstract class HomeRds {
 
   Future<List<StockDataModel>> getStockList(String contestId);
 
-  Future<ApiResponse> joinContest(JoinContestParamsModel contestId);
+  Future<JoinContestResponseModel> joinContest(JoinContestParamsModel contestId);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -77,7 +78,7 @@ class HomeRdsImpl extends HomeRds {
     try {
       final response = await client.get(ApiUrls.getStocksList(contestId), queryParameters: queryParams.toMap());
 
-      final List<dynamic> jsonList = response.data['data'];
+      final List<dynamic> jsonList = response.data['data']['stocks'];
       final stockList = jsonList.map((json) => StockDataModel.fromJson(json)).toList();
 
       return stockList;
@@ -89,7 +90,7 @@ class HomeRdsImpl extends HomeRds {
   }
 
   @override
-  Future<ApiResponse> joinContest(JoinContestParamsModel params) async {
+  Future<JoinContestResponseModel> joinContest(JoinContestParamsModel params) async {
     try {
       final response = await client.post(ApiUrls.joinContest(params.contestId), data: params.toJson());
       final apiResponse = ApiResponse.fromJson(response.data, (json) => null);
@@ -98,7 +99,9 @@ class HomeRdsImpl extends HomeRds {
         throw UnknownError(message: apiResponse.message ?? "Something went wrong");
       }
 
-      return apiResponse;
+      // Parse the data from the response
+      final responseData = response.data['data'];
+      return JoinContestResponseModel.fromJson(responseData);
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

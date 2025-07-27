@@ -10,6 +10,7 @@ import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
 import 'package:stoxplay/features/main_navigation/main_navigation_page.dart';
 import 'package:stoxplay/features/on_boarding_page/on_boarding_page.dart';
 import 'package:stoxplay/features/profile_page/presentation/pages/personal_info_page.dart';
+import 'package:stoxplay/features/profile_page/presentation/pages/playing_history_page.dart';
 import 'package:stoxplay/features/profile_page/presentation/pages/profile_page.dart';
 import 'package:stoxplay/features/stats_page/pages/contest_winner_screen.dart';
 import 'package:stoxplay/features/stats_page/pages/stats_page.dart';
@@ -31,5 +32,6 @@ class RouteList {
     AppRoutes.contestWinnerPage: (context) => ContestWinnerPage(),
     AppRoutes.winningsScreen: (context) => WinningsScreen(),
     AppRoutes.personalInfoPage: (context) => PersonalInfoPage(),
+    AppRoutes.playingHistoryPage: (context) => PlayingHistoryPage(),
   };
 }

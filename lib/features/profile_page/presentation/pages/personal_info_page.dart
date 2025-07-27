@@ -6,8 +6,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:stoxplay/features/profile_page/presentation/profile_cubit.dart';
+import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
+import 'package:stoxplay/utils/common/functions/snackbar.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
+import 'package:stoxplay/utils/common/widgets/common_back_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_textfield.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -22,6 +25,7 @@ class PersonalInfoPage extends StatefulWidget {
 
 class _PersonalInfoPageState extends State<PersonalInfoPage> {
   ValueNotifier<XFile?> profileImage = ValueNotifier(null);
+  String selectedGender = 'Select';
 
   @override
   Widget build(BuildContext context) {
@@ -37,18 +41,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                   child: Row(
                     children: [
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          padding: EdgeInsets.all(8.w),
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.blackD3D3, width: 1),
-                          ),
-                          child: Icon(Icons.arrow_back_ios_new, size: 20.w, color: AppColors.black),
-                        ),
-                      ),
+                      CommonBackButton(onTap: () => Navigator.of(context).pop()),
                       Expanded(
                         child: Center(
                           child: TextView(
@@ -112,14 +105,12 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             borderRadius: 8.r,
-                            backgroundColor: AppColors.purple661F,
+                            backgroundColor: AppColors.primaryPurple,
                           ),
                         ],
                       ),
                       SizedBox(height: 32.h),
-                      _buildTextField(cubit.firstNameController, title: "First Name"),
-                      SizedBox(height: 16.h),
-                      _buildTextField(cubit.lastNameController, title: "Last Name"),
+                      _buildTextField(cubit.firstNameController, title: "Full Name"),
                       SizedBox(height: 16.h),
                       _buildTextField(cubit.usernameController, title: "UserName"),
                       SizedBox(height: 16.h),
@@ -127,7 +118,12 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       SizedBox(height: 16.h),
                       TextView(text: 'Gender', fontColor: AppColors.black),
                       SizedBox(height: 5.h),
-                      _buildDropdownField('Select', (val) {}),
+                      _buildDropdownField(selectedGender, (val) {
+                        setState(() {
+                          selectedGender = val;
+                        });
+                      }),
+
                       SizedBox(height: 16.h),
                       TextView(text: 'Date of birth', fontColor: AppColors.black),
                       SizedBox(height: 5.h),
@@ -137,9 +133,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                         () async {
                           final date = await showDatePicker(
                             context: context,
-                            initialDate: state.dob ?? DateTime.now(),
+                            initialDate: state.dob ?? DateTime.now().subtract(Duration(days: 6570)),
                             firstDate: DateTime(1900),
-                            lastDate: DateTime(2100),
+                            lastDate: DateTime.now().subtract(Duration(days: 6570)),
                             builder: (context, child) {
                               return Theme(
                                 data: Theme.of(context).copyWith(
@@ -172,15 +168,25 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(24.w, 10.h, 24.w, 0.h),
                   child: AppButton(
+                    isLoading: state.apiStatus.isLoading,
                     text: 'Update profile',
-                    onPressed: () {
-                      cubit.updateProfile();
+                    onPressed: () async {
+                      if (cubit.firstNameController.text.trim().isEmpty ||
+                          cubit.usernameController.text.trim().isEmpty ||
+                          cubit.emailController.text.trim().isEmpty ||
+                          selectedGender == 'Select' ||
+                          state.dob == null) {
+                        showSnackBar(context: context, message: 'Please fill all the fields before submitting.');
+                        return;
+                      }
+                      await cubit.updateProfile();
+                      Navigator.pop(context);
                     },
-                    height: 54.h,
-                    borderRadius: 28.r,
-                    fontSize: 18.sp,
+
+                    height: 45.h,
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.w700,
-                    backgroundColor: AppColors.purple661F,
+                    backgroundColor: AppColors.primaryPurple,
                   ),
                 ),
               ],
@@ -210,7 +216,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
           if (v != null) onChanged(v);
         },
         decoration: InputDecoration(border: InputBorder.none),
-        icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.purple661F),
+        icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primaryPurple),
       ),
     );
   }
@@ -234,7 +240,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             ),
             Padding(
               padding: EdgeInsets.only(right: 12.w),
-              child: Icon(Icons.calendar_today_rounded, color: AppColors.purple661F, size: 22.w),
+              child: Icon(Icons.calendar_today_rounded, color: AppColors.primaryPurple, size: 22.w),
             ),
           ],
         ),

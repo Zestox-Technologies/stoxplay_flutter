@@ -18,7 +18,7 @@ class CommonBottomNavbar extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: AppColors.purple661F.withOpacity(0.1),
+            color: AppColors.primaryPurple.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -41,7 +41,6 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
   final List<Map<String, dynamic>> _menuItems = [
     {'icon': AppAssets.homeIcon, 'label': 'Home'},
     {'icon': AppAssets.statsIcon, 'label': 'Stats'},
-    {'icon': AppAssets.leaderboardIcon, 'label': 'Leaderboard'},
     {'icon': AppAssets.profileIcon, 'label': 'Profile'},
   ];
 
@@ -57,17 +56,17 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.purple661F.withOpacity(0.1),
-            AppColors.purple661F.withOpacity(0.1),
-            AppColors.purple661F.withOpacity(0.1),
-            AppColors.purple661F.withOpacity(0.1),
+            AppColors.primaryPurple.withOpacity(0.1),
+            AppColors.primaryPurple.withOpacity(0.1),
+            AppColors.primaryPurple.withOpacity(0.1),
+            AppColors.primaryPurple.withOpacity(0.1),
             AppColors.white,
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
         border: Border.all(
-          color: AppColors.purple661F.withOpacity(0.3),
+          color: AppColors.primaryPurple.withOpacity(0.3),
           width: 1,
         ),
         borderRadius: const BorderRadius.only(
@@ -101,13 +100,13 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
                       decoration: BoxDecoration(
                         color:
                             isSelected
-                                ? AppColors.purple661F.withOpacity(0.2)
+                                ? AppColors.primaryPurple.withOpacity(0.2)
                                 : Colors.transparent,
                         borderRadius: BorderRadius.circular(25.r),
                         border: Border.all(
                           color:
                               isSelected
-                                  ? AppColors.purple661F
+                                  ? AppColors.primaryPurple
                                   : Colors.transparent,
                         ),
                       ),
@@ -119,7 +118,7 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
                             Text(
                               item['label'],
                               style: TextStyle(
-                                color: AppColors.purple661F,
+                                color: AppColors.primaryPurple,
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w600,
                               ),

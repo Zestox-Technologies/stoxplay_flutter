@@ -57,7 +57,10 @@ class ConfirmationBottomSheet extends StatelessWidget {
     Navigator.pushNamed(
       context,
       AppRoutes.battleGroundScreen,
-      arguments: cubit,
+      arguments: {
+        'cubit': cubit,
+        'joinContestResponse': cubit.state.joinContestResponse,
+      },
     );
   }
 } 

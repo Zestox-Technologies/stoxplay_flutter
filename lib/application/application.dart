@@ -6,7 +6,8 @@ import 'package:stoxplay/config/route_list.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
-import 'package:stoxplay/features/profile_page/presentation/profile_cubit.dart';
+import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
+import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (context) => TimerCubit()),
-            BlocProvider(create: (context) => ProfileCubit(sl(),sl())),
+            BlocProvider(create: (context) => ProfileCubit(sl(), sl())),
             BlocProvider(
               create:
                   (context) =>
@@ -58,7 +59,7 @@ class MyApp extends StatelessWidget {
               ),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.purple661F,
+                  backgroundColor: AppColors.primaryPurple,
                   foregroundColor: AppColors.black,
                   textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                 ),

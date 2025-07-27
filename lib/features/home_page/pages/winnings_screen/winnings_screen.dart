@@ -519,7 +519,7 @@ class _WinningsList extends StatelessWidget {
                     text: '${item['amount']}',
                     fontWeight: FontWeight.w500,
                     fontSize: 16.sp,
-                    fontColor: AppColors.purple661F,
+                    fontColor: AppColors.primaryPurple,
                   ),
                   Gap(4.w),
                   Image.asset(AppAssets.stoxplayCoin, height: 18.h, width: 18.w),

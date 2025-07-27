@@ -14,11 +14,11 @@ class WalletContainer extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.white),
         borderRadius: BorderRadius.circular(15.r),
-        color: AppColors.purple661F,
+        color: AppColors.primaryPurple,
       ),
       child: Row(
         children: [
-          Icon(Icons.account_balance_wallet, color: AppColors.purple661F),
+          Icon(Icons.account_balance_wallet, color: AppColors.primaryPurple),
           TextView(
             text: title ?? '69',
             fontWeight: FontWeight.bold,

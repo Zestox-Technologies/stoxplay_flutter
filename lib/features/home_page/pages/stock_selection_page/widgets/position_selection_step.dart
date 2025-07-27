@@ -109,7 +109,7 @@ class PositionSelectionStep extends StatelessWidget {
           text: title,
           fontSize: 18.sp,
           fontWeight: FontWeight.w600,
-          fontColor: AppColors.purple661F,
+          fontColor: AppColors.primaryPurple,
         ),
         TextView(
           text: subtitle,

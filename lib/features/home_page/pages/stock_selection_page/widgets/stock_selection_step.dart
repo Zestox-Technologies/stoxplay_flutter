@@ -88,7 +88,7 @@ class StockSelectionStep extends StatelessWidget {
               width: 23.w,
               margin: EdgeInsets.symmetric(horizontal: 3.w),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.purple661F : AppColors.black9A9A.withOpacity(0.5),
+                color: isSelected ? AppColors.primaryPurple : AppColors.black9A9A.withOpacity(0.5),
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Center(

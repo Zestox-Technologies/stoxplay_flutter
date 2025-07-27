@@ -70,6 +70,9 @@ class Stock {
   StockPosition stockPosition;
   String? currentPrice;
   double? netChange;
+  bool isLiveData;
+  int? livePoints;
+  DateTime? lastUpdated;
 
   Stock({
     this.stockName,
@@ -81,6 +84,9 @@ class Stock {
     this.netChange,
     this.stockPrediction = StockPrediction.none,
     this.stockPosition = StockPosition.none,
+    this.isLiveData = false,
+    this.livePoints,
+    this.lastUpdated,
   });
 
   factory Stock.fromJson(Map<String, dynamic> json) {
@@ -128,6 +134,9 @@ class Stock {
       'netChange': netChange,
       'prediction': stockPrediction.toString().split('.').last,
       'stockPosition': stockPosition.toString().split('.').last,
+      'isLiveData': isLiveData,
+      'livePoints': livePoints,
+      'lastUpdated': lastUpdated?.toIso8601String(),
     };
   }
 }
@@ -143,6 +152,9 @@ extension StockCopyWith on Stock {
     StockPosition? stockPosition,
     String? currentPrice,
     double? netChange,
+    bool? isLiveData,
+    int? livePoints,
+    DateTime? lastUpdated,
   }) {
     return Stock(
       stockName: stockName ?? this.stockName,
@@ -154,6 +166,9 @@ extension StockCopyWith on Stock {
       stockPosition: stockPosition ?? this.stockPosition,
       currentPrice: currentPrice ?? this.currentPrice,
       netChange: netChange ?? this.netChange,
+      isLiveData: isLiveData ?? this.isLiveData,
+      livePoints: livePoints ?? this.livePoints,
+      lastUpdated: lastUpdated ?? this.lastUpdated,
     );
   }
 }

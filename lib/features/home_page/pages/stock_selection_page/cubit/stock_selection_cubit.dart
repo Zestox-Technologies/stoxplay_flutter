@@ -1,9 +1,14 @@
+import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meta/meta.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/core/network/api_urls.dart';
+import 'package:stoxplay/core/network/ws_service.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
+import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
+import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
@@ -16,9 +21,11 @@ part 'stock_selection_state.dart';
 class StockSelectionCubit extends Cubit<StockSelectionState> {
   GetStockListUseCase stockListUseCase;
   JoinContestUseCase joinContestUseCase;
+  WebSocketService ws = WebSocketService();
+  String? currentContestId;
 
   StockSelectionCubit({required this.stockListUseCase, required this.joinContestUseCase})
-    : super(StockSelectionState());
+      : super(StockSelectionState());
 
   ///APIs
   Future<List<Stock>?> getStockList(String contestId) async {
@@ -27,11 +34,11 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
     final sectorList = await stockListUseCase.call(contestId);
 
     return sectorList.fold(
-      (l) {
+          (l) {
         emit(state.copyWith(apiStatus: ApiStatus.failed));
         return null;
       },
-      (r) {
+          (r) {
         final stockList = r.map(_convertToStockModel).toList();
         emit(state.copyWith(stockList: stockList, apiStatus: ApiStatus.success));
         return stockList;
@@ -39,7 +46,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
     );
   }
 
-  joinContest(String contestId) async {
+  Future<JoinContestResponseModel?> joinContest(String contestId) async {
     emit(state.copyWith(joinContestApiStatus: ApiStatus.loading));
     await getReorderedStockList(state.selectedStockList);
 
@@ -47,36 +54,42 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
       contestId: contestId,
       teamName: "Username-T2",
       selectedStocks:
-          state.selectedStockList
-              .map((e) => SelectedStock(stockId: e.id.toString(), prediction: e.stockPrediction.toName))
-              .toList(),
+      state.selectedStockList
+          .map((e) => SelectedStock(stockId: e.id.toString(), prediction: e.stockPrediction.toName))
+          .toList(),
       captainStockId:
-          state.selectedStockList.where((element) => element.stockPosition == StockPosition.leader).first.id.toString(),
+      state.selectedStockList.where((element) => element.stockPosition == StockPosition.leader).first.id.toString(),
       viceCaptainStockId:
-          state.selectedStockList
-              .where((element) => element.stockPosition == StockPosition.viceLeader)
-              .first
-              .id
-              .toString(),
+      state.selectedStockList
+          .where((element) => element.stockPosition == StockPosition.viceLeader)
+          .first
+          .id
+          .toString(),
       flexStockId:
-          state.selectedStockList
-              .where((element) => element.stockPosition == StockPosition.coLeader)
-              .first
-              .id
-              .toString(),
+      state.selectedStockList
+          .where((element) => element.stockPosition == StockPosition.coLeader)
+          .first
+          .id
+          .toString(),
     );
 
     final result = await joinContestUseCase.call(params);
 
     return result.fold(
-      (l) {
+          (l) {
         // Fluttertoast.showToast(msg: "Join contest failed please try again later");
         emit(state.copyWith(joinContestApiStatus: ApiStatus.failed, message: l.message));
+        return null;
       },
-      (r) {
+          (r) {
         emit(
-          state.copyWith(joinContestApiStatus: r.isSuccess ? ApiStatus.success : ApiStatus.failed, message: r.message),
+          state.copyWith(
+            joinContestApiStatus: ApiStatus.success,
+            message: "Successfully joined contest!",
+            joinContestResponse: r,
+          ),
         );
+        return r; // Return the response model with the id
       },
     );
   }
@@ -91,6 +104,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
       currentPrice: stockData.currentPrice?.toString() ?? '0',
       netChange: stockData.percentageChange,
       image: stockData.logoUrl,
+      percentage: stockData.percentageChange?.toString() ?? '0.0',
       stockPrediction: StockPrediction.none,
       stockPosition: StockPosition.none,
     );
