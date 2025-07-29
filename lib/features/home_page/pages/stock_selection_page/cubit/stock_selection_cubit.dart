@@ -12,6 +12,8 @@ import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
+import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
@@ -22,10 +24,11 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
   GetStockListUseCase stockListUseCase;
   JoinContestUseCase joinContestUseCase;
   WebSocketService ws = WebSocketService();
+  TimerCubit timerCubit = TimerCubit();
   String? currentContestId;
 
   StockSelectionCubit({required this.stockListUseCase, required this.joinContestUseCase})
-      : super(StockSelectionState());
+    : super(StockSelectionState());
 
   ///APIs
   Future<List<Stock>?> getStockList(String contestId) async {
@@ -34,13 +37,18 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
     final sectorList = await stockListUseCase.call(contestId);
 
     return sectorList.fold(
-          (l) {
+      (l) {
         emit(state.copyWith(apiStatus: ApiStatus.failed));
         return null;
       },
-          (r) {
-        final stockList = r.map(_convertToStockModel).toList();
-        emit(state.copyWith(stockList: stockList, apiStatus: ApiStatus.success));
+      (r) {
+        final stockList = r.stocks.map(_convertToStockModel).toList();
+        final totalSeconds = getTotalSecondsFromTimeLeft(r.timeLeftToStart);
+        print('Starting timer with $totalSeconds seconds');
+        timerCubit.startTimer(seconds: totalSeconds);
+        emit(
+          state.copyWith(stockList: stockList, apiStatus: ApiStatus.success, timeLeftToStartModel: r.timeLeftToStart),
+        );
         return stockList;
       },
     );
@@ -54,34 +62,34 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
       contestId: contestId,
       teamName: "Username-T2",
       selectedStocks:
-      state.selectedStockList
-          .map((e) => SelectedStock(stockId: e.id.toString(), prediction: e.stockPrediction.toName))
-          .toList(),
+          state.selectedStockList
+              .map((e) => SelectedStock(stockId: e.id.toString(), prediction: e.stockPrediction.toName))
+              .toList(),
       captainStockId:
-      state.selectedStockList.where((element) => element.stockPosition == StockPosition.leader).first.id.toString(),
+          state.selectedStockList.where((element) => element.stockPosition == StockPosition.leader).first.id.toString(),
       viceCaptainStockId:
-      state.selectedStockList
-          .where((element) => element.stockPosition == StockPosition.viceLeader)
-          .first
-          .id
-          .toString(),
+          state.selectedStockList
+              .where((element) => element.stockPosition == StockPosition.viceLeader)
+              .first
+              .id
+              .toString(),
       flexStockId:
-      state.selectedStockList
-          .where((element) => element.stockPosition == StockPosition.coLeader)
-          .first
-          .id
-          .toString(),
+          state.selectedStockList
+              .where((element) => element.stockPosition == StockPosition.coLeader)
+              .first
+              .id
+              .toString(),
     );
 
     final result = await joinContestUseCase.call(params);
 
     return result.fold(
-          (l) {
+      (l) {
         // Fluttertoast.showToast(msg: "Join contest failed please try again later");
         emit(state.copyWith(joinContestApiStatus: ApiStatus.failed, message: l.message));
         return null;
       },
-          (r) {
+      (r) {
         emit(
           state.copyWith(
             joinContestApiStatus: ApiStatus.success,

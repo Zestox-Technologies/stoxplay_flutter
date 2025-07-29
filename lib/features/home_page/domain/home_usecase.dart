@@ -41,17 +41,17 @@ class GetContestListUseCase extends UseCase<List<ContestModel>, String> {
     return await repo.getContestList(params);
   }
 }
-class GetStockListUseCase extends UseCase<List<StockDataModel>, String> {
+
+class GetStockListUseCase extends UseCase<StockResponseModel, String> {
   final HomeRepo repo;
 
   GetStockListUseCase({required this.repo});
 
   @override
-  Future<Either<AppError, List<StockDataModel>>> call(String params) async {
+  Future<Either<AppError, StockResponseModel>> call(String params) async {
     return await repo.getStockList(params);
   }
 }
-
 
 class JoinContestUseCase extends UseCase<JoinContestResponseModel, JoinContestParamsModel> {
   final HomeRepo repo;

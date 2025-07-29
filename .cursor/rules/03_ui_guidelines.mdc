@@ -1,0 +1,53 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# UI/UX Guidelines
+
+## Theming
+1. Implement comprehensive theme support:
+   - Light theme
+   - Dark theme
+   - Custom themes
+2. Maintain central theme configuration
+3. Use ThemeData for consistent styling
+4. Define semantic color tokens
+5. Support dynamic theme switching
+
+## Responsive Design
+1. Use flutter_screenutil for adaptive scaling
+2. Implement responsive layouts:
+   - Support multiple screen sizes
+   - Handle orientation changes
+   - Account for different aspect ratios
+3. Follow Material Design guidelines
+4. Maintain proper spacing and alignment
+
+## Widget Structure
+1. Prefer composition over inheritance
+2. Keep widget tree depth minimal
+3. Extract reusable widgets
+4. Follow consistent naming conventions:
+   - Pages end with Page
+   - Widgets end with Widget
+   - Dialogs end with Dialog
+
+## Navigation
+1. Use dedicated routing layer (go_router) withe named 
+2. Implement proper navigation state management
+3. Handle deep linking
+4. Maintain route constants
+
+## Accessibility
+1. Support screen readers
+2. Implement proper semantic labels
+3. Maintain sufficient contrast ratios
+4. Support text scaling
+
+## Performance
+1. Lazy load when possible
+2. Implement pagination for lists
+3. Cache images and network resources
+4. Use const constructors where applicable
+5. Minimize unnecessary rebuilds

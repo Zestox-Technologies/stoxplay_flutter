@@ -67,3 +67,49 @@ class StockDataModel {
     "percentageChange": percentageChange,
   };
 }
+class TimeLeftToStartModel {
+  final String status;
+  final int days;
+  final int hours;
+  final int minutes;
+  final int seconds;
+
+  TimeLeftToStartModel({
+    required this.status,
+    required this.days,
+    required this.hours,
+    required this.minutes,
+    required this.seconds,
+  });
+
+  factory TimeLeftToStartModel.fromJson(Map<String, dynamic> json) {
+    return TimeLeftToStartModel(
+      status: json['status'],
+      days: json['days'],
+      hours: json['hours'],
+      minutes: json['minutes'],
+      seconds: json['seconds'],
+    );
+  }
+}
+
+class StockResponseModel {
+  final TimeLeftToStartModel timeLeftToStart;
+  final List<StockDataModel> stocks;
+
+  StockResponseModel({
+    required this.timeLeftToStart,
+    required this.stocks,
+  });
+
+  factory StockResponseModel.fromJson(Map<String, dynamic> json) {
+    final data = json['data'];
+    return StockResponseModel(
+      timeLeftToStart: TimeLeftToStartModel.fromJson(data['timeLeftToStart']),
+      stocks: (data['stocks'] as List)
+          .map((item) => StockDataModel.fromJson(item))
+          .toList(),
+    );
+  }
+}
+

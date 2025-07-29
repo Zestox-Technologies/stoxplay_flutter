@@ -1,0 +1,50 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Deployment and Infrastructure Guidelines
+
+## Environment Configuration
+1. Implement flavor system for:
+   - Development
+   - Staging
+   - Production
+2. Maintain separate configuration files per environment
+3. Use environment variables for sensitive data
+4. Implement proper API versioning
+
+## CI/CD Pipeline
+1. Required checks:
+   - Static code analysis
+   - Unit tests
+   - Widget tests
+   - Integration tests
+   - Code coverage
+2. Automated versioning
+3. Build optimization
+4. Release management
+
+## Monitoring and Analytics
+1. Integrate crash reporting (Firebase Crashlytics)
+2. Implement analytics tracking
+3. Monitor app performance
+4. Track user engagement metrics
+
+## Security
+1. Secure storage for sensitive data
+2. API security measures
+3. Code obfuscation in release builds
+4. Regular security audits
+
+## Version Control
+1. Follow semantic versioning
+2. Maintain changelog
+3. Document breaking changes
+4. Ensure backward compatibility
+
+## Documentation
+1. Maintain up-to-date API documentation
+2. Document build and deployment processes
+3. Keep README files current
+4. Document environment setup

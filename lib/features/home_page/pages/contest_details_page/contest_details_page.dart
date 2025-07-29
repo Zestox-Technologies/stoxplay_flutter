@@ -9,6 +9,7 @@ import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_details_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
+import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/features/profile_page/presentation/pages/profile_page.dart';
 import 'package:stoxplay/features/stats_page/pages/stats_page.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
@@ -30,6 +31,7 @@ class ContestDetailsPage extends StatefulWidget {
 class _ContestDetailsPageState extends State<ContestDetailsPage> {
   late SectorModel contest;
   late HomeCubit cubit;
+  late ProfileCubit profileCubit;
   bool _isInitialized = false;
 
   @override
@@ -43,6 +45,13 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
       cubit.getContestList(contest.id.toString());
       _isInitialized = true;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    profileCubit = BlocProvider.of<ProfileCubit>(context);
+    profileCubit.fetchProfile();
   }
 
   @override
@@ -85,12 +94,19 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                     ),
                     Gap(10.h),
                     CachedImageWidget(imageUrl: contest.sectorLogo, height: 100.h, width: 100.w, fit: BoxFit.cover),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(AppAssets.stoxplayCoin, height: 40.h, width: 40.w),
-                        TextView(text: '1700', fontSize: 16.sp),
-                      ],
+                    Gap(10.h),
+                    BlocBuilder<ProfileCubit, ProfileState>(
+                      bloc: profileCubit,
+                      builder: (context, state) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextView(text: state.profileModel?.walletBalance.toString() ?? '0', fontSize: 16.sp),
+                            Gap(5.w),
+                            Image.asset(AppAssets.stoxplayCoin, height: 20.h, width: 20.w),
+                          ],
+                        );
+                      },
                     ),
                     Column(
                       children: [

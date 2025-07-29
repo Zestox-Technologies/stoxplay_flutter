@@ -40,7 +40,7 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
   late StockSelectionCubit cubit;
   late JoinContestResponseModel joinData;
   WebSocketService ws = WebSocketService();
-  late ValueNotifier<List<LiveStock>> liveStocksNotifier = ValueNotifier([]);
+  late ValueNotifier<ScoreUpdatePayload?> liveStocksNotifier = ValueNotifier(null);
 
   void getUserData() {
     final raw = StorageService().read(DBKeys.user);
@@ -82,7 +82,6 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
 
     ws.connect(ApiUrls.wsUrl).then((_) {
       ws.sendJson({"type": "SUBSCRIBE_TEAM", "token": userData.token, "userTeamId": joinData.id});
-
       ws.events.listen((event) {
         switch (event) {
           case TextDataReceived(:final text):
@@ -91,7 +90,7 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
               print("WebSocket data : $text");
               final payload = ScoreUpdatePayload.fromJson(decoded['payload']);
               if (payload.liveStocks.isNotEmpty) {
-                liveStocksNotifier.value = payload.liveStocks;
+                liveStocksNotifier.value = payload;
               }
             }
             break;
@@ -130,9 +129,9 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
             body: Stack(
               children: [
                 Positioned.fill(child: Image.asset(AppAssets.battleground, fit: BoxFit.cover)),
-                ValueListenableBuilder<List<LiveStock>>(
+                ValueListenableBuilder<ScoreUpdatePayload?>(
                   valueListenable: liveStocksNotifier,
-                  builder: (context, stockList, _) {
+                  builder: (context, data, _) {
                     final fallbackStock = LiveStock(
                       stockId: '0',
                       symbol: '',
@@ -144,7 +143,7 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                     );
 
                     LiveStock? findByRole(String role) =>
-                        stockList.firstWhere((s) => s.role == role, orElse: () => fallbackStock);
+                        data?.liveStocks.firstWhere((s) => s.role == role, orElse: () => fallbackStock);
 
                     return Column(
                       children: [
@@ -229,13 +228,13 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               TextView(
-                                text: "Points - 0.0",
+                                text: "Points - ${data?.totalPoints}",
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
                                 fontColor: AppColors.white,
                               ),
                               TextView(
-                                text: "Rank - 00",
+                                text: "Rank - ${data?.rank}",
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.bold,
                                 fontColor: AppColors.white,
@@ -265,18 +264,39 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            BattlegroundItemWidget(data: stockList.length > 0 ? stockList[0] : fallbackStock),
-                            BattlegroundItemWidget(data: stockList.length > 1 ? stockList[1] : fallbackStock),
-                            BattlegroundItemWidget(data: stockList.length > 2 ? stockList[2] : fallbackStock),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.isNotEmpty)
+                                      ? data.liveStocks[0]
+                                      : fallbackStock,
+                            ),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.length > 1)
+                                      ? data.liveStocks[1]
+                                      : fallbackStock,
+                            ),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.length > 2)
+                                      ? data.liveStocks[2]
+                                      : fallbackStock,
+                            ),
                           ],
                         ),
+
                         Spacer(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(width: 20.w),
                             BattlegroundItemWidget(data: findByRole("FLEX") ?? fallbackStock),
-                            BattlegroundItemWidget(data: stockList.length > 3 ? stockList[3] : fallbackStock),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.length > 3)
+                                      ? data.liveStocks[3]
+                                      : fallbackStock,
+                            ),
                             SizedBox(width: 20.w),
                           ],
                         ),
@@ -287,7 +307,12 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             SizedBox(width: 20.w),
-                            BattlegroundItemWidget(data: stockList.length > 4 ? stockList[4] : fallbackStock),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.length > 4)
+                                      ? data.liveStocks[4]
+                                      : fallbackStock,
+                            ),
                             BattlegroundItemWidget(data: findByRole("VICE_CAPTAIN") ?? fallbackStock),
                             SizedBox(width: 20.w),
                           ],
@@ -296,9 +321,24 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            BattlegroundItemWidget(data: stockList.length > 5 ? stockList[5] : fallbackStock),
-                            BattlegroundItemWidget(data: stockList.length > 6 ? stockList[6] : fallbackStock),
-                            BattlegroundItemWidget(data: stockList.length > 7 ? stockList[7] : fallbackStock),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.length > 5)
+                                      ? data.liveStocks[5]
+                                      : fallbackStock,
+                            ),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.length > 6)
+                                      ? data.liveStocks[6]
+                                      : fallbackStock,
+                            ),
+                            BattlegroundItemWidget(
+                              data:
+                                  (data?.liveStocks != null && data!.liveStocks.length > 7)
+                                      ? data.liveStocks[7]
+                                      : fallbackStock,
+                            ),
                           ],
                         ),
                         Spacer(),

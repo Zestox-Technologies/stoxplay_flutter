@@ -15,7 +15,7 @@ abstract class HomeRepo {
 
   Future<Either<AppError, bool>> getContestStatus();
 
-  Future<Either<AppError, List<StockDataModel>>> getStockList(String contestId);
+  Future<Either<AppError,StockResponseModel>> getStockList(String contestId);
 
   Future<Either<AppError, JoinContestResponseModel>> joinContest(JoinContestParamsModel params);
 }
@@ -56,7 +56,7 @@ class HomeRepoImpl extends HomeRepo {
   }
 
   @override
-  Future<Either<AppError, List<StockDataModel>>> getStockList(String contestId) async {
+  Future<Either<AppError,StockResponseModel>> getStockList(String contestId) async {
     try {
       final result = await homeRds.getStockList(contestId);
       return Right(result);

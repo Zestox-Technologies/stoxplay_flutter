@@ -149,20 +149,18 @@ class _ContestSummaryCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  TextView(text: 'Prize Pool', fontWeight: FontWeight.w500, fontSize: 14.sp),
+                  TextView(text: 'Prize Pool: ', fontWeight: FontWeight.w500, fontSize: 14.sp),
                   Gap(4.w),
-                  Image.asset(AppAssets.stoxplayCoin, height: 18.h, width: 18.w),
-                  Gap(2.w),
                   TextView(text: '30,000', fontWeight: FontWeight.bold, fontSize: 16.sp),
+                  Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
                 ],
               ),
               Row(
                 children: [
-                  TextView(text: 'Entry Fees', fontWeight: FontWeight.w500, fontSize: 14.sp),
+                  TextView(text: 'Entry Fees: ', fontWeight: FontWeight.w500, fontSize: 14.sp),
                   Gap(4.w),
-                  Image.asset(AppAssets.stoxplayCoin, height: 18.h, width: 18.w),
-                  Gap(2.w),
                   TextView(text: '500', fontWeight: FontWeight.bold, fontSize: 16.sp),
+                  Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
                 ],
               ),
             ],

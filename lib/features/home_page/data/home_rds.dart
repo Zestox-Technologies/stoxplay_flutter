@@ -18,7 +18,7 @@ abstract class HomeRds {
 
   Future<bool> getContestStatus();
 
-  Future<List<StockDataModel>> getStockList(String contestId);
+  Future<StockResponseModel> getStockList(String contestId);
 
   Future<JoinContestResponseModel> joinContest(JoinContestParamsModel contestId);
 }
@@ -74,14 +74,11 @@ class HomeRdsImpl extends HomeRds {
   }
 
   @override
-  Future<List<StockDataModel>> getStockList(String contestId) async {
+  Future<StockResponseModel> getStockList(String contestId) async {
     try {
       final response = await client.get(ApiUrls.getStocksList(contestId), queryParameters: queryParams.toMap());
-
-      final List<dynamic> jsonList = response.data['data']['stocks'];
-      final stockList = jsonList.map((json) => StockDataModel.fromJson(json)).toList();
-
-      return stockList;
+      final stockResponse = StockResponseModel.fromJson(response.data);
+      return stockResponse;
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

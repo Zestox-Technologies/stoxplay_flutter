@@ -118,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 50.h,
                             decoration: BoxDecoration(
                               color: AppColors.primaryPurple,
-                              borderRadius: BorderRadius.circular(10.r),
+                              borderRadius: BorderRadius.circular(15.r),
                               image: DecorationImage(
                                 image: AssetImage(AppAssets.splashStrokes),
                                 fit: BoxFit.cover,
@@ -127,9 +127,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             child: Row(
                               children: [
-                                Gap(18.w),
-                                Image.asset(AppAssets.stoxplayCoin, height: 40.h, width: 40.w),
-                                Gap(5.w),
+                                Gap(15.w),
+                                Image.asset(AppAssets.stoxplayCoin, height: 30.h, width: 30.w),
+                                Gap(8.w),
                                 Text(
                                   "${profile?.walletBalance}",
                                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),

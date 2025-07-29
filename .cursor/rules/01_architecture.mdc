@@ -1,0 +1,98 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Clean Architecture Guidelines
+
+## Project Structure
+The project follows a clean architecture pattern with the following structure:
+
+```
+my_flutter_app/
+├── lib/
+│   ├── app/                    # App Entry Point
+│   │   ├── main.dart           # App Entry File
+│   │   ├── app.dart            # Root Widget & App Config
+│   │   └── routes.dart         # Route Management
+│   │
+│   ├── presentation/           # UI Layer (Pages, Widgets, Themes, State)
+│   │   ├── pages/              # App Screens (e.g., login_page.dart)
+│   │   ├── widgets/            # Reusable UI Components (e.g., custom_button.dart)
+│   │   ├── themes/             # Theme Configurations (e.g., app_theme.dart)
+│   │   └── state/              # State Management (Blocs, Cubits, Providers)
+│   │
+│   ├── domain/                 # Business Logic Layer
+│   │   ├── entities/           # Business Models (e.g., User, Product)
+│   │   ├── usecases/          # Business Rules (e.g., LoginUser, GetProducts)
+│   │   └── repositories/       # Abstract Interfaces (e.g., AuthRepository)
+│   │
+│   ├── data/                   # Data Layer
+│   │   ├── datasources/        # APIs, Local DB, Cache (e.g., api_service.dart)
+│   │   ├── repositories/       # Repository Implementations (e.g., AuthRepositoryImpl)
+│   │   └── models/            # DTOs & Mappers (e.g., user_model.dart)
+│   │
+│   └── core/                   # Shared Core Utilities
+│       ├── utils/              # Helpers (e.g., validators, formatters)
+│       ├── services/           # Common Services (Network, Storage, Auth)
+│       └── constants/          # App-wide Constants (e.g., app_strings.dart)
+│
+├── test/                       # Mirror lib/ structure for tests
+│   ├── presentation/           # UI Layer Tests
+│   ├── domain/                 # Business Logic Tests
+│   └── data/                   # Data Layer Tests
+```
+
+## Layer Responsibilities
+
+### App Layer (`lib/app/`)
+- Application entry point and configuration
+- Route management and navigation setup
+- Root widget and app-wide providers
+
+### Presentation Layer (`lib/presentation/`)
+1. Pages: Full screens/routes of the application
+2. Widgets: Reusable UI components
+3. Themes: App-wide theming and styling
+4. State: UI state management using Riverpod
+
+### Domain Layer (`lib/domain/`)
+1. Entities: Core business objects
+2. Use Cases: Business logic operations
+3. Repository Interfaces: Abstract definitions for data operations
+
+### Data Layer (`lib/data/`)
+1. Data Sources: Implementation of external services
+2. Repository Implementations: Concrete implementations of domain repositories
+3. Models: DTOs and data mapping logic
+
+### Core Layer (`lib/core/`)
+1. Utils: Shared helper functions
+2. Services: Common functionality (network, storage)
+3. Constants: App-wide configuration and strings,assets path 
+
+## Testing Structure
+- Tests mirror the main lib/ directory structure
+- Each layer has its own test directory
+- Follow naming convention: `{feature}_test.dart`
+
+## Module Guidelines
+1. Each feature should be self-contained within its layer
+2. No file should exceed 600 lines of code
+3. Follow Single Responsibility Principle (SRP)
+4. Use dependency injection with get_it
+5. Implement SOLID principles across all layers
+
+## Dependencies
+- Use Riverpod with code generation for state management
+- Implement get_it for dependency injection
+- Use dio for network operations through a clean abstraction layer
+
+## File Naming Conventions
+1. Use snake_case for file names
+2. Pages: `*_page.dart`
+3. Widgets: `*_widget.dart`
+4. Models: `*_model.dart`
+5. DTOs: `*_dto.dart`
+6. Repositories: `*_repository.dart`
+7. Use Cases: `*_usecase.dart`

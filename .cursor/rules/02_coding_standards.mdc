@@ -1,0 +1,46 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Coding Standards and Best Practices
+
+## Code Quality
+1. Strictly enforce Flutter and Dart lint rules via analysis_options.yaml
+2. No dynamic types unless absolutely necessary
+3. Ensure proper null safety implementation
+4. Use final/const appropriately
+5. Implement proper error handling
+
+## String Management
+1. No hardcoded strings allowed
+2. Use localization files for all UI text
+3. Support multi-language using Flutter localization
+4. Extract constant values to dedicated constants files
+
+## State Management
+1. Use Riverpod for state management
+2. Minimize widget rebuilds:
+   - Use selective Consumer widgets
+   - Implement proper ref.watch usage
+   - Use selectors for granular state updates
+
+## Model Handling
+1. Use Freezed for immutable data models
+2. Implement sealed classes for union types
+3. Proper error handling in model parsing
+4. Define explicit types - avoid var
+
+## Testing
+1. Follow Test-Driven Development (TDD) when possible
+2. Required test coverage:
+   - Unit tests for business logic
+   - Widget tests for UI components
+   - Integration tests for features
+3. Use mocktail for mocking in tests
+
+## Documentation
+1. Document all public APIs
+2. Include example usage in complex utilities
+3. Maintain README files for each module
+4. Use proper dartdoc comments

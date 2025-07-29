@@ -9,6 +9,7 @@ import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/sto
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/widgets/stock_selection_shimmer.dart';
 import 'package:stoxplay/features/home_page/widgets/stock_selection_widget.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
+import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
@@ -43,6 +44,12 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
   }
 
   @override
+  void dispose() {
+    cubit.timerCubit.stopTimer();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: stepper,
@@ -59,8 +66,11 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
               stepper.value--;
             }
           },
-          child: BlocProvider.value(
-            value: cubit,
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: cubit),
+              BlocProvider.value(value: cubit.timerCubit),
+            ],
             child: BlocBuilder<StockSelectionCubit, StockSelectionState>(
               bloc: cubit,
               builder: (context, state) {
@@ -162,12 +172,31 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                             fontWeight: FontWeight.w500,
                                                           ),
                                                         ),
-                                                        Text(
-                                                          'Time Left (09:10:59)',
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            fontWeight: FontWeight.w500,
-                                                          ),
+                                                        BlocBuilder<TimerCubit, TimerState>(
+                                                          builder: (context, timerState) {
+                                                            print('Timer UI: Status=${timerState.status}, Seconds=${timerState.secondsRemaining}');
+                                                            if (timerState.isRunning) {
+                                                              final duration = Duration(
+                                                                seconds: timerState.secondsRemaining,
+                                                              );
+                                                              final hours = duration.inHours
+                                                                  .remainder(24)
+                                                                  .toString()
+                                                                  .padLeft(2, '0');
+                                                              final minutes = duration.inMinutes
+                                                                  .remainder(60)
+                                                                  .toString()
+                                                                  .padLeft(2, '0');
+                                                              final seconds = duration.inSeconds
+                                                                  .remainder(60)
+                                                                  .toString()
+                                                                  .padLeft(2, '0');
+
+                                                              return Text('Time Left: $hours:$minutes:$seconds');
+                                                            } else {
+                                                              return const Text('');
+                                                            }
+                                                          },
                                                         ),
                                                       ],
                                                     ),
