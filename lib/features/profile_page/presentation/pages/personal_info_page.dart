@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/functions/snackbar.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_back_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_textfield.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -25,7 +27,6 @@ class PersonalInfoPage extends StatefulWidget {
 
 class _PersonalInfoPageState extends State<PersonalInfoPage> {
   ValueNotifier<XFile?> profileImage = ValueNotifier(null);
-  String selectedGender = 'Select';
 
   @override
   Widget build(BuildContext context) {
@@ -57,59 +58,62 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                     ],
                   ),
                 ),
+                SizedBox(height: 8.h),
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color:
+                              (state.profileModel?.profilePictureUrl != '')
+                                  ? AppColors.primaryPurple
+                                  : AppColors.blackD7D7,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: EdgeInsets.all(5.w),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.primaryPurple),
+                          shape: BoxShape.circle,
+                        ),
+                        child: ValueListenableBuilder(
+                          valueListenable: profileImage,
+                          builder: (context, image, _) {
+                            return buildProfileAvatar(
+                              profilePictureUrl: state.profileModel?.profilePictureUrl,
+                              pickedImage: profileImage.value,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Gap(10.h),
+                    AppButton(
+                      text: 'Change Image',
+                      onPressed: () async {
+                        final imagePicker = ImagePicker();
+                        final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          profileImage.value = pickedFile;
+                          await cubit.uploadProfilePicture(pickedFile.path);
+                        }
+                      },
+                      height: 32.h,
+                      width: 110.w,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
+                      borderRadius: 8.r,
+                      backgroundColor: AppColors.primaryPurple,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 15.h),
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     children: [
-                      SizedBox(height: 8.h),
-                      Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.blackD8D8),
-                              shape: BoxShape.circle,
-                            ),
-                            padding: EdgeInsets.all(5.w),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColors.blackD8D8),
-                                shape: BoxShape.circle,
-                              ),
-                              child: ValueListenableBuilder(
-                                valueListenable: profileImage,
-                                builder: (context, image, _) {
-                                  return CircleAvatar(
-                                    radius: 45.r,
-                                    backgroundColor: AppColors.white,
-                                    backgroundImage:
-                                        profileImage.value == null
-                                            ? AssetImage(AppAssets.profileIcon)
-                                            : FileImage(File(profileImage.value!.path)) as ImageProvider,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          Gap(10.h),
-                          AppButton(
-                            text: 'Change Image',
-                            onPressed: () async {
-                              final imagePicker = ImagePicker();
-                              final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-                              if (pickedFile != null) {
-                                profileImage.value = pickedFile;
-                              }
-                            },
-                            height: 32.h,
-                            width: 110.w,
-                            fontSize: 12.sp,
-                            fontWeight: FontWeight.w500,
-                            borderRadius: 8.r,
-                            backgroundColor: AppColors.primaryPurple,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 32.h),
+                      SizedBox(height: 20.h),
                       _buildTextField(cubit.firstNameController, title: "Full Name"),
                       SizedBox(height: 16.h),
                       _buildTextField(cubit.usernameController, title: "UserName"),
@@ -118,10 +122,8 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       SizedBox(height: 16.h),
                       TextView(text: 'Gender', fontColor: AppColors.black),
                       SizedBox(height: 5.h),
-                      _buildDropdownField(selectedGender, (val) {
-                        setState(() {
-                          selectedGender = val;
-                        });
+                      _buildDropdownField(state.gender ?? "SELECT", (val) {
+                        cubit.updateGender(val);
                       }),
 
                       SizedBox(height: 16.h),
@@ -174,7 +176,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       if (cubit.firstNameController.text.trim().isEmpty ||
                           cubit.usernameController.text.trim().isEmpty ||
                           cubit.emailController.text.trim().isEmpty ||
-                          selectedGender == 'Select' ||
+                          state.gender == 'Select' ||
                           state.dob == null) {
                         showSnackBar(context: context, message: 'Please fill all the fields before submitting.');
                         return;
@@ -211,13 +213,51 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: DropdownButtonFormField<String>(
         value: value,
-        items: ['Select', 'Male', 'Female', 'Other'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+        items: ['SELECT', 'MALE', 'FEMALE', 'OTHER'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
         onChanged: (v) {
           if (v != null) onChanged(v);
         },
         decoration: InputDecoration(border: InputBorder.none),
         icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primaryPurple),
       ),
+    );
+  }
+
+  Widget buildProfileAvatar({required String? profilePictureUrl, required XFile? pickedImage, double radius = 45}) {
+    // If SVG
+    if (profilePictureUrl != null && profilePictureUrl.toLowerCase().endsWith('.svg')) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.white,
+        child: ClipOval(
+          child: SVGImageWidget(imageUrl: profilePictureUrl, errorWidget: Image.asset(AppAssets.profileIcon)),
+        ),
+      );
+    }
+
+    // If profilePictureUrl is a non-SVG image
+    if (profilePictureUrl != null && profilePictureUrl.isNotEmpty) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.white,
+        backgroundImage: NetworkImage(profilePictureUrl),
+      );
+    }
+
+    // If a new image was picked from device
+    if (pickedImage != null) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.white,
+        backgroundImage: FileImage(File(pickedImage.path)),
+      );
+    }
+
+    // Default to asset
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: AppColors.white,
+      backgroundImage: AssetImage(AppAssets.profileIcon),
     );
   }
 

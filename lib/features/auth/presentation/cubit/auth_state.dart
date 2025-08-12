@@ -15,8 +15,13 @@ class AuthState extends Equatable {
   final ApiStatus completeSignUpStatus;
 
   final UserModel? user;
-  final String? errorMessage;
+  
+  // Separate error messages for each API operation
+  final String? checkPhoneErrorMessage;
+  final String? initiateSignUpErrorMessage;
   final String? verifyOtpErrorMessage;
+  final String? completeSignUpErrorMessage;
+  
   final bool? isPhoneNumberExists;
   final bool? isVerified;
   final bool? isOTPVerified;
@@ -27,8 +32,10 @@ class AuthState extends Equatable {
     this.verifyOtpStatus = ApiStatus.initial,
     this.completeSignUpStatus = ApiStatus.initial,
     this.user,
-    this.errorMessage,
+    this.checkPhoneErrorMessage,
+    this.initiateSignUpErrorMessage,
     this.verifyOtpErrorMessage,
+    this.completeSignUpErrorMessage,
     this.isPhoneNumberExists,
     this.isVerified,
     this.isOTPVerified,
@@ -40,11 +47,13 @@ class AuthState extends Equatable {
     ApiStatus? verifyOtpStatus,
     ApiStatus? completeSignUpStatus,
     UserModel? user,
-    String? errorMessage,
+    String? checkPhoneErrorMessage,
+    String? initiateSignUpErrorMessage,
+    String? verifyOtpErrorMessage,
+    String? completeSignUpErrorMessage,
     bool? isPhoneNumberExists,
     bool? isVerified,
     bool? isOTPVerified,
-    String? verifyOtpErrorMessage,
   }) {
     return AuthState(
       checkPhoneApiStatus: checkPhoneApiStatus ?? this.checkPhoneApiStatus,
@@ -52,11 +61,13 @@ class AuthState extends Equatable {
       verifyOtpStatus: verifyOtpStatus ?? this.verifyOtpStatus,
       completeSignUpStatus: completeSignUpStatus ?? this.completeSignUpStatus,
       user: user ?? this.user,
-      errorMessage: errorMessage ?? this.errorMessage,
+      checkPhoneErrorMessage: checkPhoneErrorMessage ?? this.checkPhoneErrorMessage,
+      initiateSignUpErrorMessage: initiateSignUpErrorMessage ?? this.initiateSignUpErrorMessage,
+      verifyOtpErrorMessage: verifyOtpErrorMessage ?? this.verifyOtpErrorMessage,
+      completeSignUpErrorMessage: completeSignUpErrorMessage ?? this.completeSignUpErrorMessage,
       isPhoneNumberExists: isPhoneNumberExists ?? this.isPhoneNumberExists,
       isVerified: isVerified ?? this.isVerified,
       isOTPVerified: isOTPVerified ?? this.isOTPVerified,
-      verifyOtpErrorMessage: verifyOtpErrorMessage ?? this.verifyOtpErrorMessage,
     );
   }
 
@@ -67,10 +78,12 @@ class AuthState extends Equatable {
     verifyOtpStatus,
     completeSignUpStatus,
     user,
-    errorMessage,
+    checkPhoneErrorMessage,
+    initiateSignUpErrorMessage,
+    verifyOtpErrorMessage,
+    completeSignUpErrorMessage,
     isPhoneNumberExists,
     isVerified,
     isOTPVerified,
-    verifyOtpErrorMessage,
   ];
 }

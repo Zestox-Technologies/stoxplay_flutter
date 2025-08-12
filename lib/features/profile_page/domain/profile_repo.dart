@@ -5,6 +5,8 @@ abstract class ProfileRepo {
   Future<ProfileModel> getProfile();
 
   Future<ProfileModel> updateProfile(Map<String, dynamic> data);
+
+  Future<String> fileUpload(Map<String, dynamic> data);
 }
 
 class ProfileRepoImpl implements ProfileRepo {
@@ -17,4 +19,9 @@ class ProfileRepoImpl implements ProfileRepo {
 
   @override
   Future<ProfileModel> updateProfile(Map<String, dynamic> data) => rds.updateProfile(data);
+
+  @override
+  Future<String> fileUpload(Map<String, dynamic> data) async {
+    return rds.fileUpload(data);
+  }
 }

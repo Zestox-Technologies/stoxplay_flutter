@@ -17,12 +17,10 @@ class TimerCubit extends Cubit<TimerState> {
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       final currentSeconds = state.secondsRemaining;
-      print('TimerCubit: Current seconds remaining: $currentSeconds');
 
       if (currentSeconds > 1) {
         emit(TimerState.running(secondsRemaining: currentSeconds - 1));
       } else {
-        print('TimerCubit: Timer finished');
         emit(const TimerState.finished());
         timer.cancel();
       }

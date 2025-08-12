@@ -73,6 +73,14 @@ class Stock {
   bool isLiveData;
   int? livePoints;
   DateTime? lastUpdated;
+  int? selectionPercentage;
+  int? captainSelectionPercentage;
+  int? viceCaptainSelectionPercentage;
+  int? flexSelectionPercentage;
+  int? upPredictionPercentage;
+  int? downPredictionPercentage;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 
   Stock({
     this.stockName,
@@ -87,6 +95,12 @@ class Stock {
     this.isLiveData = false,
     this.livePoints,
     this.lastUpdated,
+    this.selectionPercentage,
+    this.captainSelectionPercentage,
+    this.viceCaptainSelectionPercentage,
+    this.flexSelectionPercentage,
+    this.upPredictionPercentage,
+    this.downPredictionPercentage,
   });
 
   factory Stock.fromJson(Map<String, dynamic> json) {
@@ -100,6 +114,12 @@ class Stock {
       netChange: json['netChange'],
       stockPrediction: _parseStockPrediction(json['prediction']),
       stockPosition: _parseStockPosition(json['stockPosition']),
+      selectionPercentage: json['selectionPercentage'],
+      captainSelectionPercentage: json['captainSelectionPercentage'],
+      viceCaptainSelectionPercentage: json['viceCaptainSelectionPercentage'],
+      flexSelectionPercentage: json['flexSelectionPercentage'],
+      upPredictionPercentage: json['upPredictionPercentage'],
+      downPredictionPercentage: json['downPredictionPercentage'],
     );
   }
 
@@ -137,6 +157,12 @@ class Stock {
       'isLiveData': isLiveData,
       'livePoints': livePoints,
       'lastUpdated': lastUpdated?.toIso8601String(),
+      'selectionPercentage': selectionPercentage,
+      'captainSelectionPercentage': captainSelectionPercentage,
+      'viceCaptainSelectionPercentage': viceCaptainSelectionPercentage,
+      'flexSelectionPercentage': flexSelectionPercentage,
+      'upPredictionPercentage': upPredictionPercentage,
+      'downPredictionPercentage': downPredictionPercentage,
     };
   }
 }
@@ -155,6 +181,12 @@ extension StockCopyWith on Stock {
     bool? isLiveData,
     int? livePoints,
     DateTime? lastUpdated,
+    int? selectionPercentage,
+    int? captainSelectionPercentage,
+    int? viceCaptainSelectionPercentage,
+    int? flexSelectionPercentage,
+    int? upPredictionPercentage,
+    int? downPredictionPercentage,
   }) {
     return Stock(
       stockName: stockName ?? this.stockName,
@@ -169,6 +201,12 @@ extension StockCopyWith on Stock {
       isLiveData: isLiveData ?? this.isLiveData,
       livePoints: livePoints ?? this.livePoints,
       lastUpdated: lastUpdated ?? this.lastUpdated,
+      selectionPercentage: selectionPercentage ?? this.selectionPercentage,
+      captainSelectionPercentage: captainSelectionPercentage ?? this.captainSelectionPercentage,
+      viceCaptainSelectionPercentage: viceCaptainSelectionPercentage ?? this.viceCaptainSelectionPercentage,
+      flexSelectionPercentage: flexSelectionPercentage ?? this.flexSelectionPercentage,
+      upPredictionPercentage: upPredictionPercentage ?? this.upPredictionPercentage,
+      downPredictionPercentage: downPredictionPercentage ?? this.downPredictionPercentage,
     );
   }
 }

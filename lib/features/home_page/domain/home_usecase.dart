@@ -8,6 +8,7 @@ import 'package:stoxplay/features/home_page/data/models/join_contest_response_mo
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 
 class SectorListUseCase extends UseCase<SectorListResponse, String> {
   final HomeRepo repo;
@@ -61,5 +62,15 @@ class JoinContestUseCase extends UseCase<JoinContestResponseModel, JoinContestPa
   @override
   Future<Either<AppError, JoinContestResponseModel>> call(JoinContestParamsModel params) async {
     return await repo.joinContest(params);
+  }
+}
+class GetMyContestUseCase extends UseCase<StatsModel, String> {
+  final HomeRepo repo;
+
+  GetMyContestUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, StatsModel>> call(String params) async {
+    return await repo.getMyContests();
   }
 }

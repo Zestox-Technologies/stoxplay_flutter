@@ -44,7 +44,6 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
       (r) {
         final stockList = r.stocks.map(_convertToStockModel).toList();
         final totalSeconds = getTotalSecondsFromTimeLeft(r.timeLeftToStart);
-        print('Starting timer with $totalSeconds seconds');
         timerCubit.startTimer(seconds: totalSeconds);
         emit(
           state.copyWith(stockList: stockList, apiStatus: ApiStatus.success, timeLeftToStartModel: r.timeLeftToStart),
@@ -115,6 +114,12 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
       percentage: stockData.percentageChange?.toString() ?? '0.0',
       stockPrediction: StockPrediction.none,
       stockPosition: StockPosition.none,
+      selectionPercentage: stockData.selectionPercentage,
+      captainSelectionPercentage: stockData.captainSelectionPercentage,
+      downPredictionPercentage: stockData.downPredictionPercentage,
+      upPredictionPercentage: stockData.upPredictionPercentage,
+      flexSelectionPercentage: stockData.flexSelectionPercentage,
+      viceCaptainSelectionPercentage: stockData.viceCaptainSelectionPercentage
     );
   }
 

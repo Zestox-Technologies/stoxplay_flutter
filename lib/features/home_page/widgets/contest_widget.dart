@@ -5,17 +5,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
+import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
-import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
-
-import '../../../utils/common/functions/get_current_time.dart';
 
 class ContestWidget extends StatelessWidget {
   final SectorModel data;
@@ -121,7 +119,7 @@ class ContestWidget extends StatelessWidget {
                 }
               },
             ),
-            Gap(5.h)
+            Gap(5.h),
             // Gap(5.h),
             // Container(width: MediaQuery.of(context).size.width.w, height: 1, color: AppColors.black.withOpacity(0.2)),
             // Gap(5.h),

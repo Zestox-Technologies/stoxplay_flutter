@@ -46,7 +46,7 @@ class SVGImageWidget extends StatelessWidget {
   final double? height;
   final double? width;
   final BoxFit fit;
-  final String errorAsset;
+  final Widget errorWidget;
   final BorderRadius? borderRadius;
 
   const SVGImageWidget({
@@ -54,8 +54,8 @@ class SVGImageWidget extends StatelessWidget {
     required this.imageUrl,
     this.height,
     this.width,
+    this.errorWidget = const SizedBox(),
     this.fit = BoxFit.cover,
-    this.errorAsset = AppAssets.appIcon, // Default error icon
     this.borderRadius,
   });
 
@@ -65,9 +65,12 @@ class SVGImageWidget extends StatelessWidget {
       borderRadius: borderRadius ?? BorderRadius.zero,
       child: SvgPicture.network(
         imageUrl,
-
         height: height,
         width: width,
+        errorBuilder: (context, error, stackTrace) {
+          print("svg error ${error.toString()}");
+          return errorWidget;
+        },
         placeholderBuilder: (context) => CircularProgressIndicator(),
       ),
     );

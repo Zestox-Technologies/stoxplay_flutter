@@ -39,4 +39,6 @@ Future<void> init() async {
   sl.registerLazySingleton<ProfileRepo>(() => ProfileRepoImpl(sl()));
   sl.registerLazySingleton(() => GetProfileUseCase(sl()));
   sl.registerLazySingleton(() => UpdateProfileUseCase(sl()));
+  sl.registerLazySingleton(() => GetMyContestUseCase(repo: sl()));
+  sl.registerLazySingleton(() => FileUploadUseCase(sl()));
 }

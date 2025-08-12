@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
+import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/constants/app_routes.dart';
 
 class LiveItemWidget extends StatelessWidget {
-  const LiveItemWidget({super.key});
+  final StatsDataModel data;
+
+  const LiveItemWidget({required this.data, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +72,7 @@ class LiveItemWidget extends StatelessWidget {
                           fontColor: AppColors.black,
                         ),
                         TextView(
-                          text: "₹8,10,000",
+                          text: "₹${formatMaxWinIntl(data.contest?.prizePool ?? 0)}",
                           fontSize: 12.sp,
                           fontWeight: FontWeight.w600,
                           fontColor: AppColors.purple5A2F,
@@ -95,7 +100,12 @@ class LiveItemWidget extends StatelessWidget {
                   children: [
                     Image.asset(AppAssets.firstPrizeIcon, height: 14.h, width: 14.w),
                     Gap(4.w),
-                    TextView(text: "30k", fontSize: 12.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
+                    TextView(
+                      text: data.prize.toString() ?? '',
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      fontColor: AppColors.black,
+                    ),
                   ],
                 ),
                 Gap(16.w),
@@ -105,7 +115,12 @@ class LiveItemWidget extends StatelessWidget {
                   children: [
                     Image.asset(AppAssets.championIcon, height: 14.h, width: 14.w),
                     Gap(4.w),
-                    TextView(text: "50%", fontSize: 12.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
+                    TextView(
+                      text: "${data.contest?.winningPercentage}%",
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      fontColor: AppColors.black,
+                    ),
                   ],
                 ),
                 Gap(16.w),
@@ -127,7 +142,7 @@ class LiveItemWidget extends StatelessWidget {
                 const Spacer(),
 
                 // View Action
-                _buildViewAction(),
+                _buildViewAction(context, data),
               ],
             ),
           ),
@@ -179,14 +194,19 @@ class LiveItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildViewAction() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.visibility_outlined, size: 16.sp, color: AppColors.black6666),
-        Gap(4.w),
-        TextView(text: "View", fontSize: 12.sp, fontWeight: FontWeight.w500, fontColor: AppColors.black6666),
-      ],
+  Widget _buildViewAction(BuildContext context, StatsDataModel data) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: data.id ?? '');
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.visibility_outlined, size: 16.sp, color: AppColors.black6666),
+          Gap(4.w),
+          TextView(text: "View", fontSize: 12.sp, fontWeight: FontWeight.w500, fontColor: AppColors.black6666),
+        ],
+      ),
     );
   }
 }

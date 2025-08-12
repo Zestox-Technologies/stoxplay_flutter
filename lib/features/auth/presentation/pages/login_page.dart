@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:pinput/pinput.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/auth/data/models/auth_params_model.dart';
@@ -24,9 +24,14 @@ import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/text_formatter_extension.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> with CodeAutoFill {
   final TextEditingController mobileNoController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
   final ValueNotifier<bool> isCheckboxChecked = ValueNotifier<bool>(false);
@@ -35,9 +40,75 @@ class LoginPage extends StatelessWidget {
   final FocusNode mobileFocusNode = FocusNode();
   final FocusNode referralFocusNode = FocusNode();
 
-  void _onSendOtp(BuildContext context, AuthCubit authCubit, AuthState state) async {
+  @override
+  void initState() {
+    super.initState();
+    _initializeSmsAutofill();
+  }
+
+  void _resetFormState(AuthCubit authCubit) {
+    // Reset form state when starting fresh
+    otpController.clear();
+    referralIdController.clear();
+    if (stepper.value == 1) {
+      stepper.value = 0;
+    }
+  }
+
+  Future<void> _initializeSmsAutofill() async {
+    try {
+      await SmsAutoFill().hint;
+      listenForCode();
+    } catch (e) {
+      print('SMS autofill initialization error: $e');
+    }
+  }
+
+  Future<void> _getPhoneHint() async {
+    try {
+      final hint = await SmsAutoFill().hint;
+      if (hint != null && hint.isNotEmpty) {
+        final phoneNumber = hint.replaceAll(RegExp(r'\D'), '');
+        if (phoneNumber.length >= 10) {
+          final lastTenDigits = phoneNumber.substring(phoneNumber.length - 10);
+          setState(() {
+            mobileNoController.text = lastTenDigits;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error getting phone hint: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    SmsAutoFill().unregisterListener();
+    cancel();
+    mobileNoController.dispose();
+    otpController.dispose();
+    referralIdController.dispose();
+    mobileFocusNode.dispose();
+    referralFocusNode.dispose();
+    isCheckboxChecked.dispose();
+    stepper.dispose();
+    super.dispose();
+  }
+
+  @override
+  void codeUpdated() {
+    print('SMS Code received: $code');
+    if (code != null && code!.length == 4) {
+      setState(() {
+        otpController.text = code!;
+      });
+      _onVerifyOtp(context, context.read<AuthCubit>());
+    }
+  }
+
+  void _onSendOtp(BuildContext context, AuthCubit authCubit) async {
     final phone = mobileNoController.text.trim();
-    final referCode = referralIdController.text.trim();
+
     if (phone.length != 10) {
       showSnackBar(context: context, message: Strings.pleaseEnterValidMobileNumber);
       return;
@@ -46,25 +117,67 @@ class LoginPage extends StatelessWidget {
       showSnackBar(context: context, message: Strings.pleaseCheckTermsAndConditions);
       return;
     }
-    if (state.isPhoneNumberExists == true) {
-      stepper.value = 1;
-      context.read<TimerCubit>().startTimer(seconds: 60);
-    } else {
-      await authCubit.initiateSignUp(phoneNumber: phone, referCode: referCode);
-    }
+
+    await authCubit.initiateSignUp(phoneNumber: mobileNoController.text, referCode: referralIdController.text);
   }
 
-  void _onVerifyOtp(BuildContext context, AuthCubit authCubit) async {
+  Future<void> _onVerifyOtp(BuildContext context, AuthCubit authCubit) async {
     final otp = otpController.text.trim();
-    if (otp.length != 4) {
+    if (otp.length != 6) {
       showSnackBar(context: context, message: Strings.pleaseEnter4DigitOTP);
       return;
     }
-    await authCubit.verifyOtp(
-      phoneNumber: mobileNoController.text.trim(),
-      otp: otp,
-      isUserExists: authCubit.state.isPhoneNumberExists ?? false,
-    );
+
+    try {
+      // Clear any previous error messages
+
+      await authCubit.verifyOtp(
+        phoneNumber: mobileNoController.text,
+        otp: otp,
+        isUserExists: authCubit.state.isPhoneNumberExists!,
+      );
+    } catch (e) {
+      showSnackBar(context: context, message: "OTP verification failed: $e");
+    }
+  }
+
+  void _handleOTPVerificationSuccess(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    final isUserExists = authCubit.state.isPhoneNumberExists ?? false;
+
+    if (isUserExists) {
+      Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
+    } else {
+      Navigator.pushNamed(
+        context,
+        AppRoutes.signUpPage,
+        arguments: AuthParamsModel(
+          phoneNumber: mobileNoController.text.trim(),
+          referralCode: referralIdController.text.trim(),
+        ),
+      );
+    }
+  }
+
+  void _handleCheckPhoneSuccess(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
+    if (authCubit.state.isPhoneNumberExists!) {
+      stepper.value++;
+    }
+  }
+
+  void _handleInitiateSignUpSuccess(BuildContext context) {
+    stepper.value = 1;
+    context.read<TimerCubit>().startTimer(seconds: 60);
+    showSnackBar(context: context, message: "OTP sent successfully", backgroundColor: AppColors.green);
+  }
+
+  void _handlePhoneNumberValidation(String value, AuthCubit authCubit) {
+    // Clear any previous error messages and check phone number
+    authCubit.checkPhoneNumber(value);
+    Future.delayed(const Duration(milliseconds: 100), () {
+      referralFocusNode.requestFocus();
+    });
   }
 
   Widget _buildPhoneInputStep(BuildContext context, AuthCubit authCubit) {
@@ -81,14 +194,25 @@ class LoginPage extends StatelessWidget {
               prefixText: "+91   ",
               maxLength: 10,
               onChanged: (value) {
-                if (value.length == 10) {
-                  authCubit.checkPhoneNumber(value);
-                  Future.delayed(const Duration(milliseconds: 100), () {
-                    referralFocusNode.requestFocus();
-                  });
+                if (value.isEmpty) {
+                  // User cleared the field completely - reset form state
+                  _resetFormState(authCubit);
+                } else if (value.length == 10) {
+                  // Handle phone number validation
+                  _handlePhoneNumberValidation(value, authCubit);
+                } else {
+                  authCubit.clearInitiateSignUpStatus();
                 }
               },
-              suffix:
+              suffix: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (mobileNoController.text.isEmpty)
+                    GestureDetector(
+                      onTap: _getPhoneHint,
+                      child: Icon(Icons.smartphone, color: AppColors.gradient3, size: 20),
+                    ),
+                  SizedBox(width: 8),
                   state.isLoading
                       ? const SizedBox(
                         height: 18,
@@ -96,6 +220,8 @@ class LoginPage extends StatelessWidget {
                         child: CircularProgressIndicator(color: AppColors.gradient3, strokeWidth: 2),
                       )
                       : const SizedBox.shrink(),
+                ],
+              ),
               keyboardType: TextInputType.number,
             );
           },
@@ -175,11 +301,11 @@ class LoginPage extends StatelessWidget {
                 } else {
                   return GestureDetector(
                     onTap: () async {
+                      // Clear any previous error messages
                       await authCubit.initiateSignUp(
-                        phoneNumber: mobileNoController.text.trim(),
-                        referCode: referralIdController.text.trim(),
+                        phoneNumber: mobileNoController.text,
+                        referCode: referralIdController.text,
                       );
-                      context.read<TimerCubit>().startTimer(seconds: 60);
                     },
                     child: Text(
                       'Resend OTP',
@@ -197,21 +323,23 @@ class LoginPage extends StatelessWidget {
           ],
         ),
         Gap(5.h),
-        SizedBox(
-          height: 45.h,
-          child: Pinput(
-            length: 4,
-            controller: otpController,
-            onCompleted: (value) async {
-              final state = context.read<AuthCubit>().state;
-              await authCubit.verifyOtp(
-                phoneNumber: mobileNoController.text,
-                otp: value,
-                isUserExists: state.isPhoneNumberExists ?? false,
-              );
-            },
-            separatorBuilder: (index) => SizedBox(width: 30),
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Center(
+          child: SizedBox(
+            height: 45.h,
+            child: Pinput(
+              length: 4,
+              separatorBuilder: (index) => SizedBox(width: 20),
+              controller: otpController,
+              obscureText: true,
+              obscuringCharacter: "*",
+              onCompleted: (value) async {
+                await authCubit.verifyOtp(
+                  phoneNumber: mobileNoController.text,
+                  otp: value,
+                  isUserExists: authCubit.state.isPhoneNumberExists ?? false,
+                );
+              },
+            ),
           ),
         ),
         Gap(20.h),
@@ -230,55 +358,42 @@ class LoginPage extends StatelessWidget {
             canPop: false,
             onPopInvokedWithResult: (didPop, result) {
               if (didPop) return;
-              if (stepper.value == 1) stepper.value--;
+              if (stepper.value == 1) {
+                stepper.value--;
+                // Clear error messages and reset form when going back to phone input step
+                _resetFormState(authCubit);
+              }
             },
             child: Scaffold(
               body: BlocListener<AuthCubit, AuthState>(
                 listener: (context, state) {
-                  if (stepper.value == 0) {
-                    // Step 1: Handle check phone response
-                    if (state.checkPhoneApiStatus == ApiStatus.success) {
-                      if (state.isPhoneNumberExists == true) {
-                        stepper.value = 1;
-                        context.read<TimerCubit>().startTimer(seconds: 60);
-                      }
+                  // Handle check phone number response
+                  if (state.checkPhoneApiStatus == ApiStatus.success) {
+                    _handleCheckPhoneSuccess(context);
+                  } else if (state.checkPhoneApiStatus == ApiStatus.failed) {
+                    if (state.checkPhoneErrorMessage != null && state.checkPhoneApiStatus.isSuccess) {
+                      showSnackBar(context: context, message: state.checkPhoneErrorMessage!);
                     }
+                  }
 
-                    // Step 2: Handle initiateSignUp response
-                    if (state.initiateSignUpStatus == ApiStatus.success) {
-                      if (state.isVerified == true) {
-                        stepper.value = 1;
-                        context.read<TimerCubit>().startTimer(seconds: 60);
-                      } else if (state.isVerified == false) {
-                        // Only show this when we are *sure* it's not verified
-                        showSnackBar(context: context, message: Strings.referCodeInvalid);
-                      }
+                  // Handle initiate sign up response
+                  if (state.initiateSignUpStatus == ApiStatus.success) {
+                    _handleInitiateSignUpSuccess(context);
+                  } else if (state.initiateSignUpStatus == ApiStatus.failed) {
+                    if (state.initiateSignUpErrorMessage != null && state.checkPhoneErrorMessage == null) {
+                      showSnackBar(context: context, message: state.initiateSignUpErrorMessage!);
                     }
-                  } else {
-                    // Step 3: Handle verify OTP response
-                    if (state.verifyOtpStatus == ApiStatus.success) {
-                      if (state.isOTPVerified == true) {
-                        if (state.isPhoneNumberExists == true) {
-                          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
-                        } else {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.signUpPage,
-                            arguments: AuthParamsModel(
-                              phoneNumber: mobileNoController.text,
-                              referralCode: referralIdController.text,
-                            ),
-                          );
-                        }
-                      } else {
-                        showSnackBar(context: context, message: Strings.otpInvalid);
-                      }
-                    } else if (state.verifyOtpStatus == ApiStatus.failed) {
-                      showSnackBar(context: context, message: state.verifyOtpErrorMessage ?? 'Something went wrong');
+                  }
+
+                  // Handle OTP verification response
+                  if (state.verifyOtpStatus == ApiStatus.success) {
+                    _handleOTPVerificationSuccess(context);
+                  } else if (state.verifyOtpStatus == ApiStatus.failed) {
+                    if (state.verifyOtpErrorMessage != null) {
+                      showSnackBar(context: context, message: state.verifyOtpErrorMessage!);
                     }
                   }
                 },
-
                 child: SingleChildScrollView(
                   child: ValueListenableBuilder<int>(
                     valueListenable: stepper,
@@ -341,17 +456,19 @@ class LoginPage extends StatelessWidget {
                                           BlocBuilder<AuthCubit, AuthState>(
                                             builder: (context, state) {
                                               final isLoading =
+                                                  state.checkPhoneApiStatus.isLoading ||
                                                   state.initiateSignUpStatus.isLoading ||
                                                   state.verifyOtpStatus.isLoading;
                                               final isOtpStep = step == 1;
+
                                               return AppButton(
                                                 text: isOtpStep ? Strings.verifyOTP : Strings.sendOTP,
                                                 isLoading: isLoading,
-                                                onPressed: () {
+                                                onPressed: () async {
                                                   if (!isOtpStep) {
-                                                    _onSendOtp(context, authCubit, state);
+                                                    _onSendOtp(context, authCubit);
                                                   } else {
-                                                    _onVerifyOtp(context, authCubit);
+                                                    await _onVerifyOtp(context, authCubit);
                                                   }
                                                 },
                                               );

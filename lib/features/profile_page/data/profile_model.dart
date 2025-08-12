@@ -10,7 +10,9 @@ class ProfileModel {
   final int walletBalance;
   final String? state;
   final String? area;
+  final String? gender;
   final DateTime? dob;
+  final String? profilePictureUrl;
 
   ProfileModel({
     required this.id,
@@ -25,6 +27,8 @@ class ProfileModel {
     required this.state,
     required this.area,
     this.dob,
+    this.gender,
+    this.profilePictureUrl,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -40,7 +44,9 @@ class ProfileModel {
       walletBalance: json['walletBalance'],
       state: json['state'],
       area: json['area'],
-      dob: json['dob'] != null ? DateTime.tryParse(json['dob']) : null,
+      profilePictureUrl: json['profilePictureUrl'] ?? '',
+      dob: json['dateOfBirth'] != null ? DateTime.tryParse(json['dateOfBirth']) : null,
+      gender: json['gender'] ?? 'SELECT',
     );
   }
 
@@ -57,6 +63,8 @@ class ProfileModel {
     String? state,
     String? area,
     DateTime? dob,
+    String? profilePictureUrl,
+    String? gender,
   }) {
     return ProfileModel(
       id: id ?? this.id,
@@ -71,6 +79,8 @@ class ProfileModel {
       state: state ?? this.state,
       area: area ?? this.area,
       dob: dob ?? this.dob,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      gender: gender ?? this.gender,
     );
   }
 
@@ -87,7 +97,9 @@ class ProfileModel {
       'walletBalance': walletBalance,
       'state': state,
       'area': area,
-      'dob': dob?.toIso8601String(),
+      'dateOfBirth': dob?.toIso8601String(),
+      'profilePictureUrl': profilePictureUrl,
+      'gender': gender,
     };
   }
-} 
+}

@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
+import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
-import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
-import 'package:stoxplay/utils/constants/app_strings.dart' show Strings;
 
 class UpcomingItemWidget extends StatelessWidget {
-  const UpcomingItemWidget({super.key});
+  final StatsDataModel data;
+
+  const UpcomingItemWidget({required this.data, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +33,16 @@ class UpcomingItemWidget extends StatelessWidget {
             child: Row(
               children: [
                 // HDFC Bank Logo
-                Container(
-                  width: 50.w,
-                  height: 50.h,
-                  decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: AppColors.red, width: 2)),
-                  child: Image.asset(AppAssets.appIcon),
+                CircleAvatar(
+                  radius: 20.r,
+                  child: ClipOval(
+                    child: CachedImageWidget(
+                      imageUrl: data.contest?.sectorLogo ?? '',
+                      height: 100.h,
+                      width: 100.w,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
                 Gap(12.w),
                 // Bank Name and Type
@@ -42,7 +51,7 @@ class UpcomingItemWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextView(
-                        text: "Bank wars",
+                        text: data.name ?? '',
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                         fontColor: AppColors.black,
@@ -63,17 +72,25 @@ class UpcomingItemWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     TextView(
-                      text: "Entry Fee ₹500",
+                      text: "Entry Fee ₹${data.contest?.entryFee}",
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
                       fontColor: AppColors.purple5A2F,
                     ),
                     Gap(2.h),
-                    TextView(
-                      text: "Time Left: 09:10:59",
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w400,
-                      fontColor: AppColors.black9999,
+                    BlocBuilder<TimerCubit, TimerState>(
+                      builder: (context, timerState) {
+                        if (timerState.isRunning) {
+                          final duration = Duration(seconds: timerState.secondsRemaining);
+                          final hours = duration.inHours.remainder(24).toString().padLeft(2, '0');
+                          final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+                          final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+
+                          return Text('Time Left: $hours:$minutes:$seconds');
+                        } else {
+                          return const Text('');
+                        }
+                      },
                     ),
                   ],
                 ),
@@ -129,7 +146,7 @@ class UpcomingItemWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextView(
-                      text: "Team-1",
+                      text: "${data.name?.split("-").last}",
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
                       fontColor: AppColors.purple5A2F,
@@ -187,17 +204,22 @@ class UpcomingItemWidget extends StatelessWidget {
                     Row(
                       children: [
                         // View Button
-                        Row(
-                          children: [
-                            Icon(Icons.visibility_outlined, size: 16.sp, color: AppColors.black6666),
-                            Gap(4.w),
-                            TextView(
-                              text: "View",
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              fontColor: AppColors.black6666,
-                            ),
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: data.id ?? '');
+                          },
+                          child: Row(
+                            children: [
+                              Icon(Icons.visibility_outlined, size: 16.sp, color: AppColors.black6666),
+                              Gap(4.w),
+                              TextView(
+                                text: "View",
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                fontColor: AppColors.black6666,
+                              ),
+                            ],
+                          ),
                         ),
                         Gap(10.w),
 

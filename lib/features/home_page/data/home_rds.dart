@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/api_service.dart';
@@ -7,6 +9,7 @@ import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/models/QueryParams.dart';
 
 import 'models/sector_model.dart';
@@ -21,6 +24,8 @@ abstract class HomeRds {
   Future<StockResponseModel> getStockList(String contestId);
 
   Future<JoinContestResponseModel> joinContest(JoinContestParamsModel contestId);
+
+  Future<StatsModel> getMyContests();
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -99,6 +104,19 @@ class HomeRdsImpl extends HomeRds {
       // Parse the data from the response
       final responseData = response.data['data'];
       return JoinContestResponseModel.fromJson(responseData);
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<StatsModel> getMyContests() async {
+    try {
+      final response = await client.get(ApiUrls.getMyContests);
+      final responseData = response.data['data'];
+      return StatsModel.fromJson(responseData);
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

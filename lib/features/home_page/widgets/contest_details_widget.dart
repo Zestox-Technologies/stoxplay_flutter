@@ -39,7 +39,7 @@ class ContestDetailsWidget extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              Positioned.fill(child: Image.asset(AppAssets.lightSplashStrokes)),
+              // Positioned.fill(child: Image.asset(AppAssets.lightSplashStrokes)),
               Column(
                 children: [
                   Column(
@@ -77,7 +77,7 @@ class ContestDetailsWidget extends StatelessWidget {
                               Navigator.pushNamed(
                                 context,
                                 AppRoutes.stockSelectionScreen,
-                                arguments: data.id.toString(),
+                                arguments: {'contestId': data.id.toString(), 'price': data.entryFee.toString()},
                               );
                             },
                             child: Container(
@@ -143,7 +143,7 @@ class ContestDetailsWidget extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Image.asset(AppAssets.medalIcon, height: 10.h, width: 10.w),
+                                Image.asset(AppAssets.firstPrizeIcon, height: 10.h, width: 10.w),
                                 SizedBox(width: 5.w),
                                 TextView(text: "50k", fontColor: AppColors.black6666, fontSize: 12.sp),
                               ],
@@ -151,7 +151,7 @@ class ContestDetailsWidget extends StatelessWidget {
                             SizedBox(width: 20.w),
                             Row(
                               children: [
-                                Image.asset(AppAssets.cupIcon, height: 10.h, width: 10.w),
+                                Image.asset(AppAssets.championIcon, height: 10.h, width: 10.w),
                                 SizedBox(width: 5.w),
                                 TextView(
                                   text: "${data.winningChancePercentage.toString()}%",
@@ -163,7 +163,7 @@ class ContestDetailsWidget extends StatelessWidget {
                             SizedBox(width: 20.w),
                             Row(
                               children: [
-                                Image.asset(AppAssets.mIcon, height: 10.h, width: 10.w),
+                                Image.asset(AppAssets.mIcon, color: AppColors.orangeCCCC, height: 10.h, width: 10.w),
                                 SizedBox(width: 5.w),
                                 TextView(
                                   text: data.teamsPerUser.toString(),

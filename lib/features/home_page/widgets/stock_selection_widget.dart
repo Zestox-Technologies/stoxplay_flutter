@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,9 +36,11 @@ class StockSelectionWidget extends StatelessWidget {
     return BlocBuilder<StockSelectionCubit, StockSelectionState>(
       bloc: cubit,
       builder: (context, state) {
+        print(stock.selectionPercentage);
         return ValueListenableBuilder(
           valueListenable: stepper,
           builder: (context, steps, _) {
+            bool isDown = (stock.downPredictionPercentage?.toInt() ?? 0) > (stock.upPredictionPercentage?.toInt() ?? 0);
             return Stack(
               children: [
                 Container(
@@ -46,15 +50,15 @@ class StockSelectionWidget extends StatelessWidget {
                     boxShadow: [
                       BoxShadow(
                         color:
-                        stepper.value == 1
-                            ? (state.selectedStockList[index].stockPrediction == StockPrediction.up)
-                            ? AppColors.green0CAE
-                            : AppColors.red
-                            : (state.stockList[index].stockPrediction == StockPrediction.up)
-                            ? AppColors.green0CAE
-                            : (state.stockList[index].stockPrediction == StockPrediction.down)
-                            ? AppColors.red
-                            : AppColors.blue7E.withOpacity(0.5),
+                            stepper.value == 1
+                                ? (state.selectedStockList[index].stockPrediction == StockPrediction.up)
+                                    ? AppColors.green0CAE
+                                    : AppColors.red
+                                : (state.stockList[index].stockPrediction == StockPrediction.up)
+                                ? AppColors.green0CAE
+                                : (state.stockList[index].stockPrediction == StockPrediction.down)
+                                ? AppColors.red
+                                : AppColors.blue7E.withOpacity(0.5),
                         offset: const Offset(0, 0),
                         blurRadius: 4,
                         spreadRadius: 1,
@@ -62,15 +66,15 @@ class StockSelectionWidget extends StatelessWidget {
                     ],
                     border: Border.all(
                       color:
-                      stepper.value == 1
-                          ? (state.selectedStockList[index].stockPrediction == StockPrediction.up)
-                          ? AppColors.green0CAE
-                          : AppColors.red
-                          : (state.stockList[index].stockPrediction == StockPrediction.up)
-                          ? AppColors.green0CAE
-                          : (state.stockList[index].stockPrediction == StockPrediction.down)
-                          ? AppColors.red
-                          : AppColors.blue7E.withOpacity(0.5),
+                          stepper.value == 1
+                              ? (state.selectedStockList[index].stockPrediction == StockPrediction.up)
+                                  ? AppColors.green0CAE
+                                  : AppColors.red
+                              : (state.stockList[index].stockPrediction == StockPrediction.up)
+                              ? AppColors.green0CAE
+                              : (state.stockList[index].stockPrediction == StockPrediction.down)
+                              ? AppColors.red
+                              : AppColors.blue7E.withOpacity(0.5),
                     ),
                   ),
                   child: Container(
@@ -85,7 +89,14 @@ class StockSelectionWidget extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            SizedBox(height: 35.h, width: 35.w, child: SVGImageWidget(imageUrl: stock.image ?? '')),
+                            SizedBox(
+                              height: 35.h,
+                              width: 35.w,
+                              child: SVGImageWidget(
+                                imageUrl: stock.image ?? '',
+                                errorWidget: Image.network(stock.image.toString()),
+                              ),
+                            ),
                             SizedBox(width: 15.w),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -95,10 +106,7 @@ class StockSelectionWidget extends StatelessWidget {
                                   text: '₹${stock.stockPrice} (${stock.netChange.toString()}%) ',
                                   fontWeight: FontWeight.w500,
                                   fontSize: 12.sp,
-                                  fontColor:
-                                  (stock.netChange ?? 0.0) < 0
-                                      ? AppColors.red
-                                      : AppColors.green0CAE,
+                                  fontColor: (stock.netChange ?? 0.0) < 0 ? AppColors.red : AppColors.green0CAE,
                                 ),
                               ],
                             ),
@@ -111,248 +119,276 @@ class StockSelectionWidget extends StatelessWidget {
                             child: Row(
                               children: [
                                 Icon(
-                                  index % 2 == 0 ? Icons.arrow_downward : Icons.arrow_upward,
+                                  isDown ? Icons.arrow_downward : Icons.arrow_upward,
                                   size: 13.sp,
-                                  color: index % 2 == 0 ? AppColors.red : AppColors.green0CAE,
+                                  color: isDown ? AppColors.red : AppColors.green0CAE,
                                 ),
                                 TextView(
-                                  text: "30%",
+                                  text: '${(stock.selectionPercentage ?? 0).toString()}%',
                                   fontSize: 13.sp,
-                                  fontColor: index % 2 == 0 ? AppColors.red : AppColors.green0CAE,
+                                  fontColor: isDown ? AppColors.red : AppColors.green0CAE,
                                 ),
                               ],
                             ),
                           ),
                         stepper.value == 1
                             ? Row(
-                          spacing: 7.w,
-                          children: [
-                            CircularIconWidget(
-                              onPressed: () {
-                                final oldStock = state.selectedStockList[index];
-                                final isSelected = state.selectedStockList.any(
+                              spacing: 7.w,
+                              children: [
+                                CircularIconWidget(
+                                  onPressed: () {
+                                    final oldStock = state.selectedStockList[index];
+                                    final isSelected = state.selectedStockList.any(
                                       (stock) =>
-                                  (stock.stockPosition == StockPosition.leader &&
-                                      stock == state.selectedStockList[index]),
-                                );
-                                final updatedStock = Stock(
-                                  stockName: oldStock.stockName,
-                                  id: oldStock.id,
-                                  stockPrice: oldStock.stockPrice,
-                                  percentage: oldStock.percentage,
-                                  image: oldStock.image,
-                                  netChange: oldStock.netChange,
-                                  currentPrice: oldStock.currentPrice,
-                                  stockPrediction: oldStock.stockPrediction,
-                                  stockPosition: isSelected ? StockPosition.none : StockPosition.leader,
-                                );
-                                cubit.updateSelectedStock(
-                                  stock: updatedStock,
-                                  index: index,
-                                  stockPosition: StockPosition.leader,
-                                );
-                              },
-                              shadowBlurRadius: 3,
-                              borderColor: AppColors.black9A9A,
-                              backgroundColor:
-                              state.selectedStockList[index].stockPosition == StockPosition.leader
-                                  ? AppColors.purple5A2F
-                                  : AppColors.white,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextView(
-                                    text: "L",
-                                    fontSize: 14.sp,
-                                    fontColor:
-                                    state.selectedStockList[index].stockPosition == StockPosition.leader
-                                        ? AppColors.white
-                                        : AppColors.black9A9A,
-                                    lineHeight: 0,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: TextView(
-                                      text: "45%",
-                                      fontColor:
+                                          (stock.stockPosition == StockPosition.leader &&
+                                              stock == state.selectedStockList[index]),
+                                    );
+                                    final updatedStock = Stock(
+                                      stockName: oldStock.stockName,
+                                      id: oldStock.id,
+                                      stockPrice: oldStock.stockPrice,
+                                      percentage: oldStock.percentage,
+                                      image: oldStock.image,
+                                      netChange: oldStock.netChange,
+                                      currentPrice: oldStock.currentPrice,
+                                      stockPrediction: oldStock.stockPrediction,
+                                      stockPosition: isSelected ? StockPosition.none : StockPosition.leader,
+                                      selectionPercentage: stock.selectionPercentage,
+                                      captainSelectionPercentage: stock.captainSelectionPercentage,
+                                      viceCaptainSelectionPercentage: stock.viceCaptainSelectionPercentage,
+                                      flexSelectionPercentage: stock.flexSelectionPercentage,
+                                      upPredictionPercentage: stock.upPredictionPercentage,
+                                      downPredictionPercentage: stock.downPredictionPercentage,
+                                      lastUpdated: stock.lastUpdated,
+                                      livePoints: stock.livePoints,
+                                      isLiveData: stock.isLiveData,
+                                    );
+                                    cubit.updateSelectedStock(
+                                      stock: updatedStock,
+                                      index: index,
+                                      stockPosition: StockPosition.leader,
+                                    );
+                                  },
+                                  shadowBlurRadius: 3,
+                                  borderColor: AppColors.black9A9A,
+                                  backgroundColor:
                                       state.selectedStockList[index].stockPosition == StockPosition.leader
-                                          ? AppColors.white
-                                          : AppColors.black9A9A,
-                                      fontSize: 5.sp,
-                                      fontWeight: FontWeight.w900,
-                                    ),
+                                          ? AppColors.purple5A2F
+                                          : AppColors.white,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextView(
+                                        text: "L",
+                                        fontSize: 14.sp,
+                                        fontColor:
+                                            state.selectedStockList[index].stockPosition == StockPosition.leader
+                                                ? AppColors.white
+                                                : AppColors.black9A9A,
+                                        lineHeight: 0,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                      Transform.translate(
+                                        offset: const Offset(0, -3),
+                                        child: TextView(
+                                          text: "${state.selectedStockList[index].captainSelectionPercentage ?? ''}%",
+                                          fontColor:
+                                              state.selectedStockList[index].stockPosition == StockPosition.leader
+                                                  ? AppColors.white
+                                                  : AppColors.black9A9A,
+                                          fontSize: 5.sp,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            CircularIconWidget(
-                              onPressed: () {
-                                final oldStock = state.selectedStockList[index];
-                                final isSelected = state.selectedStockList.any(
+                                ),
+                                CircularIconWidget(
+                                  onPressed: () {
+                                    final oldStock = state.selectedStockList[index];
+                                    final isSelected = state.selectedStockList.any(
                                       (stock) =>
-                                  (stock.stockPosition == StockPosition.coLeader &&
-                                      stock == state.selectedStockList[index]),
-                                );
-                                final updatedStock = Stock(
-                                  stockName: oldStock.stockName,
-                                  id: oldStock.id,
-                                  stockPrice: oldStock.stockPrice,
-                                  percentage: oldStock.percentage,
-                                  image: oldStock.image,
-                                  netChange: oldStock.netChange,
-                                  currentPrice: oldStock.currentPrice,
-                                  stockPrediction: oldStock.stockPrediction,
-                                  stockPosition: isSelected ? StockPosition.none : StockPosition.coLeader,
-                                );
-                                cubit.updateSelectedStock(
-                                  stock: updatedStock,
-                                  index: index,
-                                  stockPosition: StockPosition.coLeader,
-                                );
-                              },
-                              shadowBlurRadius: 3,
-                              borderColor: AppColors.black9A9A,
-                              backgroundColor:
-                              state.selectedStockList[index].stockPosition == StockPosition.coLeader
-                                  ? AppColors.purple5A2F
-                                  : AppColors.white,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextView(
-                                    text: "CL",
-                                    fontSize: 14.sp,
-                                    fontColor:
-                                    state.selectedStockList[index].stockPosition == StockPosition.coLeader
-                                        ? AppColors.white
-                                        : AppColors.black9A9A,
-                                    lineHeight: 0,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: TextView(
-                                      text: "70%",
-                                      fontColor:
+                                          (stock.stockPosition == StockPosition.coLeader &&
+                                              stock == state.selectedStockList[index]),
+                                    );
+                                    final updatedStock = Stock(
+                                      stockName: oldStock.stockName,
+                                      id: oldStock.id,
+                                      stockPrice: oldStock.stockPrice,
+                                      percentage: oldStock.percentage,
+                                      image: oldStock.image,
+                                      netChange: oldStock.netChange,
+                                      currentPrice: oldStock.currentPrice,
+                                      stockPrediction: oldStock.stockPrediction,
+                                      stockPosition: isSelected ? StockPosition.none : StockPosition.coLeader,
+                                      selectionPercentage: stock.selectionPercentage,
+                                      captainSelectionPercentage: stock.captainSelectionPercentage,
+                                      viceCaptainSelectionPercentage: stock.viceCaptainSelectionPercentage,
+                                      flexSelectionPercentage: stock.flexSelectionPercentage,
+                                      upPredictionPercentage: stock.upPredictionPercentage,
+                                      downPredictionPercentage: stock.downPredictionPercentage,
+                                      lastUpdated: stock.lastUpdated,
+                                      livePoints: stock.livePoints,
+                                      isLiveData: stock.isLiveData,
+                                    );
+                                    cubit.updateSelectedStock(
+                                      stock: updatedStock,
+                                      index: index,
+                                      stockPosition: StockPosition.coLeader,
+                                    );
+                                  },
+                                  shadowBlurRadius: 3,
+                                  borderColor: AppColors.black9A9A,
+                                  backgroundColor:
                                       state.selectedStockList[index].stockPosition == StockPosition.coLeader
-                                          ? AppColors.white
-                                          : AppColors.black9A9A,
-                                      fontSize: 6.sp,
-                                      fontWeight: FontWeight.w900,
-                                    ),
+                                          ? AppColors.purple5A2F
+                                          : AppColors.white,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextView(
+                                        text: "CL",
+                                        fontSize: 14.sp,
+                                        fontColor:
+                                            state.selectedStockList[index].stockPosition == StockPosition.coLeader
+                                                ? AppColors.white
+                                                : AppColors.black9A9A,
+                                        lineHeight: 0,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                      Transform.translate(
+                                        offset: const Offset(0, -3),
+                                        child: TextView(
+                                          text: "${state.selectedStockList[index].flexSelectionPercentage ?? ''}%",
+                                          fontColor:
+                                              state.selectedStockList[index].stockPosition == StockPosition.coLeader
+                                                  ? AppColors.white
+                                                  : AppColors.black9A9A,
+                                          fontSize: 6.sp,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            CircularIconWidget(
-                              onPressed: () {
-                                final oldStock = state.selectedStockList[index];
-                                final isSelected = state.selectedStockList.any(
+                                ),
+                                CircularIconWidget(
+                                  onPressed: () {
+                                    final oldStock = state.selectedStockList[index];
+                                    final isSelected = state.selectedStockList.any(
                                       (stock) =>
-                                  (stock.stockPosition == StockPosition.viceLeader &&
-                                      stock == state.selectedStockList[index]),
-                                );
-                                final updatedStock = Stock(
-                                  stockName: oldStock.stockName,
-                                  id: oldStock.id,
-                                  stockPrice: oldStock.stockPrice,
-                                  percentage: oldStock.percentage,
-                                  image: oldStock.image,
-                                  netChange: oldStock.netChange,
-                                  currentPrice: oldStock.currentPrice,
-                                  stockPrediction: oldStock.stockPrediction,
-                                  stockPosition: isSelected ? StockPosition.none : StockPosition.viceLeader,
-                                );
-                                cubit.updateSelectedStock(
-                                  stock: updatedStock,
-                                  index: index,
-                                  stockPosition: StockPosition.viceLeader,
-                                );
-                              },
-                              borderColor: AppColors.black9A9A,
-                              backgroundColor:
-                              state.selectedStockList[index].stockPosition == StockPosition.viceLeader
-                                  ? AppColors.purple5A2F
-                                  : AppColors.white,
-                              shadowBlurRadius: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextView(
-                                    text: "VL",
-                                    fontSize: 14.sp,
-                                    fontColor:
-                                    state.selectedStockList[index].stockPosition == StockPosition.viceLeader
-                                        ? AppColors.white
-                                        : AppColors.black9A9A,
-                                    lineHeight: 0,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -3),
-                                    child: TextView(
-                                      text: "50%",
-                                      fontColor:
+                                          (stock.stockPosition == StockPosition.viceLeader &&
+                                              stock == state.selectedStockList[index]),
+                                    );
+                                    final updatedStock = Stock(
+                                      stockName: oldStock.stockName,
+                                      id: oldStock.id,
+                                      stockPrice: oldStock.stockPrice,
+                                      percentage: oldStock.percentage,
+                                      image: oldStock.image,
+                                      netChange: oldStock.netChange,
+                                      currentPrice: oldStock.currentPrice,
+                                      stockPrediction: oldStock.stockPrediction,
+                                      stockPosition: isSelected ? StockPosition.none : StockPosition.viceLeader,
+                                      selectionPercentage: stock.selectionPercentage,
+                                      captainSelectionPercentage: stock.captainSelectionPercentage,
+                                      viceCaptainSelectionPercentage: stock.viceCaptainSelectionPercentage,
+                                      flexSelectionPercentage: stock.flexSelectionPercentage,
+                                      upPredictionPercentage: stock.upPredictionPercentage,
+                                      downPredictionPercentage: stock.downPredictionPercentage,
+                                      lastUpdated: stock.lastUpdated,
+                                      livePoints: stock.livePoints,
+                                      isLiveData: stock.isLiveData,
+                                    );
+                                    cubit.updateSelectedStock(
+                                      stock: updatedStock,
+                                      index: index,
+                                      stockPosition: StockPosition.viceLeader,
+                                    );
+                                  },
+                                  borderColor: AppColors.black9A9A,
+                                  backgroundColor:
                                       state.selectedStockList[index].stockPosition == StockPosition.viceLeader
-                                          ? AppColors.white
-                                          : AppColors.black9A9A,
-                                      fontSize: 6.sp,
-                                      fontWeight: FontWeight.w900,
-                                    ),
+                                          ? AppColors.purple5A2F
+                                          : AppColors.white,
+                                  shadowBlurRadius: 3,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextView(
+                                        text: "VL",
+                                        fontSize: 14.sp,
+                                        fontColor:
+                                            state.selectedStockList[index].stockPosition == StockPosition.viceLeader
+                                                ? AppColors.white
+                                                : AppColors.black9A9A,
+                                        lineHeight: 0,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                      Transform.translate(
+                                        offset: const Offset(0, -3),
+                                        child: TextView(
+                                          text:
+                                              "${state.selectedStockList[index].viceCaptainSelectionPercentage ?? ''}%",
+                                          fontColor:
+                                              state.selectedStockList[index].stockPosition == StockPosition.viceLeader
+                                                  ? AppColors.white
+                                                  : AppColors.black9A9A,
+                                          fontSize: 6.sp,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
+                                ),
+                              ],
+                            )
                             : Row(
-                          spacing: 7.w,
-                          children: [
-                            CircularIconWidget(
-                              onPressed: onUpPressed,
-                              icon: Icons.arrow_upward,
-                              iconSize: 18.sp,
-                              borderColor:
-                              (state.stockList[index].stockPrediction == StockPrediction.up)
-                                  ? AppColors.white
-                                  : AppColors.green0CAE,
-                              boxShadowColor: AppColors.green0CAE,
-                              shadowBlurRadius: 2,
-                              backgroundColor:
-                              (state.stockList[index].stockPrediction == StockPrediction.up)
-                                  ? AppColors.green0CAE
-                                  : AppColors.white,
-                              iconColor:
-                              (state.stockList[index].stockPrediction == StockPrediction.up)
-                                  ? AppColors.white
-                                  : AppColors.green0CAE,
+                              spacing: 7.w,
+                              children: [
+                                CircularIconWidget(
+                                  onPressed: onUpPressed,
+                                  icon: Icons.arrow_upward,
+                                  iconSize: 18.sp,
+                                  borderColor:
+                                      (state.stockList[index].stockPrediction == StockPrediction.up)
+                                          ? AppColors.white
+                                          : AppColors.green0CAE,
+                                  boxShadowColor: AppColors.green0CAE,
+                                  shadowBlurRadius: 2,
+                                  backgroundColor:
+                                      (state.stockList[index].stockPrediction == StockPrediction.up)
+                                          ? AppColors.green0CAE
+                                          : AppColors.white,
+                                  iconColor:
+                                      (state.stockList[index].stockPrediction == StockPrediction.up)
+                                          ? AppColors.white
+                                          : AppColors.green0CAE,
+                                ),
+                                SizedBox(),
+                                CircularIconWidget(
+                                  onPressed: onDownPressed,
+                                  icon: Icons.arrow_downward_rounded,
+                                  iconSize: 18.sp,
+                                  borderColor:
+                                      (state.stockList[index].stockPrediction == StockPrediction.down)
+                                          ? AppColors.white
+                                          : AppColors.red,
+                                  boxShadowColor: AppColors.red,
+                                  shadowBlurRadius: 2,
+                                  backgroundColor:
+                                      (state.stockList[index].stockPrediction == StockPrediction.down)
+                                          ? AppColors.red
+                                          : AppColors.white,
+                                  iconColor:
+                                      (state.stockList[index].stockPrediction == StockPrediction.down)
+                                          ? AppColors.white
+                                          : AppColors.red,
+                                ),
+                              ],
                             ),
-                            SizedBox(),
-                            CircularIconWidget(
-                              onPressed: onDownPressed,
-                              icon: Icons.arrow_downward_rounded,
-                              iconSize: 18.sp,
-                              borderColor:
-                              (state.stockList[index].stockPrediction == StockPrediction.down)
-                                  ? AppColors.white
-                                  : AppColors.red,
-                              boxShadowColor: AppColors.red,
-                              shadowBlurRadius: 2,
-                              backgroundColor:
-                              (state.stockList[index].stockPrediction == StockPrediction.down)
-                                  ? AppColors.red
-                                  : AppColors.white,
-                              iconColor:
-                              (state.stockList[index].stockPrediction == StockPrediction.down)
-                                  ? AppColors.white
-                                  : AppColors.red,
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),

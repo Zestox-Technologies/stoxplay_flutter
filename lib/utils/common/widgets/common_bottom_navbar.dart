@@ -1,8 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stoxplay/config/navigation/navigation_state.dart';
+import 'package:stoxplay/core/di/service_locator.dart';
+import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
+import 'package:stoxplay/features/stats_page/presentation/cubit/stats_cubit.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 
@@ -33,14 +37,29 @@ class CustomBottomNavbar extends StatefulWidget {
 }
 
 class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
+  late ProfileCubit profileCubit;
+  late StatsCubit statsCubit;
+
   final List<Map<String, dynamic>> _menuItems = [
     {'icon': AppAssets.homeIcon, 'label': 'Home'},
     {'icon': AppAssets.statsIcon, 'label': 'Stats'},
     {'icon': AppAssets.profileIcon, 'label': 'Profile'},
   ];
 
+  @override
+  void initState() {
+    profileCubit = BlocProvider.of<ProfileCubit>(context);
+    statsCubit = BlocProvider.of<StatsCubit>(context);
+    super.initState();
+  }
+
   void _onItemTapped(int index) {
     NavigationState().updateIndex(index);
+    if (index != 1) {
+      profileCubit.fetchProfile();
+    } else {
+      statsCubit.getMyContests();
+    }
   }
 
   @override
@@ -50,7 +69,7 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
         padding: EdgeInsets.only(top: 10),
         height: 55.h,
         width: double.infinity,
-        decoration:  BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
           border: Border(top: BorderSide(color: AppColors.black6767, width: 0.5)),
         ),
@@ -62,7 +81,6 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
               children: List.generate(_menuItems.length, (index) {
                 final item = _menuItems[index];
                 final isSelected = selectedIndex == index;
-
                 return GestureDetector(
                   onTap: () => _onItemTapped(index),
                   child: Column(

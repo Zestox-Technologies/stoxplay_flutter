@@ -13,11 +13,17 @@ class StockDataModel {
   final double? currentPrice;
   final bool? isActive;
   final String? sectorId;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
   final double? previousDayClose;
   final double? netChange;
   final double? percentageChange;
+  final int? selectionPercentage;
+  final int? captainSelectionPercentage;
+  final int? viceCaptainSelectionPercentage;
+  final int? flexSelectionPercentage;
+  final int? upPredictionPercentage;
+  final int? downPredictionPercentage;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   StockDataModel({
     this.id,
@@ -28,45 +34,68 @@ class StockDataModel {
     this.currentPrice,
     this.isActive,
     this.sectorId,
-    this.createdAt,
-    this.updatedAt,
     this.previousDayClose,
     this.netChange,
     this.percentageChange,
+    this.selectionPercentage,
+    this.captainSelectionPercentage,
+    this.viceCaptainSelectionPercentage,
+    this.flexSelectionPercentage,
+    this.upPredictionPercentage,
+    this.downPredictionPercentage,
+    this.createdAt,
+    this.updatedAt,
   });
 
-  factory StockDataModel.fromJson(Map<String, dynamic> json) => StockDataModel(
-    id: json["id"],
-    symbol: json["symbol"],
-    name: json["name"],
-    instrumentKey: json["instrumentKey"],
-    logoUrl: json["logoUrl"],
-    currentPrice: json["currentPrice"]?.toDouble(),
-    isActive: json["isActive"],
-    sectorId: json["sectorId"],
-    previousDayClose: json["previousDayClose"]?.toDouble(),
-    netChange: json["netChange"]?.toDouble(),
-    createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-    updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
-    percentageChange: json["percentageChange"]?.toDouble(),
-  );
+  factory StockDataModel.fromJson(Map<String, dynamic> json) {
+    return StockDataModel(
+      id: json["id"],
+      symbol: json["symbol"],
+      name: json["name"],
+      instrumentKey: json["instrumentKey"],
+      logoUrl: json["logoUrl"],
+      currentPrice: (json["currentPrice"] as num?)?.toDouble(),
+      isActive: json["isActive"],
+      sectorId: json["sectorId"],
+      previousDayClose: (json["previousDayClose"] as num?)?.toDouble(),
+      netChange: (json["netChange"] as num?)?.toDouble(),
+      percentageChange: (json["percentageChange"] as num?)?.toDouble(),
+      selectionPercentage: json["selectionPercentage"] ?? 0,
+      captainSelectionPercentage: json["captainSelectionPercentage"] ?? 0,
+      viceCaptainSelectionPercentage: json["viceCaptainSelectionPercentage"] ?? 0,
+      flexSelectionPercentage: json["flexSelectionPercentage"] ?? 0,
+      upPredictionPercentage: json["upPredictionPercentage"] ?? 0,
+      downPredictionPercentage: json["downPredictionPercentage"] ?? 0,
+      createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
+      updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "symbol": symbol,
-    "name": name,
-    "instrumentKey": instrumentKey,
-    "logoUrl": logoUrl,
-    "currentPrice": currentPrice,
-    "isActive": isActive,
-    "sectorId": sectorId,
-    "previousDayClose": previousDayClose,
-    "netChange": netChange,
-    "createdAt": createdAt?.toIso8601String(),
-    "updatedAt": updatedAt?.toIso8601String(),
-    "percentageChange": percentageChange,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "symbol": symbol,
+      "name": name,
+      "instrumentKey": instrumentKey,
+      "logoUrl": logoUrl,
+      "currentPrice": currentPrice,
+      "isActive": isActive,
+      "sectorId": sectorId,
+      "previousDayClose": previousDayClose,
+      "netChange": netChange,
+      "percentageChange": percentageChange,
+      "selectionPercentage": selectionPercentage ?? "0.00",
+      "captainSelectionPercentage": captainSelectionPercentage ?? "0.00",
+      "viceCaptainSelectionPercentage": viceCaptainSelectionPercentage ?? "0.00",
+      "flexSelectionPercentage": flexSelectionPercentage ?? "0.00",
+      "upPredictionPercentage": upPredictionPercentage ?? "0.00",
+      "downPredictionPercentage": downPredictionPercentage ?? "0.00",
+      "createdAt": createdAt?.toIso8601String(),
+      "updatedAt": updatedAt?.toIso8601String(),
+    };
+  }
 }
+
 class TimeLeftToStartModel {
   final String status;
   final int days;
@@ -91,25 +120,31 @@ class TimeLeftToStartModel {
       seconds: json['seconds'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "days": days,
+    "hours": hours,
+    "minutes": minutes,
+    "seconds": seconds,
+  };
 }
 
 class StockResponseModel {
   final TimeLeftToStartModel timeLeftToStart;
   final List<StockDataModel> stocks;
 
-  StockResponseModel({
-    required this.timeLeftToStart,
-    required this.stocks,
-  });
+  StockResponseModel({required this.timeLeftToStart, required this.stocks});
 
   factory StockResponseModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
     return StockResponseModel(
       timeLeftToStart: TimeLeftToStartModel.fromJson(data['timeLeftToStart']),
-      stocks: (data['stocks'] as List)
-          .map((item) => StockDataModel.fromJson(item))
-          .toList(),
+      stocks: (data['stocks'] as List).map((item) => StockDataModel.fromJson(item)).toList(),
     );
   }
-}
 
+  Map<String, dynamic> toJson() {
+    return {'timeLeftToStart': timeLeftToStart.toJson(), 'stocks': stocks.map((stock) => stock.toJson()).toList()};
+  }
+}

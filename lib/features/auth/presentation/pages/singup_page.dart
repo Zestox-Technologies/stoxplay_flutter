@@ -40,7 +40,7 @@ class SignUpPage extends StatelessWidget {
                   Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
                 }
                 if (state.completeSignUpStatus.isFailed) {
-                  showSnackBar(context: context, message: state.errorMessage ?? 'Signup failed');
+                  showSnackBar(context: context, message: state.completeSignUpErrorMessage ?? 'Signup failed');
                 }
               },
               child: SingleChildScrollView(
@@ -129,7 +129,7 @@ class SignUpPage extends StatelessWidget {
                                               showSnackBar(context: context, message: 'Please enter a username');
                                               return;
                                             }
-                                            
+
                                             await authCubit.completeSignUp(
                                               phoneNumber: authParams.phoneNumber.toString(),
                                               referCode: authParams.referralCode.toString(),

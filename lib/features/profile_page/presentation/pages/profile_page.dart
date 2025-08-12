@@ -7,6 +7,7 @@ import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -23,7 +24,6 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late ProfileCubit profileCubit;
-  late final ValueNotifier<int> navIndex;
   late final VoidCallback navListener;
 
   @override
@@ -35,7 +35,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    navIndex.removeListener(navListener);
     super.dispose();
   }
 
@@ -80,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(5.w),
+                            padding: EdgeInsets.all(10.w),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10.r),
@@ -88,11 +87,29 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             child: Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 20.r,
-                                  backgroundImage: AssetImage(
-                                    AppAssets.profileIcon,
-                                  ), // Replace with network if available
+                                BlocSelector<ProfileCubit, ProfileState, String?>(
+                                  bloc: profileCubit,
+                                  selector: (state) => state.profileModel?.profilePictureUrl,
+                                  builder: (context, picUrl) {
+                                    final hasPic = (picUrl != null && picUrl.isNotEmpty);
+                                    if (picUrl != null && picUrl.toLowerCase().endsWith('.svg')) {
+                                      return CircleAvatar(
+                                        radius: 32.r,
+                                        backgroundColor: AppColors.white,
+                                        child: ClipOval(
+                                          child: SVGImageWidget(
+                                            imageUrl: picUrl,
+                                            errorWidget: Image.asset(AppAssets.profileIcon),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return CircleAvatar(
+                                      radius: 32.r,
+                                      backgroundImage: hasPic ? NetworkImage(picUrl) : null,
+                                      child: hasPic ? null : Icon(Icons.person, size: 50.h),
+                                    );
+                                  },
                                 ),
                                 Gap(16.w),
                                 Column(

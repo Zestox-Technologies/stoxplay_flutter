@@ -7,6 +7,7 @@ import 'package:stoxplay/features/home_page/data/models/join_contest_params_mode
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 
 abstract class HomeRepo {
   Future<Either<AppError, SectorListResponse>> getSectorList();
@@ -15,9 +16,11 @@ abstract class HomeRepo {
 
   Future<Either<AppError, bool>> getContestStatus();
 
-  Future<Either<AppError,StockResponseModel>> getStockList(String contestId);
+  Future<Either<AppError, StockResponseModel>> getStockList(String contestId);
 
   Future<Either<AppError, JoinContestResponseModel>> joinContest(JoinContestParamsModel params);
+
+  Future<Either<AppError, StatsModel>> getMyContests();
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -56,7 +59,7 @@ class HomeRepoImpl extends HomeRepo {
   }
 
   @override
-  Future<Either<AppError,StockResponseModel>> getStockList(String contestId) async {
+  Future<Either<AppError, StockResponseModel>> getStockList(String contestId) async {
     try {
       final result = await homeRds.getStockList(contestId);
       return Right(result);
@@ -69,6 +72,16 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<AppError, JoinContestResponseModel>> joinContest(JoinContestParamsModel params) async {
     try {
       final result = await homeRds.joinContest(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, StatsModel>> getMyContests() async {
+    try {
+      final result = await homeRds.getMyContests();
       return Right(result);
     } catch (e) {
       return handleException(e);

@@ -88,6 +88,37 @@ class ApiService {
     }
   }
 
+  // POST with FormData (e.g., file uploads or multipart form submissions)
+  Future<Response> postFormData(
+    String path, {
+    required Map<String, dynamic> formFields,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final formData = FormData.fromMap(formFields);
+
+      print('Making POST FormData request to: $path');
+      print('Form fields: $formFields');
+
+      final response = await _dio.post(
+        path,
+        data: formData,
+        queryParameters: queryParameters,
+        options: options ?? Options(contentType: 'multipart/form-data', headers: {"Accept": "*/*"}),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
+      return response;
+    } on DioException catch (e) {
+      print('POST FormData Request Error: ${e.message}');
+      print('Error Response: ${e.response?.data}');
+      rethrow;
+    }
+  }
+
   // Generic PUT method
   Future<Response> put(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
     try {

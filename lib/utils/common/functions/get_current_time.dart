@@ -19,19 +19,14 @@ Future<DateTime?> getCurrentTime() async {
   } catch (e) {
     print('Error fetching time: $e');
   }
-  return  null;
+  return null;
 }
+
 String formatMaxWinIntl(int amount) {
-  final format = NumberFormat.compactCurrency(
-    decimalDigits: 1,
-    symbol: '₹',
-    locale: 'en_IN',
-  );
+  final format = NumberFormat.compactCurrency(decimalDigits: 1, symbol: '₹', locale: 'en_IN');
   return format.format(amount);
 }
+
 int getTotalSecondsFromTimeLeft(TimeLeftToStartModel timeLeft) {
-  return timeLeft.days * 86400 +
-      timeLeft.hours * 3600 +
-      timeLeft.minutes * 60 +
-      timeLeft.seconds;
+  return timeLeft.days * 86400 + timeLeft.hours * 3600 + timeLeft.minutes * 60 + timeLeft.seconds;
 }

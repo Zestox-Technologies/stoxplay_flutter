@@ -8,6 +8,8 @@ import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
+import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -26,6 +28,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
   late HomeCubit homeCubit;
+  late ProfileCubit profileCubit;
 
   List list = [Strings.play, Strings.learn];
 
@@ -33,6 +36,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     homeCubit = BlocProvider.of<HomeCubit>(context);
+    profileCubit = BlocProvider.of<ProfileCubit>(context);
+    profileCubit.fetchProfile();
     homeCubit.getSectorList();
   }
 
@@ -54,7 +59,26 @@ class _HomePageState extends State<HomePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CircleAvatar(child: Icon(Icons.person, size: 20.h)),
+            BlocSelector<ProfileCubit, ProfileState, String>(
+              bloc: profileCubit,
+              selector: (state) => state.profileModel?.profilePictureUrl ?? '',
+              builder: (context, pic) {
+                if (pic.toLowerCase().endsWith('.svg')) {
+                  return CircleAvatar(
+                    radius: 25.r,
+                    backgroundColor: AppColors.white,
+                    child: ClipOval(
+                      child: SVGImageWidget(imageUrl: pic, errorWidget: Image.asset(AppAssets.profileIcon)),
+                    ),
+                  );
+                }
+                return CircleAvatar(
+                  radius: 18.r,
+                  backgroundImage: pic != "" ? NetworkImage(pic) : null,
+                  child: pic != "" ? null : Icon(Icons.person, size: 40.h),
+                );
+              },
+            ),
             CommonAppbarTitle(),
             Badge(
               backgroundColor: AppColors.primaryPurple,

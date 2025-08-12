@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
+import 'package:stoxplay/features/home_page/pages/stock_selection_page/widgets/confirmation_bottom_sheet.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/widgets/stock_selection_shimmer.dart';
 import 'package:stoxplay/features/home_page/widgets/stock_selection_widget.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
@@ -33,12 +34,15 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
   ValueNotifier<int> stepper = ValueNotifier<int>(0);
   late HomeCubit homeCubit;
   String? contestId;
+  String? price;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      contestId = ModalRoute.of(context)!.settings.arguments as String;
+      final map = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+      contestId = map['contestId'];
+      price = map['price'];
       cubit.getStockList(contestId!);
     });
   }
@@ -67,10 +71,7 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
             }
           },
           child: MultiBlocProvider(
-            providers: [
-              BlocProvider.value(value: cubit),
-              BlocProvider.value(value: cubit.timerCubit),
-            ],
+            providers: [BlocProvider.value(value: cubit), BlocProvider.value(value: cubit.timerCubit)],
             child: BlocBuilder<StockSelectionCubit, StockSelectionState>(
               bloc: cubit,
               builder: (context, state) {
@@ -101,7 +102,7 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                               showModalBottomSheet(
                                 context: context,
                                 builder: (context) {
-                                  return ConfirmationBs(cubit: cubit, contestId: contestId ?? '');
+                                  return ConfirmationBs(cubit: cubit, contestId: contestId ?? '', price: price ?? '');
                                 },
                               );
                             } else {
@@ -174,7 +175,6 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                         ),
                                                         BlocBuilder<TimerCubit, TimerState>(
                                                           builder: (context, timerState) {
-                                                            print('Timer UI: Status=${timerState.status}, Seconds=${timerState.secondsRemaining}');
                                                             if (timerState.isRunning) {
                                                               final duration = Duration(
                                                                 seconds: timerState.secondsRemaining,
@@ -432,12 +432,14 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                       cubit.removeSelectedStock(stock: oldStock);
                                                       final updatedStock = oldStock.copyWith(
                                                         stockPrediction: StockPrediction.none,
+
                                                       );
                                                       cubit.updateStock(stock: updatedStock, index: index);
                                                     } else if (currentPrediction == StockPrediction.down) {
                                                       cubit.updateSelectedStockPrediction(
                                                         stockPrediction: StockPrediction.up,
                                                         stock: oldStock,
+
                                                       );
                                                       final updatedStock = oldStock.copyWith(
                                                         stockPrediction: StockPrediction.up,
@@ -540,69 +542,4 @@ enum StockPosition {
   bool get isCoLeader => this == StockPosition.coLeader;
 
   bool get isViceLeader => this == StockPosition.viceLeader;
-}
-
-class ConfirmationBs extends StatelessWidget {
-  final String contestId;
-  final StockSelectionCubit cubit;
-
-  const ConfirmationBs({required this.cubit, required this.contestId, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Column(
-          spacing: 20.h,
-          children: [
-            SizedBox(),
-            Text("Confirmation", style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Entry", style: TextStyle(fontSize: 16.sp)),
-                Row(
-                  children: [
-                    Image.asset(AppAssets.stoxplayCoin, height: 18.h, width: 18.w),
-                    Text("500", style: TextStyle(fontSize: 16.sp)),
-                  ],
-                ),
-              ],
-            ),
-            BlocListener<StockSelectionCubit, StockSelectionState>(
-              bloc: cubit,
-              listener: (context, state) {
-                if (state.joinContestApiStatus.isSuccess) {
-                  Navigator.pop(context);
-                  Future.microtask(() {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.battleGroundScreen,
-                      arguments: (cubit, state.joinContestResponse),
-                    );
-                  });
-                } else if (state.joinContestApiStatus.isFailed) {
-                  Fluttertoast.showToast(msg: state.message ?? "Join contest failed please try again later");
-                }
-              },
-              child: BlocSelector<StockSelectionCubit, StockSelectionState, ApiStatus>(
-                bloc: cubit,
-                selector: (state) => state.joinContestApiStatus,
-                builder: (context, state) {
-                  return AppButton(
-                    isLoading: state.isLoading,
-                    text: "Join Contest",
-                    onPressed: () => cubit.joinContest(contestId),
-                  );
-                },
-              ),
-            ),
-            SizedBox(),
-          ],
-        ),
-      ),
-    );
-  }
 }

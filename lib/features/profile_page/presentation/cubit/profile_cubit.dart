@@ -1,6 +1,6 @@
+
 import 'package:bloc/bloc.dart';
-import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
+import 'package:dio/dio.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/profile_page/data/profile_model.dart';
 import 'package:stoxplay/features/profile_page/domain/profile_usecase.dart';
@@ -11,6 +11,7 @@ part 'profile_state.dart';
 class ProfileCubit extends Cubit<ProfileState> {
   final GetProfileUseCase getProfileUseCase;
   final UpdateProfileUseCase updateProfileUseCase;
+  final FileUploadUseCase fileUploadUseCase;
 
   // Controllers for profile fields
   final TextEditingController firstNameController = TextEditingController();
@@ -19,7 +20,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
-  ProfileCubit(this.getProfileUseCase, this.updateProfileUseCase) : super(ProfileState());
+  ProfileCubit(this.getProfileUseCase, this.updateProfileUseCase, this.fileUploadUseCase) : super(ProfileState());
 
   @override
   Future<void> close() {
@@ -40,7 +41,15 @@ class ProfileCubit extends Cubit<ProfileState> {
       usernameController.text = profile.username;
       emailController.text = profile.email ?? '';
       phoneController.text = profile.phoneNumber;
-      emit(state.copyWith(apiStatus: ApiStatus.success, profileModel: profile));
+
+      emit(
+        state.copyWith(
+          apiStatus: ApiStatus.success,
+          gender: profile.gender ?? "SELECT",
+          profileModel: profile,
+          dob: profile.dob,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }
@@ -50,18 +59,33 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(state.copyWith(dob: dob));
   }
 
+  void updateGender(String gender) {
+    emit(state.copyWith(gender: gender));
+  }
+
   Future<void> updateProfile() async {
     emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
     try {
       final updatedProfile = {
         "firstName": firstNameController.text,
         "username": usernameController.text,
-        "profilePictureUrl": "https://i.pravatar.cc/300",
+        "profilePictureUrl": state.profileUrl,
         "dateOfBirth": state.dob?.toUtc().toIso8601String(),
-        "email": emailController.text
+        "email": emailController.text,
+        "gender": state.gender ?? 'SELECT',
       };
       final profile = await updateProfileUseCase(updatedProfile);
       emit(state.copyWith(apiStatus: ApiStatus.success));
+    } catch (e) {
+      emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> uploadProfilePicture(String imagePath) async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
+    try {
+      final profile = await fileUploadUseCase.call({"type": "profiles", "file": imagePath});
+      emit(state.copyWith(apiStatus: ApiStatus.success, profileUrl: profile));
     } catch (e) {
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }

@@ -20,10 +20,12 @@ class ApiUrls {
   ///contest flow
   static const String getSectorList = 'stock-management/sectors?isActive=true';
   static const String getContestStatus = 'client/contest-status';
+  static const String getMyContests = 'client/my-contests';
   static getContestList(String sectorId) => 'client/sectors/$sectorId/contests';
 
   ///Stock List Flow
   static getStocksList(String contestId) => '/client/contests/$contestId/stocks';
   static joinContest(String contestId) => '/client/contests/$contestId/join';
   static const String getProfile = 'users/profile';
+  static const String fileUpload = 'files/upload';
 }

@@ -37,8 +37,7 @@ class BattlegroundPage extends StatefulWidget {
 class _BattlegroundPageState extends State<BattlegroundPage> {
   final ScreenshotController screenshotController = ScreenshotController();
   late UserModel userData;
-  late StockSelectionCubit cubit;
-  late JoinContestResponseModel joinData;
+  late String teamId;
   WebSocketService ws = WebSocketService();
   late ValueNotifier<ScoreUpdatePayload?> liveStocksNotifier = ValueNotifier(null);
 
@@ -76,12 +75,11 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
     if (_isInitialized) return;
     _isInitialized = true;
 
-    final data = ModalRoute.of(context)?.settings.arguments as (StockSelectionCubit, JoinContestResponseModel);
-    cubit = data.$1;
-    joinData = data.$2;
+    final data = ModalRoute.of(context)?.settings.arguments as String;
+    teamId = data;
 
     ws.connect(ApiUrls.wsUrl).then((_) {
-      ws.sendJson({"type": "SUBSCRIBE_TEAM", "token": userData.token, "userTeamId": joinData.id});
+      ws.sendJson({"type": "SUBSCRIBE_TEAM", "token": userData.token, "userTeamId": teamId});
       ws.events.listen((event) {
         switch (event) {
           case TextDataReceived(:final text):
