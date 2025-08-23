@@ -6,6 +6,7 @@ class HomeState extends Equatable {
   SectorListResponse? sectorModel;
   List<ContestModel>? contestList;
   List<StockDataModel>? stockList;
+  List<LearningModel>? learningList;
   final bool isContestEnabled;
 
   HomeState({
@@ -14,11 +15,13 @@ class HomeState extends Equatable {
     this.isContestEnabled = false,
     this.contestList = const [],
     this.stockList = const [],
+    this.learningList = const [],
   });
 
   HomeState copyWith({
     SectorListResponse? sectorModel,
     List<ContestModel>? contestList,
+    List<LearningModel>? learningList,
     List<StockDataModel>? stockList,
     ApiStatus? apiStatus,
     bool? isContestEnabled,
@@ -29,9 +32,10 @@ class HomeState extends Equatable {
       isContestEnabled: isContestEnabled ?? this.isContestEnabled,
       contestList: contestList ?? this.contestList,
       stockList: stockList ?? this.stockList,
+      learningList: learningList ?? this.learningList,
     );
   }
 
   @override
-  List<Object?> get props => [sectorModel, apiStatus, stockList, isContestEnabled, contestList];
+  List<Object?> get props => [sectorModel, learningList, apiStatus, stockList, isContestEnabled, contestList];
 }

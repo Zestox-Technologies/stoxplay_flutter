@@ -3,7 +3,6 @@ class ApiUrls {
 
   static const String baseUrl = 'https://backend.stoxplay.com/v1/';
 
-
   ///Websocket
   static const String wsUrl = "wss://backend.stoxplay.com";
 
@@ -21,11 +20,16 @@ class ApiUrls {
   static const String getSectorList = 'stock-management/sectors?isActive=true';
   static const String getContestStatus = 'client/contest-status';
   static const String getMyContests = 'client/my-contests';
+
   static getContestList(String sectorId) => 'client/sectors/$sectorId/contests';
+
+  static updateTeam(String teamId) => '/client/teams/$teamId';
 
   ///Stock List Flow
   static getStocksList(String contestId) => '/client/contests/$contestId/stocks';
+
   static joinContest(String contestId) => '/client/contests/$contestId/join';
   static const String getProfile = 'users/profile';
   static const String fileUpload = 'files/upload';
+  static const String learningContent = 'learning-content';
 }

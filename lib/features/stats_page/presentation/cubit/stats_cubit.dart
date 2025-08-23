@@ -17,7 +17,7 @@ class StatsCubit extends Cubit<StatsState> {
 
   StatsCubit({required this.getMyContestUseCase}) : super(StatsState());
 
-  void getMyContests() async {
+  Future<void> getMyContests() async {
     emit(state.copyWith(apiStatus: ApiStatus.loading));
     try {
       final response = await getMyContestUseCase.call('');
@@ -29,19 +29,17 @@ class StatsCubit extends Cubit<StatsState> {
         (r) {
           final totalSeconds =
               ((r.upcoming?.isNotEmpty ?? false) && r.upcoming?.first.contest?.timeLeft != null)
-                  ? getTotalSecondsFromTimeLeft(
-                    r.upcoming?.first.contest?.timeLeft ??
-                        TimeLeftToStartModel(status: "", days: 0, hours: 0, minutes: 0, seconds: 0),
-                  )
+                  ? getTotalSecondsFromTimeLeft(r.upcoming?.first.contest?.timeLeft ?? TimeLeft())
                   : 0;
           timerCubit.startTimer(seconds: totalSeconds);
-          emit(state.copyWith(stats: r, apiStatus: ApiStatus.success));
+          final stats = StatsModel.fromJson(r.toJson());
+          emit(state.copyWith(stats: stats, apiStatus: ApiStatus.success));
         },
       );
     } on Exception catch (e) {
-     if (kDebugMode) {
-       print(e);
-     }
+      if (kDebugMode) {
+        print(e);
+      }
     }
   }
 }

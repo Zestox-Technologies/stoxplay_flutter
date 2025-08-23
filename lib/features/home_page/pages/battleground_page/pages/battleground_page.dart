@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,13 +14,10 @@ import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/ws_service.dart';
 import 'package:stoxplay/features/auth/data/models/user_model.dart';
-import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/widgets/battleground_item_widget.dart';
-import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
-import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
+import 'package:stoxplay/features/profile_page/data/profile_model.dart';
 import 'package:stoxplay/utils/constants/db_keys.dart';
-import 'package:stoxplay/utils/models/contest_model.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -28,7 +26,7 @@ import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:web_socket/web_socket.dart';
 
 class BattlegroundPage extends StatefulWidget {
-  BattlegroundPage({super.key});
+  const BattlegroundPage({super.key});
 
   @override
   State<BattlegroundPage> createState() => _BattlegroundPageState();
@@ -36,7 +34,7 @@ class BattlegroundPage extends StatefulWidget {
 
 class _BattlegroundPageState extends State<BattlegroundPage> {
   final ScreenshotController screenshotController = ScreenshotController();
-  late UserModel userData;
+  late ProfileModel userData;
   late String teamId;
   WebSocketService ws = WebSocketService();
   late ValueNotifier<ScoreUpdatePayload?> liveStocksNotifier = ValueNotifier(null);
@@ -46,9 +44,9 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
     if (raw == null) {
       throw Exception('User not logged in');
     } else if (raw is String) {
-      userData = UserModel.fromJson(jsonDecode(raw));
+      userData = ProfileModel.fromJson(jsonDecode(raw));
     } else if (raw is Map<String, dynamic>) {
-      userData = UserModel.fromJson(raw);
+      userData = ProfileModel.fromJson(raw);
     } else {
       throw Exception('Invalid user data in storage: $raw');
     }
@@ -77,30 +75,35 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
 
     final data = ModalRoute.of(context)?.settings.arguments as String;
     teamId = data;
+    final token = StorageService().read<String>(DBKeys.userTokenKey);
 
-    ws.connect(ApiUrls.wsUrl).then((_) {
-      ws.sendJson({"type": "SUBSCRIBE_TEAM", "token": userData.token, "userTeamId": teamId});
-      ws.events.listen((event) {
-        switch (event) {
-          case TextDataReceived(:final text):
-            final decoded = jsonDecode(text);
-            if (decoded['type'] == 'SCORE_UPDATE') {
-              print("WebSocket data : $text");
-              final payload = ScoreUpdatePayload.fromJson(decoded['payload']);
-              if (payload.liveStocks.isNotEmpty) {
-                liveStocksNotifier.value = payload;
-              }
+    ws
+        .connect(ApiUrls.wsUrl)
+        .then((_) {
+          ws.sendJson({"type": "SUBSCRIBE_TEAM", "token": token, "userTeamId": teamId});
+          ws.events.listen((event) {
+            switch (event) {
+              case TextDataReceived(:final text):
+                final decoded = jsonDecode(text);
+                if (decoded['type'] == 'SCORE_UPDATE') {
+                  final payload = ScoreUpdatePayload.fromJson(decoded['payload']);
+                  if (payload.liveStocks.isNotEmpty) {
+                    liveStocksNotifier.value = payload;
+                  }
+                }
+                break;
+              case CloseReceived(:final code, :final reason):
+                break;
+              case BinaryDataReceived(:final data):
+                break;
             }
-            break;
-          case CloseReceived(:final code, :final reason):
-            print("WebSocket closed: $code - $reason");
-            break;
-          case BinaryDataReceived(:final data):
-            print("WebSocket binary received: $data");
-            break;
-        }
-      });
-    });
+          });
+        })
+        .onError((error, stackTrace) {
+          if (kDebugMode) {
+            print(error.toString());
+          }
+        });
   }
 
   @override
@@ -138,6 +141,8 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                       points: 0,
                       role: 'NORMAL',
                       isPredictionCorrect: false,
+                      logoUrl: '',
+                      prediction: 'DOWN',
                     );
 
                     LiveStock? findByRole(String role) =>
@@ -155,7 +160,7 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                               icon: Icon(Icons.arrow_back_ios_new, color: AppColors.white),
                             ),
                             Text(
-                              userData.user?.firstName ?? 'Stoxplay',
+                              userData.username ?? 'Stoxplay',
                               style: TextStyle(
                                 color: AppColors.white,
                                 fontWeight: FontWeight.w700,
@@ -237,24 +242,23 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                                 fontWeight: FontWeight.bold,
                                 fontColor: AppColors.white,
                               ),
-                              Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: Icon(Icons.refresh, color: AppColors.white, size: 22.sp),
-                                  ),
-                                  SizedBox(width: 10.w),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.popUntil(
-                                        context,
-                                        (route) => route.settings.name == AppRoutes.stockSelectionScreen,
-                                      );
-                                    },
-                                    child: Image.asset(AppAssets.editIcon, height: 18.h, width: 18.w),
-                                  ),
-                                ],
-                              ),
+                              // Row(
+                              //   children: [
+                              //     GestureDetector(
+                              //       onTap: () {},
+                              //       child: Icon(Icons.refresh, color: AppColors.white, size: 22.sp),
+                              //     ),
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     Navigator.popUntil(
+                              //       context,
+                              //       (route) => route.settings.name == AppRoutes.stockSelectionScreen,
+                              //     );
+                              //   },
+                              //   child: Image.asset(AppAssets.editIcon, height: 18.h, width: 18.w),
+                              // ),
+                              // ],
+                              // ),
                             ],
                           ),
                         ),

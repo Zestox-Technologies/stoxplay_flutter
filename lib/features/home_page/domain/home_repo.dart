@@ -5,6 +5,7 @@ import 'package:stoxplay/features/home_page/data/home_rds.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
+import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
@@ -21,6 +22,10 @@ abstract class HomeRepo {
   Future<Either<AppError, JoinContestResponseModel>> joinContest(JoinContestParamsModel params);
 
   Future<Either<AppError, StatsModel>> getMyContests();
+
+  Future<Either<AppError, String>> updateTeam(JoinContestParamsModel params);
+
+  Future<Either<AppError, List<LearningModel>>> getLearningList(String params);
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -82,6 +87,26 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<AppError, StatsModel>> getMyContests() async {
     try {
       final result = await homeRds.getMyContests();
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, String>> updateTeam(JoinContestParamsModel params) async {
+    try {
+      final result = await homeRds.updateTeam(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, List<LearningModel>>> getLearningList(String params) async {
+    try {
+      final result = await homeRds.getLearningList(params);
       return Right(result);
     } catch (e) {
       return handleException(e);

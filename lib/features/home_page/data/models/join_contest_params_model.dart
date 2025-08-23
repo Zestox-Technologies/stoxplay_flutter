@@ -5,6 +5,7 @@ class JoinContestParamsModel {
   final String captainStockId;
   final String viceCaptainStockId;
   final String flexStockId;
+  String? teamId;
 
   JoinContestParamsModel({
     required this.contestId,
@@ -13,6 +14,7 @@ class JoinContestParamsModel {
     required this.captainStockId,
     required this.viceCaptainStockId,
     required this.flexStockId,
+    this.teamId,
   });
 
   Map<String, dynamic> toJson() => {

@@ -5,6 +5,7 @@ import 'package:stoxplay/core/network/use_case.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
+import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
@@ -64,6 +65,7 @@ class JoinContestUseCase extends UseCase<JoinContestResponseModel, JoinContestPa
     return await repo.joinContest(params);
   }
 }
+
 class GetMyContestUseCase extends UseCase<StatsModel, String> {
   final HomeRepo repo;
 
@@ -72,5 +74,26 @@ class GetMyContestUseCase extends UseCase<StatsModel, String> {
   @override
   Future<Either<AppError, StatsModel>> call(String params) async {
     return await repo.getMyContests();
+  }
+}
+
+class UpdateTeamUseCase extends UseCase<String, JoinContestParamsModel> {
+  final HomeRepo repo;
+
+  UpdateTeamUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, String>> call(JoinContestParamsModel params) async {
+    return await repo.updateTeam(params);
+  }
+}
+class LearningListUseCase extends UseCase<List<LearningModel>, String> {
+  final HomeRepo repo;
+
+  LearningListUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, List<LearningModel>>> call(String params) async {
+    return await repo.getLearningList(params);
   }
 }

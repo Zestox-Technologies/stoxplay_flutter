@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
+
 StockDataModel stockDataModelFromJson(String str) => StockDataModel.fromJson(json.decode(str));
 
 String stockDataModelToJson(StockDataModel data) => json.encode(data.toJson());
@@ -16,12 +18,12 @@ class StockDataModel {
   final double? previousDayClose;
   final double? netChange;
   final double? percentageChange;
-  final int? selectionPercentage;
-  final int? captainSelectionPercentage;
-  final int? viceCaptainSelectionPercentage;
-  final int? flexSelectionPercentage;
-  final int? upPredictionPercentage;
-  final int? downPredictionPercentage;
+  final double? selectionPercentage;
+  final double? captainSelectionPercentage;
+  final double? viceCaptainSelectionPercentage;
+  final double? flexSelectionPercentage;
+  final double? upPredictionPercentage;
+  final double? downPredictionPercentage;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -60,12 +62,13 @@ class StockDataModel {
       previousDayClose: (json["previousDayClose"] as num?)?.toDouble(),
       netChange: (json["netChange"] as num?)?.toDouble(),
       percentageChange: (json["percentageChange"] as num?)?.toDouble(),
-      selectionPercentage: json["selectionPercentage"] ?? 0,
-      captainSelectionPercentage: json["captainSelectionPercentage"] ?? 0,
-      viceCaptainSelectionPercentage: json["viceCaptainSelectionPercentage"] ?? 0,
-      flexSelectionPercentage: json["flexSelectionPercentage"] ?? 0,
-      upPredictionPercentage: json["upPredictionPercentage"] ?? 0,
-      downPredictionPercentage: json["downPredictionPercentage"] ?? 0,
+      selectionPercentage: (json['selectionPercentage'] as num?)?.toDouble(),
+      captainSelectionPercentage: (json['captainSelectionPercentage'] as num?)?.toDouble(),
+      viceCaptainSelectionPercentage: (json['viceCaptainSelectionPercentage'] as num?)?.toDouble(),
+      flexSelectionPercentage: (json['flexSelectionPercentage'] as num?)?.toDouble(),
+      upPredictionPercentage: (json['upPredictionPercentage'] as num?)?.toDouble(),
+      downPredictionPercentage: (json['downPredictionPercentage'] as num?)?.toDouble(),
+
       createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
       updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
     );
@@ -96,42 +99,8 @@ class StockDataModel {
   }
 }
 
-class TimeLeftToStartModel {
-  final String status;
-  final int days;
-  final int hours;
-  final int minutes;
-  final int seconds;
-
-  TimeLeftToStartModel({
-    required this.status,
-    required this.days,
-    required this.hours,
-    required this.minutes,
-    required this.seconds,
-  });
-
-  factory TimeLeftToStartModel.fromJson(Map<String, dynamic> json) {
-    return TimeLeftToStartModel(
-      status: json['status'],
-      days: json['days'],
-      hours: json['hours'],
-      minutes: json['minutes'],
-      seconds: json['seconds'],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    "status": status,
-    "days": days,
-    "hours": hours,
-    "minutes": minutes,
-    "seconds": seconds,
-  };
-}
-
 class StockResponseModel {
-  final TimeLeftToStartModel timeLeftToStart;
+  final TimeLeft timeLeftToStart;
   final List<StockDataModel> stocks;
 
   StockResponseModel({required this.timeLeftToStart, required this.stocks});
@@ -139,7 +108,7 @@ class StockResponseModel {
   factory StockResponseModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
     return StockResponseModel(
-      timeLeftToStart: TimeLeftToStartModel.fromJson(data['timeLeftToStart']),
+      timeLeftToStart: TimeLeft.fromJson(data['timeLeftToStart']),
       stocks: (data['stocks'] as List).map((item) => StockDataModel.fromJson(item)).toList(),
     );
   }

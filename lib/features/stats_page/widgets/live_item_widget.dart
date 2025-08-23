@@ -40,14 +40,14 @@ class LiveItemWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextView(
-                        text: "Bank wars",
+                        text: data.contest?.sectorName ?? '',
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                         fontColor: AppColors.black,
                       ),
                       Gap(2.h),
                       TextView(
-                        text: "Bank wars",
+                        text: data.contest?.name ?? '',
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                         fontColor: AppColors.purple5A2F,

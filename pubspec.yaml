@@ -62,6 +62,8 @@ dependencies:
   firebase_core: ^4.0.0
   firebase_auth: ^6.0.0
   sms_autofill: ^2.4.1
+  web_socket_channel: ^3.0.3
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

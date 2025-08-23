@@ -59,54 +59,54 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   ),
                 ),
                 SizedBox(height: 8.h),
-                Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color:
-                              (state.profileModel?.profilePictureUrl != '')
-                                  ? AppColors.primaryPurple
-                                  : AppColors.blackD7D7,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      padding: EdgeInsets.all(5.w),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.primaryPurple),
-                          shape: BoxShape.circle,
-                        ),
-                        child: ValueListenableBuilder(
-                          valueListenable: profileImage,
-                          builder: (context, image, _) {
-                            return buildProfileAvatar(
+                ValueListenableBuilder(
+                  valueListenable: profileImage,
+                  builder: (context, image, _) {
+                    return Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color:
+                                  (state.profileModel?.profilePictureUrl != '')
+                                      ? AppColors.primaryPurple
+                                      : AppColors.blackD7D7,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          padding: EdgeInsets.all(5.w),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.primaryPurple),
+                              shape: BoxShape.circle,
+                            ),
+                            child: buildProfileAvatar(
                               profilePictureUrl: state.profileModel?.profilePictureUrl,
                               pickedImage: profileImage.value,
-                            );
-                          },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Gap(10.h),
-                    AppButton(
-                      text: 'Change Image',
-                      onPressed: () async {
-                        final imagePicker = ImagePicker();
-                        final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-                        if (pickedFile != null) {
-                          profileImage.value = pickedFile;
-                          await cubit.uploadProfilePicture(pickedFile.path);
-                        }
-                      },
-                      height: 32.h,
-                      width: 110.w,
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                      borderRadius: 8.r,
-                      backgroundColor: AppColors.primaryPurple,
-                    ),
-                  ],
+                        Gap(10.h),
+                        AppButton(
+                          text: 'Change Image',
+                          onPressed: () async {
+                            final imagePicker = ImagePicker();
+                            final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+                            if (pickedFile != null) {
+                              profileImage.value = pickedFile;
+                              await cubit.uploadProfilePicture(pickedFile.path);
+                            }
+                          },
+                          height: 32.h,
+                          width: 110.w,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          borderRadius: 8.r,
+                          backgroundColor: AppColors.primaryPurple,
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 SizedBox(height: 15.h),
                 Expanded(
@@ -224,7 +224,16 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   }
 
   Widget buildProfileAvatar({required String? profilePictureUrl, required XFile? pickedImage, double radius = 45}) {
-    // If SVG
+    // Prioritize newly picked local image so user immediately sees selection
+    if (pickedImage != null) {
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.white,
+        backgroundImage: FileImage(File(pickedImage.path)),
+      );
+    }
+
+    // If SVG from network
     if (profilePictureUrl != null && profilePictureUrl.toLowerCase().endsWith('.svg')) {
       return CircleAvatar(
         radius: radius,
@@ -241,15 +250,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
         radius: radius,
         backgroundColor: AppColors.white,
         backgroundImage: NetworkImage(profilePictureUrl),
-      );
-    }
-
-    // If a new image was picked from device
-    if (pickedImage != null) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: AppColors.white,
-        backgroundImage: FileImage(File(pickedImage.path)),
       );
     }
 

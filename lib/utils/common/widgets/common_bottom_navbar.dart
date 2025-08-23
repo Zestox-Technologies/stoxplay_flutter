@@ -54,10 +54,14 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
   }
 
   void _onItemTapped(int index) {
+    final currentIndex = NavigationState().currentIndex.value;
+
+    if (currentIndex == index) return;
     NavigationState().updateIndex(index);
+
     if (index != 1) {
       profileCubit.fetchProfile();
-    } else {
+    } else if (index == 1) {
       statsCubit.getMyContests();
     }
   }

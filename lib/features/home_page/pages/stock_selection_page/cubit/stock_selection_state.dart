@@ -8,7 +8,8 @@ class StockSelectionState extends Equatable {
   String? message;
   ApiStatus joinContestApiStatus;
   JoinContestResponseModel? joinContestResponse;
-  TimeLeftToStartModel? timeLeftToStartModel;
+  TimeLeft? timeLeftToStartModel;
+  bool isEdit;
 
   StockSelectionState({
     this.stockList = const [],
@@ -18,6 +19,7 @@ class StockSelectionState extends Equatable {
     this.message,
     this.joinContestResponse,
     this.timeLeftToStartModel,
+    this.isEdit = false,
   });
 
   StockSelectionState copyWith({
@@ -27,7 +29,8 @@ class StockSelectionState extends Equatable {
     List<Stock>? selectedStockList,
     String? message,
     JoinContestResponseModel? joinContestResponse,
-    TimeLeftToStartModel? timeLeftToStartModel,
+    TimeLeft? timeLeftToStartModel,
+    bool? isEdit,
   }) {
     return StockSelectionState(
       stockList: stockList ?? this.stockList,
@@ -37,6 +40,7 @@ class StockSelectionState extends Equatable {
       message: message ?? this.message,
       joinContestResponse: joinContestResponse ?? this.joinContestResponse,
       timeLeftToStartModel: timeLeftToStartModel ?? this.timeLeftToStartModel,
+      isEdit: isEdit ?? this.isEdit,
     );
   }
 
@@ -49,5 +53,6 @@ class StockSelectionState extends Equatable {
     message,
     joinContestResponse,
     timeLeftToStartModel,
+    isEdit
   ];
 }

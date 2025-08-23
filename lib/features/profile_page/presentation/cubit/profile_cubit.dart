@@ -1,10 +1,11 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
+import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/profile_page/data/profile_model.dart';
 import 'package:stoxplay/features/profile_page/domain/profile_usecase.dart';
 import 'package:flutter/material.dart';
+import 'package:stoxplay/utils/constants/db_keys.dart';
 
 part 'profile_state.dart';
 
@@ -37,17 +38,18 @@ class ProfileCubit extends Cubit<ProfileState> {
     try {
       final profile = await getProfileUseCase();
       // Set controllers
-      firstNameController.text = profile.firstName;
-      usernameController.text = profile.username;
+      firstNameController.text = profile.firstName ?? '';
+      usernameController.text = profile.username ?? '';
       emailController.text = profile.email ?? '';
-      phoneController.text = profile.phoneNumber;
+      phoneController.text = profile.phoneNumber ?? '';
+      StorageService().write(DBKeys.user, profile.toJson());
 
       emit(
         state.copyWith(
           apiStatus: ApiStatus.success,
           gender: profile.gender ?? "SELECT",
           profileModel: profile,
-          dob: profile.dob,
+          dob: profile.dateOfBirth,
         ),
       );
     } catch (e) {

@@ -33,6 +33,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetContestListUseCase(repo: sl()));
   sl.registerLazySingleton(() => GetStockListUseCase(repo: sl()));
   sl.registerLazySingleton(() => JoinContestUseCase(repo: sl()));
+  sl.registerLazySingleton(() => UpdateTeamUseCase(repo: sl()));
+  sl.registerLazySingleton(() => LearningListUseCase(repo: sl()));
 
   // Profile Feature
   sl.registerLazySingleton<ProfileRds>(() => ProfileRdsImpl(apiService: sl()));

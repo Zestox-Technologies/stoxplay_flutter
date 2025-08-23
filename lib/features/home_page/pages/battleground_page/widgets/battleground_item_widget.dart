@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/pages/battleground_page.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -22,7 +23,10 @@ class BattlegroundItemWidget extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: AppColors.red.withOpacity(0.6),
+            color:
+                data.prediction.toUpperCase() == "UP"
+                    ? AppColors.green.withOpacity(0.6)
+                    : AppColors.red.withOpacity(0.6),
             spreadRadius: 3.0,
             blurRadius: 3.0,
             offset: Offset(0, 1),
@@ -34,7 +38,7 @@ class BattlegroundItemWidget extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
-          border: Border.all(color: AppColors.red),
+          border: Border.all(color: data.prediction.toUpperCase() == "UP" ? AppColors.green : AppColors.red),
           borderRadius: BorderRadius.circular(4.r),
         ),
         child: _buildContent(data),
@@ -61,7 +65,12 @@ class BattlegroundItemWidget extends StatelessWidget {
             border: Border.all(color: AppColors.black.withOpacity(0.2), width: 0.1),
             borderRadius: BorderRadius.circular(3.r),
           ),
-          child: Center(child: Image.asset(AppAssets.appIcon, height: 30.h, width: 30.w)),
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: SVGImageWidget(imageUrl: data.logoUrl, height: 30.h, width: 30.w),
+            ),
+          ),
         ),
         Column(
           children: [
@@ -87,9 +96,9 @@ class BattlegroundItemWidget extends StatelessWidget {
               height: 9.h,
               child: CustomPaint(
                 painter: TrianglePainter(
-                  strokeColor: AppColors.red,
+                  strokeColor: data.prediction.toUpperCase() == "UP" ? AppColors.green : AppColors.red,
                   paintingStyle: PaintingStyle.fill,
-                  direction: TriangleDirection.down,
+                  direction: data.prediction.toUpperCase() == "UP" ? TriangleDirection.up : TriangleDirection.down,
                 ),
               ),
             ).paddingTop(5.h),
@@ -112,7 +121,11 @@ class BattlegroundItemWidget extends StatelessWidget {
               children: [
                 Gap(5.h),
                 TextView(text: data.currentPrice.toString(), fontColor: AppColors.black, fontSize: 10.sp),
-                TextView(text: data.netChange.toString(), fontColor: AppColors.red, fontSize: 8.sp),
+                TextView(
+                  text: data.netChange.toString(),
+                  fontColor: (data.netChange ?? 0) < 0 ? AppColors.red : AppColors.green,
+                  fontSize: 8.sp,
+                ),
               ],
             ),
             Flexible(

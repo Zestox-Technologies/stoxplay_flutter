@@ -99,4 +99,9 @@ class Strings {
   static const String error = 'Error';
   static const String success = 'Success';
   static const String loading = 'Loading...';
+
+  // App Constants
+  static const String video = 'VIDEO';
+  static const String pdf = 'PDF';
+  static const String quiz = 'QUIZ';
 }

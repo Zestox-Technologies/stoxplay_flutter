@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 
 class CompletedItemWidget extends StatelessWidget {
-  const CompletedItemWidget({super.key});
+  final StatsDataModel data;
+
+  const CompletedItemWidget({required this.data, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +18,7 @@ class CompletedItemWidget extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: AppColors.blackD7D7, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(
         children: [
@@ -46,7 +43,7 @@ class CompletedItemWidget extends StatelessWidget {
                         fontColor: AppColors.black,
                       ),
                       TextView(
-                        text: "Bank wars",
+                        text: data.contest?.name ?? '',
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                         fontColor: AppColors.purple5A2F,
@@ -57,28 +54,24 @@ class CompletedItemWidget extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Divider
-          Container(
-            height: 1.h,
-            color: AppColors.blackD7D7,
-            margin: EdgeInsets.symmetric(horizontal: 16.w),
-          ),
-          
+          Container(height: 1.h, color: AppColors.blackD7D7, margin: EdgeInsets.symmetric(horizontal: 16.w)),
+
           // Middle Section - Date and Time
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: TextView(
-                    text: "Date: 21 March,2025",
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                    fontColor: AppColors.black,
-                  ),
-                ),
+                // Expanded(
+                //   child: TextView(
+                //     text: "Date: 21 March,2025",
+                //     fontSize: 12.sp,
+                //     fontWeight: FontWeight.w500,
+                //     fontColor: AppColors.black,
+                //   ),
+                // ),
                 TextView(
                   text: "Time: 4:15 PM",
                   fontSize: 12.sp,
@@ -88,25 +81,16 @@ class CompletedItemWidget extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Divider
-          Container(
-            height: 1.h,
-            color: AppColors.blackD7D7,
-            margin: EdgeInsets.symmetric(horizontal: 16.w),
-          ),
-          
+          Container(height: 1.h, color: AppColors.blackD7D7, margin: EdgeInsets.symmetric(horizontal: 16.w)),
+
           // Bottom Section - Participation Details
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             child: Row(
               children: [
-                TextView(
-                  text: "1-Team",
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
-                  fontColor: AppColors.black9999,
-                ),
+                TextView(text: "1-Team", fontSize: 12.sp, fontWeight: FontWeight.w500, fontColor: AppColors.black9999),
                 Gap(16.w),
                 TextView(
                   text: "1-Contest",

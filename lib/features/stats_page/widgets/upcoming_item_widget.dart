@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
+import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -58,7 +59,7 @@ class UpcomingItemWidget extends StatelessWidget {
                       ),
                       Gap(2.h),
                       TextView(
-                        text: "Bank wars",
+                        text: data.contest?.sectorName ?? '',
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                         fontColor: AppColors.purple5A2F,
@@ -118,7 +119,7 @@ class UpcomingItemWidget extends StatelessWidget {
                     Image.asset(AppAssets.cupIcon, height: 16.h, width: 16.w),
                     Gap(4.w),
                     TextView(
-                      text: "Prize: ₹8,10,000",
+                      text: "Prize: ${formatMaxWinIntl(data.contest?.prizePool ?? 0)}",
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                       fontColor: AppColors.black9999,
@@ -152,7 +153,7 @@ class UpcomingItemWidget extends StatelessWidget {
                       fontColor: AppColors.purple5A2F,
                     ),
                     TextView(
-                      text: "2000 Spots Remaining",
+                      text: "${data.contest?.spotsRemaining ?? 0} Spots Remaining",
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                       fontColor: AppColors.black9999,
@@ -179,7 +180,12 @@ class UpcomingItemWidget extends StatelessWidget {
                       children: [
                         Image.asset(AppAssets.championIcon, height: 14.h, width: 14.w),
                         Gap(4.w),
-                        TextView(text: "50%", fontSize: 12.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
+                        TextView(
+                          text: "${data.contest?.winningPercentage}%",
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          fontColor: AppColors.black,
+                        ),
                       ],
                     ),
                     Gap(16.w),

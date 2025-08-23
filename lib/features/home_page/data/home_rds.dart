@@ -8,6 +8,7 @@ import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
+import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/models/QueryParams.dart';
@@ -23,9 +24,13 @@ abstract class HomeRds {
 
   Future<StockResponseModel> getStockList(String contestId);
 
-  Future<JoinContestResponseModel> joinContest(JoinContestParamsModel contestId);
+  Future<JoinContestResponseModel> joinContest(JoinContestParamsModel params);
 
   Future<StatsModel> getMyContests();
+
+  Future<String> updateTeam(JoinContestParamsModel params);
+
+  Future<List<LearningModel>> getLearningList(String params);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -117,6 +122,35 @@ class HomeRdsImpl extends HomeRds {
       final response = await client.get(ApiUrls.getMyContests);
       final responseData = response.data['data'];
       return StatsModel.fromJson(responseData);
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<String> updateTeam(JoinContestParamsModel params) async {
+    try {
+      final response = await client.post(ApiUrls.updateTeam(params.teamId.toString()), data: params.toJson());
+      final responseData = response.data['data'];
+      return responseData;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<LearningModel>> getLearningList(String params) async {
+    try {
+      final response = await client.get(ApiUrls.learningContent, queryParameters: {'type': params});
+
+      final List<dynamic> jsonList = response.data['data']['data'];
+      final learningList = jsonList.map((json) => LearningModel.fromJson(json)).toList();
+
+      return learningList;
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

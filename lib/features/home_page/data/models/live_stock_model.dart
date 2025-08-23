@@ -6,6 +6,8 @@ class LiveStock {
   final double netChange;
   final bool isPredictionCorrect;
   final String role;
+  final String logoUrl;
+  final String prediction;
 
   LiveStock({
     required this.stockId,
@@ -15,6 +17,8 @@ class LiveStock {
     required this.netChange,
     required this.isPredictionCorrect,
     required this.role,
+    required this.logoUrl,
+    required this.prediction,
   });
 
   factory LiveStock.fromJson(Map<String, dynamic> json) {
@@ -26,6 +30,8 @@ class LiveStock {
       netChange: json['netChange'].toDouble(),
       isPredictionCorrect: json['isPredictionCorrect'],
       role: json['role'],
+      logoUrl: json['logoUrl'],
+      prediction: json['prediction'],
     );
   }
 
@@ -38,8 +44,11 @@ class LiveStock {
       'netChange': netChange,
       'isPredictionCorrect': isPredictionCorrect,
       'role': role,
+      'logoUrl': logoUrl,
+      'prediction': prediction,
     };
-}}
+  }
+}
 
 class ScoreUpdatePayload {
   final String userTeamId;
@@ -59,9 +68,7 @@ class ScoreUpdatePayload {
       userTeamId: json['userTeamId'],
       totalPoints: json['totalPoints'],
       rank: json['rank'],
-      liveStocks: (json['liveStocks'] as List<dynamic>)
-          .map((e) => LiveStock.fromJson(e))
-          .toList(),
+      liveStocks: (json['liveStocks'] as List<dynamic>).map((e) => LiveStock.fromJson(e)).toList(),
     );
   }
 

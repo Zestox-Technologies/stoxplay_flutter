@@ -36,7 +36,6 @@ class StockSelectionWidget extends StatelessWidget {
     return BlocBuilder<StockSelectionCubit, StockSelectionState>(
       bloc: cubit,
       builder: (context, state) {
-        print(stock.selectionPercentage);
         return ValueListenableBuilder(
           valueListenable: stepper,
           builder: (context, steps, _) {

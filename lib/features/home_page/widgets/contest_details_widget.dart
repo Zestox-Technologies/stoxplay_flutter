@@ -64,7 +64,7 @@ class ContestDetailsWidget extends StatelessWidget {
                           Row(
                             children: [
                               TextView(
-                                text: (data.totalCollection ?? 0).toString(),
+                                text: (data.prizePool ?? 0).toString(),
                                 fontSize: 18.sp,
                                 fontColor: AppColors.black,
                               ),

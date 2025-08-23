@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
@@ -98,11 +99,16 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                               stepper.value++;
                             }
                           } else {
-                            if (isPositionSelectionComplete) {
+                            if (isPositionSelectionComplete && !state.isEdit) {
                               showModalBottomSheet(
                                 context: context,
                                 builder: (context) {
-                                  return ConfirmationBs(cubit: cubit, contestId: contestId ?? '', price: price ?? '');
+                                  return ConfirmationBs(
+                                    cubit: cubit,
+                                    stepper: stepper,
+                                    contestId: contestId ?? '',
+                                    price: price ?? '',
+                                  );
                                 },
                               );
                             } else {
@@ -432,14 +438,12 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                       cubit.removeSelectedStock(stock: oldStock);
                                                       final updatedStock = oldStock.copyWith(
                                                         stockPrediction: StockPrediction.none,
-
                                                       );
                                                       cubit.updateStock(stock: updatedStock, index: index);
                                                     } else if (currentPrediction == StockPrediction.down) {
                                                       cubit.updateSelectedStockPrediction(
                                                         stockPrediction: StockPrediction.up,
                                                         stock: oldStock,
-
                                                       );
                                                       final updatedStock = oldStock.copyWith(
                                                         stockPrediction: StockPrediction.up,

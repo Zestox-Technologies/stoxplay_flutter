@@ -11,9 +11,10 @@ import 'package:stoxplay/utils/constants/app_routes.dart';
 class ConfirmationBs extends StatelessWidget {
   final String contestId;
   final StockSelectionCubit cubit;
+  ValueNotifier<int> stepper;
   final String price;
 
-  const ConfirmationBs({required this.cubit, required this.price, required this.contestId, super.key});
+  ConfirmationBs({required this.cubit, required this.stepper, required this.price, required this.contestId, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +45,7 @@ class ConfirmationBs extends StatelessWidget {
                 if (state.joinContestApiStatus.isSuccess) {
                   Navigator.pop(context);
                   Future.microtask(() {
+                    stepper.value--;
                     Navigator.pushNamed(
                       context,
                       AppRoutes.battleGroundScreen,

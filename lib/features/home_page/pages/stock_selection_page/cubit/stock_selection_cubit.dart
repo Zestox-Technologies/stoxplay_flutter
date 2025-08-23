@@ -12,6 +12,7 @@ import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
@@ -94,6 +95,7 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
             joinContestApiStatus: ApiStatus.success,
             message: "Successfully joined contest!",
             joinContestResponse: r,
+            isEdit: true,
           ),
         );
         return r; // Return the response model with the id

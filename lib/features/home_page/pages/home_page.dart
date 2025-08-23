@@ -8,6 +8,7 @@ import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
+import 'package:stoxplay/features/home_page/widgets/news_list.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
@@ -131,6 +132,7 @@ class _HomePageState extends State<HomePage> {
                           child: CommonTabWidget(
                             onTap: () {
                               selectedIndex.value = 1;
+                              homeCubit.getLearningList(Strings.video);
                             },
                             isSelected: selectedIndex.value == 1,
                             title: Strings.learn,
@@ -280,7 +282,12 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ],
                           )
-                          : Center(child: Text(Strings.learn)),
+                          : BlocBuilder<HomeCubit, HomeState>(
+                            bloc: homeCubit,
+                            builder: (context, state) {
+                              return NewsList(list: state.learningList ?? []);
+                            },
+                          ),
                     ],
                   ),
                 );

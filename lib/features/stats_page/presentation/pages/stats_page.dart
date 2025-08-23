@@ -11,6 +11,8 @@ import 'package:stoxplay/features/stats_page/widgets/upcoming_item_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/primary_container.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/core/network/api_response.dart';
+import 'package:shimmer/shimmer.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -22,7 +24,7 @@ class StatsPage extends StatefulWidget {
 class _StatsPageState extends State<StatsPage> {
   final ValueNotifier<int> selectedIndexNotifier = ValueNotifier(0);
   final ValueNotifier<int> completedIndexNotifier = ValueNotifier(0);
-  StatsCubit statsCubit = StatsCubit(getMyContestUseCase: sl());
+  late StatsCubit statsCubit;
 
   @override
   void dispose() {
@@ -34,7 +36,7 @@ class _StatsPageState extends State<StatsPage> {
   @override
   void initState() {
     super.initState();
-    statsCubit.getMyContests();
+    statsCubit = BlocProvider.of<StatsCubit>(context);
   }
 
   @override
@@ -87,191 +89,211 @@ class _StatsPageState extends State<StatsPage> {
             body: ValueListenableBuilder(
               valueListenable: selectedIndexNotifier,
               builder: (context, selectedIndex, _) {
-                return Column(
-                  children: [
-                    Container(height: 1.h, width: double.maxFinite, color: Colors.grey),
-                    Gap(15.h),
-                    completedIndexNotifier.value == 0
-                        ? Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 14.w),
-                          child: BlocBuilder<StatsCubit, StatsState>(
-                            bloc: statsCubit,
-                            builder: (context, state) {
-                              return Column(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(4.w),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.whiteF9F9,
-                                      borderRadius: BorderRadius.circular(25.r),
-                                      border: Border.all(color: AppColors.blackD7D7.withOpacity(0.3), width: 1),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              selectedIndexNotifier.value = 0;
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(vertical: 5.h),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    selectedIndexNotifier.value == 0
-                                                        ? AppColors.purple5A2F
-                                                        : AppColors.transparent,
-                                                borderRadius: BorderRadius.circular(20.r),
-                                                border: Border.all(
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(height: 1.h, width: double.maxFinite, color: Colors.grey),
+                      Gap(15.h),
+                      completedIndexNotifier.value == 0
+                          ? Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 14.w),
+                            child: BlocBuilder<StatsCubit, StatsState>(
+                              bloc: statsCubit,
+                              builder: (context, state) {
+                                return Column(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(4.w),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.whiteF9F9,
+                                        borderRadius: BorderRadius.circular(25.r),
+                                        border: Border.all(color: AppColors.blackD7D7.withOpacity(0.3), width: 1),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                selectedIndexNotifier.value = 0;
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(vertical: 5.h),
+                                                decoration: BoxDecoration(
                                                   color:
                                                       selectedIndexNotifier.value == 0
-                                                          ? AppColors.blackD7D7
-                                                          : AppColors.blackD7D7.withOpacity(0.5),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "Upcoming",
-                                                  style: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    fontWeight: FontWeight.w500,
+                                                          ? AppColors.purple5A2F
+                                                          : AppColors.transparent,
+                                                  borderRadius: BorderRadius.circular(20.r),
+                                                  border: Border.all(
                                                     color:
                                                         selectedIndexNotifier.value == 0
-                                                            ? AppColors.white
-                                                            : AppColors.black,
+                                                            ? AppColors.blackD7D7
+                                                            : AppColors.blackD7D7.withOpacity(0.5),
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    "Upcoming",
+                                                    style: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      fontWeight: FontWeight.w500,
+                                                      color:
+                                                          selectedIndexNotifier.value == 0
+                                                              ? AppColors.white
+                                                              : AppColors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Gap(4.w),
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              selectedIndexNotifier.value = 1;
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(vertical: 5.h),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    selectedIndexNotifier.value == 1
-                                                        ? AppColors.purple5A2F
-                                                        : AppColors.transparent,
-                                                borderRadius: BorderRadius.circular(20.r),
-                                                border: Border.all(
+                                          Gap(4.w),
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                selectedIndexNotifier.value = 1;
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(vertical: 5.h),
+                                                decoration: BoxDecoration(
                                                   color:
                                                       selectedIndexNotifier.value == 1
-                                                          ? AppColors.blackD7D7
-                                                          : AppColors.blackD7D7.withOpacity(0.5),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "Live",
-                                                  style: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    fontWeight: FontWeight.w500,
+                                                          ? AppColors.purple5A2F
+                                                          : AppColors.transparent,
+                                                  borderRadius: BorderRadius.circular(20.r),
+                                                  border: Border.all(
                                                     color:
                                                         selectedIndexNotifier.value == 1
-                                                            ? AppColors.white
-                                                            : AppColors.black,
+                                                            ? AppColors.blackD7D7
+                                                            : AppColors.blackD7D7.withOpacity(0.5),
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    "Live",
+                                                    style: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      fontWeight: FontWeight.w500,
+                                                      color:
+                                                          selectedIndexNotifier.value == 1
+                                                              ? AppColors.white
+                                                              : AppColors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Gap(4.w),
-                                        Expanded(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              selectedIndexNotifier.value = 2;
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(vertical: 5.h),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    selectedIndexNotifier.value == 2
-                                                        ? AppColors.primaryPurple
-                                                        : AppColors.transparent,
-                                                borderRadius: BorderRadius.circular(20.r),
-                                                border: Border.all(
+                                          Gap(4.w),
+                                          Expanded(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                selectedIndexNotifier.value = 2;
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(vertical: 5.h),
+                                                decoration: BoxDecoration(
                                                   color:
                                                       selectedIndexNotifier.value == 2
-                                                          ? AppColors.blackD7D7
-                                                          : AppColors.blackD7D7.withOpacity(0.5),
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "Completed",
-                                                  style: TextStyle(
-                                                    fontSize: 14.sp,
-                                                    fontWeight: FontWeight.w500,
+                                                          ? AppColors.primaryPurple
+                                                          : AppColors.transparent,
+                                                  borderRadius: BorderRadius.circular(20.r),
+                                                  border: Border.all(
                                                     color:
                                                         selectedIndexNotifier.value == 2
-                                                            ? AppColors.white
-                                                            : AppColors.black,
+                                                            ? AppColors.blackD7D7
+                                                            : AppColors.blackD7D7.withOpacity(0.5),
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    "Completed",
+                                                    style: TextStyle(
+                                                      fontSize: 14.sp,
+                                                      fontWeight: FontWeight.w500,
+                                                      color:
+                                                          selectedIndexNotifier.value == 2
+                                                              ? AppColors.white
+                                                              : AppColors.black,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Gap(15.h),
-                                  selectedIndexNotifier.value == 0
-                                      ? state.stats?.upcoming?.isEmpty ?? true
-                                          ? Column(children: [SizedBox(height: 200.h), Text("No Upcoming contests")])
-                                          : ListView.separated(
-                                            separatorBuilder: (context, index) => SizedBox(height: 10),
-                                            shrinkWrap: true,
-                                            itemCount: state.stats?.upcoming?.length ?? 0,
-                                            itemBuilder:
-                                                (context, index) =>
-                                                    UpcomingItemWidget(data: state.stats!.upcoming![index]),
-                                          )
-                                      : selectedIndexNotifier.value == 1
-                                      ? state.stats?.live?.isEmpty ?? true
-                                          ? Column(children: [SizedBox(height: 200.h), Text("No Live contests")])
-                                          : ListView.separated(
-                                            shrinkWrap: true,
-                                            separatorBuilder: (context, index) => SizedBox(height: 10),
-                                            itemCount: state.stats?.live?.length ?? 0,
-                                            itemBuilder:
-                                                (context, index) => LiveItemWidget(data: state.stats!.live![index]),
-                                          )
-                                      : state.stats?.completed?.isEmpty ?? true
-                                      ? Column(children: [SizedBox(height: 200.h), Text("No Completed contests")])
-                                      : ListView.separated(
-                                        shrinkWrap: true,
-                                        separatorBuilder: (context, index) => SizedBox(height: 10),
-                                        itemCount: state.stats?.completed?.length ?? 0,
-                                        itemBuilder: (context, index) => CompletedItemWidget(),
+                                        ],
                                       ),
-                                ],
-                              );
+                                    ),
+                                    Gap(15.h),
+                                    state.apiStatus.isLoading
+                                        ? ListView.separated(
+                                          shrinkWrap: true,
+                                          physics: NeverScrollableScrollPhysics(),
+                                          itemCount: 2,
+                                          separatorBuilder: (context, index) => SizedBox(height: 15),
+                                          itemBuilder: (context, index) {
+                                            return Shimmer.fromColors(
+                                              baseColor: Colors.grey[300]!,
+                                              highlightColor: Colors.grey[100]!,
+                                              child: PrimaryContainer(child: SizedBox(height: 120.h)),
+                                            );
+                                          },
+                                        )
+                                        : selectedIndexNotifier.value == 0
+                                        ? state.stats?.upcoming?.isEmpty ?? true
+                                            ? Column(children: [SizedBox(height: 200.h), Text("No Upcoming contests")])
+                                            : ListView.separated(
+                                              separatorBuilder: (context, index) => SizedBox(height: 10),
+                                              shrinkWrap: true,
+                                              physics: NeverScrollableScrollPhysics(),
+                                              padding: EdgeInsets.only(bottom: 50),
+                                              itemCount: state.stats?.upcoming?.length ?? 0,
+                                              itemBuilder:
+                                                  (context, index) =>
+                                                      UpcomingItemWidget(data: state.stats!.upcoming![index]),
+                                            )
+                                        : selectedIndexNotifier.value == 1
+                                        ? state.stats?.live?.isEmpty ?? true
+                                            ? Column(children: [SizedBox(height: 200.h), Text("No Live contests")])
+                                            : ListView.separated(
+                                              shrinkWrap: true,
+                                              separatorBuilder: (context, index) => SizedBox(height: 10),
+                                              itemCount: state.stats?.live?.length ?? 0,
+                                              itemBuilder:
+                                                  (context, index) => LiveItemWidget(data: state.stats!.live![index]),
+                                            )
+                                        : state.stats?.completed?.isEmpty ?? true
+                                        ? Column(children: [SizedBox(height: 200.h), Text("No Completed contests")])
+                                        : ListView.separated(
+                                          shrinkWrap: true,
+                                          separatorBuilder: (context, index) => SizedBox(height: 10),
+                                          itemCount: state.stats?.completed?.length ?? 0,
+                                          itemBuilder:
+                                              (context, index) =>
+                                                  CompletedItemWidget(data: state.stats!.completed![index]),
+                                        ),
+                                  ],
+                                );
+                              },
+                            ),
+                          )
+                          : PopScope(
+                            canPop: false,
+                            onPopInvokedWithResult: (didPop, result) {
+                              if (didPop) {
+                                return;
+                              }
+                              if (completedIndexNotifier.value == 1) {
+                                completedIndexNotifier.value--;
+                              }
                             },
+                            child: ContestWinnerPage(),
                           ),
-                        )
-                        : PopScope(
-                          canPop: false,
-                          onPopInvokedWithResult: (didPop, result) {
-                            if (didPop) {
-                              return;
-                            }
-                            if (completedIndexNotifier.value == 1) {
-                              completedIndexNotifier.value--;
-                            }
-                          },
-                          child: ContestWinnerPage(),
-                        ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),

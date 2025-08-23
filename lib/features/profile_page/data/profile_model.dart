@@ -1,56 +1,82 @@
+// To parse this JSON data, do
+//
+//     final profileModel = profileModelFromJson(jsonString);
+
+import 'dart:convert';
+
+ProfileModel profileModelFromJson(String str) => ProfileModel.fromJson(json.decode(str));
+
+String profileModelToJson(ProfileModel data) => json.encode(data.toJson());
+
 class ProfileModel {
-  final String id;
-  final String firstName;
-  final String lastName;
-  final String? email;
-  final String username;
-  final String phoneNumber;
-  final String roleName;
-  final bool active;
-  final int walletBalance;
-  final String? state;
-  final String? area;
-  final String? gender;
-  final DateTime? dob;
-  final String? profilePictureUrl;
+  String? id;
+  String? firstName;
+  String? lastName;
+  String? email;
+  String? username;
+  String? profilePictureUrl;
+  DateTime? dateOfBirth;
+  String? phoneNumber;
+  String? gender;
+  String? roleName;
+  bool? active;
+  int? walletBalance;
+  dynamic state;
+  dynamic area;
 
   ProfileModel({
-    required this.id,
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.username,
-    required this.phoneNumber,
-    required this.roleName,
-    required this.active,
-    required this.walletBalance,
-    required this.state,
-    required this.area,
-    this.dob,
-    this.gender,
+    this.id,
+    this.firstName,
+    this.lastName,
+    this.email,
+    this.username,
     this.profilePictureUrl,
+    this.dateOfBirth,
+    this.phoneNumber,
+    this.gender,
+    this.roleName,
+    this.active,
+    this.walletBalance,
+    this.state,
+    this.area,
   });
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    return ProfileModel(
-      id: json['id'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
-      email: json['email'],
-      username: json['username'],
-      phoneNumber: json['phoneNumber'],
-      roleName: json['roleName'],
-      active: json['active'],
-      walletBalance: json['walletBalance'],
-      state: json['state'],
-      area: json['area'],
-      profilePictureUrl: json['profilePictureUrl'] ?? '',
-      dob: json['dateOfBirth'] != null ? DateTime.tryParse(json['dateOfBirth']) : null,
-      gender: json['gender'] ?? 'SELECT',
-    );
-  }
+  factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
+    id: json["id"],
+    firstName: json["firstName"],
+    lastName: json["lastName"],
+    email: json["email"],
+    username: json["username"],
+    profilePictureUrl: json["profilePictureUrl"],
+    dateOfBirth: json["dateOfBirth"] == null ? null : DateTime.parse(json["dateOfBirth"]),
+    phoneNumber: json["phoneNumber"],
+    gender: json["gender"],
+    roleName: json["roleName"],
+    active: json["active"],
+    walletBalance: json["walletBalance"],
+    state: json["state"],
+    area: json["area"],
+  );
 
-  ProfileModel copyWith({
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "firstName": firstName,
+    "lastName": lastName,
+    "email": email,
+    "username": username,
+    "profilePictureUrl": profilePictureUrl,
+    "dateOfBirth": dateOfBirth?.toIso8601String(),
+    "phoneNumber": phoneNumber,
+    "gender": gender,
+    "roleName": roleName,
+    "active": active,
+    "walletBalance": walletBalance,
+    "state": state,
+    "area": area,
+  };
+
+
+ProfileModel copyWith({
     String? id,
     String? firstName,
     String? lastName,
@@ -78,28 +104,9 @@ class ProfileModel {
       walletBalance: walletBalance ?? this.walletBalance,
       state: state ?? this.state,
       area: area ?? this.area,
-      dob: dob ?? this.dob,
+      dateOfBirth: dob ?? this.dateOfBirth,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       gender: gender ?? this.gender,
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'firstName': firstName,
-      'lastName': lastName,
-      'email': email,
-      'username': username,
-      'phoneNumber': phoneNumber,
-      'roleName': roleName,
-      'active': active,
-      'walletBalance': walletBalance,
-      'state': state,
-      'area': area,
-      'dateOfBirth': dob?.toIso8601String(),
-      'profilePictureUrl': profilePictureUrl,
-      'gender': gender,
-    };
   }
 }

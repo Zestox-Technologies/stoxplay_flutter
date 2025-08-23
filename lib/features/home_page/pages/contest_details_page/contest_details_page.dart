@@ -88,7 +88,18 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                       style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w700),
                     ),
                     Gap(10.h),
-                    CachedImageWidget(imageUrl: contest.sectorLogo, height: 100.h, width: 100.w, fit: BoxFit.cover),
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundColor: AppColors.primaryPurple,
+                      child: ClipOval(
+                        child: CachedImageWidget(
+                          imageUrl: contest.sectorLogo,
+                          height: 100.h,
+                          width: 100.w,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
                     Gap(10.h),
                     BlocBuilder<ProfileCubit, ProfileState>(
                       bloc: profileCubit,

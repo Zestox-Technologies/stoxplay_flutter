@@ -73,12 +73,12 @@ class Stock {
   bool isLiveData;
   int? livePoints;
   DateTime? lastUpdated;
-  int? selectionPercentage;
-  int? captainSelectionPercentage;
-  int? viceCaptainSelectionPercentage;
-  int? flexSelectionPercentage;
-  int? upPredictionPercentage;
-  int? downPredictionPercentage;
+  double? selectionPercentage;
+  double? captainSelectionPercentage;
+  double? viceCaptainSelectionPercentage;
+  double? flexSelectionPercentage;
+  double? upPredictionPercentage;
+  double? downPredictionPercentage;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -181,12 +181,12 @@ extension StockCopyWith on Stock {
     bool? isLiveData,
     int? livePoints,
     DateTime? lastUpdated,
-    int? selectionPercentage,
-    int? captainSelectionPercentage,
-    int? viceCaptainSelectionPercentage,
-    int? flexSelectionPercentage,
-    int? upPredictionPercentage,
-    int? downPredictionPercentage,
+    double? selectionPercentage,
+    double? captainSelectionPercentage,
+    double? viceCaptainSelectionPercentage,
+    double? flexSelectionPercentage,
+    double? upPredictionPercentage,
+    double? downPredictionPercentage,
   }) {
     return Stock(
       stockName: stockName ?? this.stockName,

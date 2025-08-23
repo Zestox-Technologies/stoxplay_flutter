@@ -27,12 +27,16 @@ class MyApp extends StatelessWidget {
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (context) => TimerCubit()),
-            BlocProvider(create: (context) => ProfileCubit(sl(), sl(),sl())),
+            BlocProvider(create: (context) => ProfileCubit(sl(), sl(), sl())),
             BlocProvider(create: (context) => StatsCubit(getMyContestUseCase: sl())),
             BlocProvider(
               create:
-                  (context) =>
-                      HomeCubit(sectorListUseCase: sl(), getContestListUseCase: sl(), contestStatusUseCase: sl()),
+                  (context) => HomeCubit(
+                    sectorListUseCase: sl(),
+                    getContestListUseCase: sl(),
+                    learningListUseCase: sl(),
+                    contestStatusUseCase: sl(),
+                  ),
             ),
           ],
           child: MaterialApp(

@@ -1,12 +1,15 @@
-// To parse this JSON data, do
-//
-//     final statsModel = statsModelFromJson(jsonString);
 
 import 'dart:convert';
 
-import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 
-StatsModel statsModelFromJson(String str) => StatsModel.fromJson(json.decode(str));
+StatsModel statsModelFromJson(String str) {
+  try {
+    return StatsModel.fromJson(json.decode(str));
+  } catch (e) {
+    // Return a default model if parsing fails
+    return StatsModel();
+  }
+}
 
 String statsModelToJson(StatsModel data) => json.encode(data.toJson());
 
@@ -17,34 +20,55 @@ class StatsModel {
 
   StatsModel({this.upcoming, this.live, this.completed});
 
-  factory StatsModel.fromJson(Map<String, dynamic> json) => StatsModel(
-    upcoming:
-        json["upcoming"] == null
-            ? []
-            : List<StatsDataModel>.from(json["upcoming"]!.map((x) => StatsDataModel.fromJson(x))),
-    live: json["live"] == null ? [] : List<StatsDataModel>.from(json["live"]!.map((x) => StatsDataModel.fromJson(x))),
-    completed:
-        json["completed"] == null
-            ? []
-            : List<StatsDataModel>.from(json["completed"]!.map((x) => StatsDataModel.fromJson(x))),
-  );
+  factory StatsModel.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return StatsModel();
+
+    return StatsModel(
+      upcoming: _parseStatsDataList(json["upcoming"]),
+      live: _parseStatsDataList(json["live"]),
+      completed: _parseStatsDataList(json["completed"]),
+    );
+  }
+
+  static List<StatsDataModel>? _parseStatsDataList(dynamic data) {
+    if (data == null) return null;
+    if (data is! List) return null;
+
+    try {
+      return List<StatsDataModel>.from(data.map((x) => StatsDataModel.fromJson(x)).where((x) => x != null));
+    } catch (e) {
+      return null;
+    }
+  }
 
   Map<String, dynamic> toJson() => {
-    "upcoming": upcoming == null ? [] : List<dynamic>.from(upcoming!.map((x) => x.toJson())),
-    "live": live == null ? [] : List<dynamic>.from(live!.map((x) => x.toJson())),
-    "completed": completed == null ? [] : List<dynamic>.from(completed!.map((x) => x.toJson())),
+    "upcoming": upcoming?.map((x) => x.toJson()).toList() ?? [],
+    "live": live?.map((x) => x.toJson()).toList() ?? [],
+    "completed": completed?.map((x) => x.toJson()).toList() ?? [],
   };
 }
 
-class StatsDataModel {
-  final String? id;
-  final String? name;
-  final int? rank;
-  final int? points;
-  final int? prize;
-  final Contest? contest;
 
-  StatsDataModel({this.id, this.name, this.rank, this.points, this.prize, this.contest});
+StatsDataModel statsDataModelFromJson(String str) => StatsDataModel.fromJson(json.decode(str));
+
+String statsDataModelToJson(StatsDataModel data) => json.encode(data.toJson());
+
+class StatsDataModel {
+  String? id;
+  String? name;
+  dynamic rank;
+  dynamic points;
+  dynamic prize;
+  Contest? contest;
+
+  StatsDataModel({
+    this.id,
+    this.name,
+    this.rank,
+    this.points,
+    this.prize,
+    this.contest,
+  });
 
   factory StatsDataModel.fromJson(Map<String, dynamic> json) => StatsDataModel(
     id: json["id"],
@@ -66,15 +90,15 @@ class StatsDataModel {
 }
 
 class Contest {
-  final String? id;
-  final String? name;
-  final String? sectorName;
-  final String? sectorLogo;
-  final int? entryFee;
-  final int? prizePool;
-  final int? winningPercentage;
-  final TimeLeftToStartModel? timeLeft;
-  final int? spotsRemaining;
+  String? id;
+  String? name;
+  String? sectorName;
+  String? sectorLogo;
+  int? entryFee;
+  int? prizePool;
+  int? winningPercentage;
+  TimeLeft? timeLeft;
+  int? spotsRemaining;
 
   Contest({
     this.id,
@@ -96,7 +120,7 @@ class Contest {
     entryFee: json["entryFee"],
     prizePool: json["prizePool"],
     winningPercentage: json["winningPercentage"],
-    timeLeft: json["timeLeft"] == null ? null : TimeLeftToStartModel.fromJson(json["timeLeft"]),
+    timeLeft: json["timeLeft"] == null ? null : TimeLeft.fromJson(json["timeLeft"]),
     spotsRemaining: json["spotsRemaining"],
   );
 
@@ -110,5 +134,37 @@ class Contest {
     "winningPercentage": winningPercentage,
     "timeLeft": timeLeft?.toJson(),
     "spotsRemaining": spotsRemaining,
+  };
+}
+
+class TimeLeft {
+  String? status;
+  int? days;
+  int? hours;
+  int? minutes;
+  int? seconds;
+
+  TimeLeft({
+    this.status,
+    this.days,
+    this.hours,
+    this.minutes,
+    this.seconds,
+  });
+
+  factory TimeLeft.fromJson(Map<String, dynamic> json) => TimeLeft(
+    status: json["status"],
+    days: json["days"],
+    hours: json["hours"],
+    minutes: json["minutes"],
+    seconds: json["seconds"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "days": days,
+    "hours": hours,
+    "minutes": minutes,
+    "seconds": seconds,
   };
 }

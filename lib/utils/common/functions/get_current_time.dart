@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 
 final Dio _dio = Dio();
 
@@ -27,6 +28,6 @@ String formatMaxWinIntl(int amount) {
   return format.format(amount);
 }
 
-int getTotalSecondsFromTimeLeft(TimeLeftToStartModel timeLeft) {
-  return timeLeft.days * 86400 + timeLeft.hours * 3600 + timeLeft.minutes * 60 + timeLeft.seconds;
+int getTotalSecondsFromTimeLeft(TimeLeft timeLeft) {
+  return timeLeft.days! * 86400 + timeLeft.hours! * 3600 + timeLeft.minutes! * 60 + (timeLeft.seconds ?? 0);
 }
