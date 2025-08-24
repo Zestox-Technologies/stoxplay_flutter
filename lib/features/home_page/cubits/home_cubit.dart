@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
@@ -15,12 +16,14 @@ class HomeCubit extends Cubit<HomeState> {
   ContestStatusUseCase contestStatusUseCase;
   GetContestListUseCase getContestListUseCase;
   LearningListUseCase learningListUseCase;
+  GetAdsUseCase getAdsUseCase;
 
   HomeCubit({
     required this.sectorListUseCase,
     required this.getContestListUseCase,
     required this.contestStatusUseCase,
     required this.learningListUseCase,
+    required this.getAdsUseCase,
   }) : super(HomeState());
 
   void getSectorList() async {
@@ -56,6 +59,15 @@ class HomeCubit extends Cubit<HomeState> {
     learningList.fold(
       (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
       (r) => emit(state.copyWith(learningList: r, apiStatus: ApiStatus.success)),
+    );
+  }
+
+  Future<void> getAdsList() async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading));
+    final learningList = await getAdsUseCase.call('');
+    learningList.fold(
+      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
+      (r) => emit(state.copyWith(adsList: r, apiStatus: ApiStatus.success)),
     );
   }
 }

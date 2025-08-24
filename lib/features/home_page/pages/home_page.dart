@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:stoxplay/features/auth/presentation/cubit/auth_state.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
+import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
@@ -30,7 +35,9 @@ class _HomePageState extends State<HomePage> {
   ValueNotifier<int> selectedIndex = ValueNotifier<int>(0);
   late HomeCubit homeCubit;
   late ProfileCubit profileCubit;
-
+  late PageController _pageController;
+  int _currentPage = 0;
+  Timer? _timer;
   List list = [Strings.play, Strings.learn];
 
   @override
@@ -38,8 +45,29 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     homeCubit = BlocProvider.of<HomeCubit>(context);
     profileCubit = BlocProvider.of<ProfileCubit>(context);
+    _pageController = PageController(viewportFraction: 1);
+
+    // Auto-scroll every 3 seconds
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+      if (homeCubit.state.adsList == null || homeCubit.state.adsList!.isEmpty) return;
+
+      if (_currentPage < (homeCubit.state.adsList!.length - 1)) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
     profileCubit.fetchProfile();
     homeCubit.getSectorList();
+    homeCubit.getAdsList();
   }
 
   void showWithdrawDialog() async {
@@ -95,7 +123,23 @@ class _HomePageState extends State<HomePage> {
           SliverToBoxAdapter(
             child: Column(
               children: [
-                Image.asset(AppAssets.carouselImage, height: 150.h, width: MediaQuery.of(context).size.width),
+                BlocSelector<HomeCubit, HomeState, List<AdsModel>>(
+                  bloc: homeCubit,
+                  selector: (state) => state.adsList ?? [],
+                  builder: (context, adsList) {
+                    return SizedBox(
+                      height: 150.h,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: adsList.length,
+                        itemBuilder: (context, index) {
+                          return Image.network(adsList[index].fileUrl ?? '', width: MediaQuery.of(context).size.width);
+                        },
+                      ),
+                    );
+                  },
+                ),
                 Gap(10.h), // Some spacing before the sticky tab
               ],
             ),
