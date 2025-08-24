@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/features/home_page/data/home_rds.dart';
+import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
@@ -22,6 +23,8 @@ abstract class HomeRepo {
   Future<Either<AppError, JoinContestResponseModel>> joinContest(JoinContestParamsModel params);
 
   Future<Either<AppError, StatsModel>> getMyContests();
+
+  Future<Either<AppError, List<AdsModel>>> getAds();
 
   Future<Either<AppError, String>> updateTeam(JoinContestParamsModel params);
 
@@ -107,6 +110,16 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<AppError, List<LearningModel>>> getLearningList(String params) async {
     try {
       final result = await homeRds.getLearningList(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, List<AdsModel>>> getAds() async{
+    try {
+      final result = await homeRds.getAds();
       return Right(result);
     } catch (e) {
       return handleException(e);

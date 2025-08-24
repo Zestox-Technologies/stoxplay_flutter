@@ -30,8 +30,8 @@ class Strings {
   static const String weWillSendYouOTP = "We will send you One Time Password(OTP)";
   static const String signUp = "Sign Up";
   static const String signIn = "Sign In";
-  static const String verifyOTP = "VERIFY OTP";
-  static const String sendOTP = "SEND OTP";
+  static const String verifyOTP = "VERIFY VOICE OTP";
+  static const String sendOTP = "SEND VOICE OTP";
   static const String upload = "UPLOAD";
   static const String dontHaveAnAccount = "Don't have an account";
   static const String haveAnInviteCode = "Have an Invite Code?";

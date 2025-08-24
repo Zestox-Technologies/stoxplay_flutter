@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/api_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/app_error.dart';
+import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
@@ -31,6 +30,8 @@ abstract class HomeRds {
   Future<String> updateTeam(JoinContestParamsModel params);
 
   Future<List<LearningModel>> getLearningList(String params);
+
+  Future<List<AdsModel>> getAds();
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -151,6 +152,22 @@ class HomeRdsImpl extends HomeRds {
       final learningList = jsonList.map((json) => LearningModel.fromJson(json)).toList();
 
       return learningList;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<AdsModel>> getAds() async {
+    try {
+      final response = await client.get(ApiUrls.getAds);
+
+      final List<dynamic> jsonList = response.data['data'];
+      final adsList = jsonList.map((json) => AdsModel.fromJson(json)).toList();
+
+      return adsList;
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

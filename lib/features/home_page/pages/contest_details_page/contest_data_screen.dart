@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:lottie/lottie.dart';
 import 'package:stoxplay/features/home_page/pages/home_page.dart';
+import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -10,14 +12,14 @@ import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
-class WinningsScreen extends StatefulWidget {
-  const WinningsScreen({super.key});
+class ContestDataScreen extends StatefulWidget {
+  const ContestDataScreen({super.key});
 
   @override
-  State<WinningsScreen> createState() => _WinningsScreenState();
+  State<ContestDataScreen> createState() => _ContestDataScreenState();
 }
 
-class _WinningsScreenState extends State<WinningsScreen> {
+class _ContestDataScreenState extends State<ContestDataScreen> {
   int selectedTab = 0; // 0: Leaderboard, 1: Winnings
   final String currentUser = 'Ravi Mehta';
   ValueNotifier<int> selectedIndex = ValueNotifier(0);
@@ -155,6 +157,7 @@ class _ContestSummaryCard extends StatelessWidget {
                   Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
                 ],
               ),
+
               Row(
                 children: [
                   TextView(text: 'Entry Fees: ', fontWeight: FontWeight.w500, fontSize: 14.sp),
@@ -166,27 +169,7 @@ class _ContestSummaryCard extends StatelessWidget {
             ],
           ),
           Gap(8.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.people, size: 16, color: AppColors.black6666),
-                  Gap(4.w),
-                  TextView(text: '30k', fontSize: 12.sp, fontColor: AppColors.black6666),
-                  Gap(12.w),
-                  Icon(Icons.percent, size: 16, color: AppColors.black6666),
-                  Gap(4.w),
-                  TextView(text: '50%', fontSize: 12.sp, fontColor: AppColors.black6666),
-                  Gap(12.w),
-                  Icon(Icons.timer, size: 16, color: AppColors.black6666),
-                  Gap(4.w),
-                  TextView(text: '10', fontSize: 12.sp, fontColor: AppColors.black6666),
-                ],
-              ),
-              TextView(text: 'Rank – 1', fontWeight: FontWeight.w600, fontSize: 14.sp),
-            ],
-          ),
+          AppButton(text: Strings.join, onPressed: () {}, height: 30.h, fontSize: 12.sp),
         ],
       ),
     );
@@ -199,10 +182,10 @@ class _StatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stats = [
-      {'icon': '📊', 'title': '6,000', 'subtitle': 'spots left', 'highlight': true},
-      {'icon': '🏆', 'title': 'Top 25%', 'subtitle': 'Winners'},
-      {'icon': '📈', 'title': '₹7.5 Lakhs', 'subtitle': 'Total Payout'},
-      {'icon': '🎯', 'title': '20', 'subtitle': 'Teams Max Entry'},
+      {'icon': AppAssets.chartJson, 'title': '6,000', 'subtitle': 'spots left', 'highlight': true},
+      {'icon': AppAssets.trophyJson, 'title': 'Top 25%', 'subtitle': 'Winners'},
+      {'icon': AppAssets.graphJson, 'title': '₹7.5 Lakhs', 'subtitle': 'Total Payout'},
+      {'icon': AppAssets.targetJson, 'title': '20', 'subtitle': 'Teams Max Entry'},
     ];
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -256,7 +239,7 @@ class _StatCardBox extends StatelessWidget {
                 border: Border.all(color: AppColors.blackD7D7.withOpacity(0.3)),
               ),
               alignment: Alignment.center,
-              child: Text(data['icon'], style: TextStyle(fontSize: 28, color: AppColors.purple5A2F)),
+              child: Lottie.asset(data['icon'], height: 30, width: 30),
             ),
             Gap(12.w),
             Expanded(
@@ -446,7 +429,7 @@ class _LeaderboardItem extends StatelessWidget {
       child: Row(
         children: [
           Gap(12.w),
-          TextView(text: rank.toString(), fontWeight: FontWeight.w600, fontSize: 16.sp),
+          TextView(text: "#", fontWeight: FontWeight.w600, fontSize: 16.sp),
           Expanded(
             child: ListTile(
               leading: CircleAvatar(backgroundImage: NetworkImage(avatar), radius: 22.r),
@@ -454,29 +437,23 @@ class _LeaderboardItem extends StatelessWidget {
                 children: [
                   TextView(text: name, fontWeight: FontWeight.w600, fontSize: 16.sp),
                   Gap(8.w),
-                  if (isCurrentUser)
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.purple5A2F.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: TextView(
-                        text: 'You',
-                        fontColor: AppColors.purple5A2F,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12.sp,
-                      ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.purple5A2F.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
+                    child: Text("T1"),
+                  ),
                 ],
               ),
-              subtitle: TextView(text: '$points Points', fontSize: 14.sp, fontColor: AppColors.black6666),
-              trailing:
-                  isCrown
-                      ? Icon(Icons.emoji_events, color: AppColors.orangeF6A6, size: 28)
-                      : rank == 1
-                      ? Icon(Icons.emoji_events, color: AppColors.orangeF6A6, size: 28)
-                      : null,
+              // subtitle: TextView(text: '$points Points', fontSize: 14.sp, fontColor: AppColors.black6666),
+              // trailing:
+              //     isCrown
+              //         ? Icon(Icons.emoji_events, color: AppColors.orangeF6A6, size: 28)
+              //         : rank == 1
+              //         ? Icon(Icons.emoji_events, color: AppColors.orangeF6A6, size: 28)
+              //         : null,
               leadingAndTrailingTextStyle: null,
               contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
               minVerticalPadding: 0,

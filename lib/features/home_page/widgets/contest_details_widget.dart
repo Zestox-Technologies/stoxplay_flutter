@@ -27,7 +27,7 @@ class ContestDetailsWidget extends StatelessWidget {
           ignoreOnTap
               ? null
               : () {
-                Navigator.pushNamed(context, AppRoutes.winningsScreen, arguments: data);
+                Navigator.pushNamed(context, AppRoutes.contestDataScreen, arguments: data);
               },
       child: Container(
         decoration: boxDecorationForContestWidget,

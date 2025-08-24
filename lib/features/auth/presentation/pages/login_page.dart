@@ -97,7 +97,6 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
 
   @override
   void codeUpdated() {
-    print('SMS Code received: $code');
     if (code != null && code!.length == 4) {
       setState(() {
         otpController.text = code!;
@@ -162,6 +161,7 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
   void _handleCheckPhoneSuccess(BuildContext context) {
     final authCubit = context.read<AuthCubit>();
     if (authCubit.state.isPhoneNumberExists!) {
+      context.read<TimerCubit>().startTimer(seconds: 60);
       stepper.value++;
     }
   }
@@ -299,23 +299,32 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
                     ),
                   );
                 } else {
-                  return GestureDetector(
-                    onTap: () async {
-                      // Clear any previous error messages
-                      await authCubit.initiateSignUp(
-                        phoneNumber: mobileNoController.text,
-                        referCode: referralIdController.text,
+                  return BlocBuilder<AuthCubit, AuthState>(
+                    bloc: authCubit,
+                    builder: (context, state) {
+                      return GestureDetector(
+                        onTap: () async {
+                          if (state.checkPhoneApiStatus.isSuccess) {
+                            // Clear any previous error messages
+                            await authCubit.checkPhoneNumber(mobileNoController.text);
+                          } else {
+                            await authCubit.initiateSignUp(
+                              phoneNumber: mobileNoController.text,
+                              referCode: referralIdController.text,
+                            );
+                          }
+                        },
+                        child: Text(
+                          'Resend VOICE OTP',
+                          style: TextStyle(
+                            color: Colors.green.shade600,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       );
                     },
-                    child: Text(
-                      'Resend OTP',
-                      style: TextStyle(
-                        color: Colors.green.shade600,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
                   );
                 }
               },
@@ -404,83 +413,90 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SizedBox(height: MediaQuery.of(context).size.height * 0.07),
-                                  Stack(
-                                    children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: Image.asset(AppAssets.lightSplashStrokes, fit: BoxFit.cover),
-                                      ),
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(top: 100.h),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              CommonStoxplayIcon(
-                                                iconHeight: 55.h,
-                                                iconWidth: 55.w,
-                                                shadowHeight: 15.h,
-                                                shadowWidth: 80.w,
-                                              ),
-                                              CommonStoxplayText(fontSize: 50.sp),
-                                            ],
-                                          ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                                Stack(
+                                  children: [
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: Image.asset(AppAssets.lightSplashStrokes, fit: BoxFit.cover),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 100.h),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            CommonStoxplayIcon(
+                                              iconHeight: 55.h,
+                                              iconWidth: 55.w,
+                                              shadowHeight: 15.h,
+                                              shadowWidth: 80.w,
+                                            ),
+                                            CommonStoxplayText(fontSize: 50.sp),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                  Gap(30.h),
-                                  TextView(text: Strings.login, fontSize: 40.sp, fontWeight: FontWeight.w700),
-                                  TextView(
-                                    text: step == 0 ? Strings.weWillSendYouOTP : Strings.pleaseSignInToExistingAccount,
-                                    fontColor: AppColors.black39,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                  SizedBox(height: 40.h),
-                                  ShadowContainer(
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 28.h),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          step == 0
-                                              ? _buildPhoneInputStep(context, authCubit)
-                                              : _buildOtpStep(context, authCubit),
-                                          BlocBuilder<AuthCubit, AuthState>(
-                                            builder: (context, state) {
-                                              final isLoading =
-                                                  state.checkPhoneApiStatus.isLoading ||
-                                                  state.initiateSignUpStatus.isLoading ||
-                                                  state.verifyOtpStatus.isLoading;
-                                              final isOtpStep = step == 1;
+                                    ),
+                                  ],
+                                ),
+                                Gap(10.h),
+                                TextView(text: Strings.login, fontSize: 40.sp, fontWeight: FontWeight.w700),
+                                TextView(
+                                  text: step == 0 ? Strings.weWillSendYouOTP : Strings.pleaseSignInToExistingAccount,
+                                  fontColor: AppColors.black39,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                                SizedBox(height: 20.h),
+                                ShadowContainer(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 28.h),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        step == 0
+                                            ? _buildPhoneInputStep(context, authCubit)
+                                            : _buildOtpStep(context, authCubit),
+                                        BlocBuilder<AuthCubit, AuthState>(
+                                          builder: (context, state) {
+                                            final isLoading =
+                                                state.checkPhoneApiStatus.isLoading ||
+                                                state.initiateSignUpStatus.isLoading ||
+                                                state.verifyOtpStatus.isLoading;
+                                            final isOtpStep = step == 1;
 
-                                              return AppButton(
-                                                text: isOtpStep ? Strings.verifyOTP : Strings.sendOTP,
-                                                isLoading: isLoading,
-                                                onPressed: () async {
-                                                  if (!isOtpStep) {
-                                                    _onSendOtp(context, authCubit);
-                                                  } else {
-                                                    await _onVerifyOtp(context, authCubit);
-                                                  }
-                                                },
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ),
+                                            return AppButton(
+                                              text: isOtpStep ? Strings.verifyOTP : Strings.sendOTP,
+                                              isLoading: isLoading,
+                                              onPressed: () async {
+                                                if (!isOtpStep) {
+                                                  _onSendOtp(context, authCubit);
+                                                } else {
+                                                  await _onVerifyOtp(context, authCubit);
+                                                }
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                Gap(10.h),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Text(
+                                    "Note: For your security, the OTP will be delivered to you through a phone call. Please be patient and wait for the call — this process may take a short while.",
+                                    style: TextStyle(color: AppColors.red, fontSize: 10.sp),
+                                  ),
+                                ),
+                              ],
                             ),
+                            Spacer(),
                             TermsConditionWidget(),
                             Gap(20.h),
                           ],

@@ -592,7 +592,7 @@ final List<Map<String, dynamic>> leaderboard = [
     'avatar': 'https://randomuser.me/api/portraits/men/1.jpg',
     'points': 120,
     'isCrown': true,
-    'isCurrentUser': false,
+    'isCurrentUser': true,
   },
   {
     'name': 'Amit Sharma',
@@ -620,7 +620,7 @@ final List<Map<String, dynamic>> leaderboard = [
     'avatar': 'https://randomuser.me/api/portraits/men/5.jpg',
     'points': 120,
     'isCrown': false,
-    'isCurrentUser': true,
+    'isCurrentUser': false,
   },
   {
     'name': 'Oliver Johnson',

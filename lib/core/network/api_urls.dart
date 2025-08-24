@@ -32,4 +32,5 @@ class ApiUrls {
   static const String getProfile = 'users/profile';
   static const String fileUpload = 'files/upload';
   static const String learningContent = 'learning-content';
+  static const String getAds = 'ads-management/client';
 }

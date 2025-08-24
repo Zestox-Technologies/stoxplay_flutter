@@ -41,4 +41,12 @@ class AppAssets {
   static const String helpIcon = 'assets/icons/help_icon.png';
   static const String notificationBell = 'assets/icons/notification_bell.png';
   static const String firstPrizeIcon = 'assets/icons/first_prize_icon.png';
+
+
+  //json
+  static const String chartJson = 'assets/json/chart.json';
+  static const String graphJson = 'assets/json/graph.json';
+  static const String targetJson = 'assets/json/target.json';
+  static const String trophyJson = 'assets/json/trophy.json';
+
 }

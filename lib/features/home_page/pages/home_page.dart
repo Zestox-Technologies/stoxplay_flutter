@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                 return CircleAvatar(
                   radius: 18.r,
                   backgroundImage: pic != "" ? NetworkImage(pic) : null,
-                  child: pic != "" ? null : Icon(Icons.person, size: 40.h),
+                  child: pic != "" ? null : Icon(Icons.person, size: 25.h),
                 );
               },
             ),
