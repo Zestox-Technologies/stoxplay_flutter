@@ -6,7 +6,6 @@ import 'package:stoxplay/config/route_list.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
-import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/features/stats_page/presentation/cubit/stats_cubit.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
@@ -37,6 +36,8 @@ class MyApp extends StatelessWidget {
                     learningListUseCase: sl(),
                     contestStatusUseCase: sl(),
                     getAdsUseCase: sl(),
+                    contestLeaderboardUseCase: sl(),
+                    contestDetailsUseCase: sl(),
                   ),
             ),
           ],

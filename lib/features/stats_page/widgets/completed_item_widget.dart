@@ -5,6 +5,7 @@ import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/constants/app_routes.dart';
 
 class CompletedItemWidget extends StatelessWidget {
   final StatsDataModel data;
@@ -13,95 +14,105 @@ class CompletedItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.blackD7D7, width: 1),
-        boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))],
-      ),
-      child: Column(
-        children: [
-          // Top Section - Event Header
-          Padding(
-            padding: EdgeInsets.all(10.w),
-            child: Row(
-              children: [
-                // HDFC Bank Logo
-                _buildIcon(),
-                Gap(12.w),
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.completedDetailsScreen);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: AppColors.blackD7D7, width: 1),
+          boxShadow: [BoxShadow(color: AppColors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 2))],
+        ),
+        child: Column(
+          children: [
+            // Top Section - Event Header
+            Padding(
+              padding: EdgeInsets.all(10.w),
+              child: Row(
+                children: [
+                  // HDFC Bank Logo
+                  _buildIcon(),
+                  Gap(12.w),
 
-                // Event Information
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextView(
-                        text: "Stock Market Championship",
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w700,
-                        fontColor: AppColors.black,
-                      ),
-                      TextView(
-                        text: data.contest?.name ?? '',
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        fontColor: AppColors.purple5A2F,
-                      ),
-                    ],
+                  // Event Information
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextView(
+                          text: "Stock Market Championship",
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w700,
+                          fontColor: AppColors.black,
+                        ),
+                        TextView(
+                          text: data.contest?.name ?? '',
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          fontColor: AppColors.purple5A2F,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          // Divider
-          Container(height: 1.h, color: AppColors.blackD7D7, margin: EdgeInsets.symmetric(horizontal: 16.w)),
+            // Divider
+            Container(height: 1.h, color: AppColors.blackD7D7, margin: EdgeInsets.symmetric(horizontal: 16.w)),
 
-          // Middle Section - Date and Time
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Expanded(
-                //   child: TextView(
-                //     text: "Date: 21 March,2025",
-                //     fontSize: 12.sp,
-                //     fontWeight: FontWeight.w500,
-                //     fontColor: AppColors.black,
-                //   ),
-                // ),
-                TextView(
-                  text: "Time: 4:15 PM",
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
-                  fontColor: AppColors.black,
-                ),
-              ],
+            // Middle Section - Date and Time
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Expanded(
+                  //   child: TextView(
+                  //     text: "Date: 21 March,2025",
+                  //     fontSize: 12.sp,
+                  //     fontWeight: FontWeight.w500,
+                  //     fontColor: AppColors.black,
+                  //   ),
+                  // ),
+                  TextView(
+                    text: "Time: 4:15 PM",
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                    fontColor: AppColors.black,
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          // Divider
-          Container(height: 1.h, color: AppColors.blackD7D7, margin: EdgeInsets.symmetric(horizontal: 16.w)),
+            // Divider
+            Container(height: 1.h, color: AppColors.blackD7D7, margin: EdgeInsets.symmetric(horizontal: 16.w)),
 
-          // Bottom Section - Participation Details
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            child: Row(
-              children: [
-                TextView(text: "1-Team", fontSize: 12.sp, fontWeight: FontWeight.w500, fontColor: AppColors.black9999),
-                Gap(16.w),
-                TextView(
-                  text: "1-Contest",
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w500,
-                  fontColor: AppColors.black9999,
-                ),
-              ],
+            // Bottom Section - Participation Details
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              child: Row(
+                children: [
+                  TextView(
+                    text: "1-Team",
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                    fontColor: AppColors.black9999,
+                  ),
+                  Gap(16.w),
+                  TextView(
+                    text: "1-Contest",
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                    fontColor: AppColors.black9999,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

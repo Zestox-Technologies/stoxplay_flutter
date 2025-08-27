@@ -3,9 +3,9 @@ import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/core/network/use_case.dart';
 import 'package:stoxplay/features/auth/data/models/auth_params_model.dart';
+import 'package:stoxplay/features/auth/data/models/check_phone_number_model.dart';
 import 'package:stoxplay/features/auth/data/models/user_model.dart';
 import 'package:stoxplay/features/auth/domain/auth_repo.dart';
-import 'package:stoxplay/features/auth/data/models/check_phone_number_model.dart';
 
 class CheckPhoneNumberUseCase extends UseCase<CheckPhoneNumberModel, AuthParamsModel> {
   final AuthRepository repository;

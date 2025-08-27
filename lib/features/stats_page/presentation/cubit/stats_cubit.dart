@@ -1,9 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 import 'package:stoxplay/core/network/api_response.dart';
-import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';

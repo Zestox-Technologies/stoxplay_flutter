@@ -29,8 +29,12 @@ class ApiUrls {
   static getStocksList(String contestId) => '/client/contests/$contestId/stocks';
 
   static joinContest(String contestId) => '/client/contests/$contestId/join';
+  static clientContestDetails(String contestId) => '/client/contests/$contestId/details';
+  static clientContestLeaderboard(String contestId) => '/client/contests/$contestId/leaderboard';
   static const String getProfile = 'users/profile';
   static const String fileUpload = 'files/upload';
   static const String learningContent = 'learning-content';
   static const String getAds = 'ads-management/client';
+
+  static clientTeams(String teamId) => '/client/teams/$teamId';
 }

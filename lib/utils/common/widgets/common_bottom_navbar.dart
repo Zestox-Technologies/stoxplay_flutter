@@ -1,10 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stoxplay/config/navigation/navigation_state.dart';
-import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/features/stats_page/presentation/cubit/stats_cubit.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';

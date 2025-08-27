@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
-import 'package:stoxplay/utils/constants/app_colors.dart';
 
 class StockSelectionShimmer extends StatelessWidget {
   const StockSelectionShimmer({super.key});

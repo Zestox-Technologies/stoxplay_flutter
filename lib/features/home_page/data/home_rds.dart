@@ -4,6 +4,8 @@ import 'package:stoxplay/core/network/api_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
@@ -12,6 +14,7 @@ import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/models/QueryParams.dart';
 
+import 'models/client_teams_response_model.dart';
 import 'models/sector_model.dart';
 
 abstract class HomeRds {
@@ -32,6 +35,12 @@ abstract class HomeRds {
   Future<List<LearningModel>> getLearningList(String params);
 
   Future<List<AdsModel>> getAds();
+
+  Future<ClientTeamsResponseModel> teamsClient(JoinContestParamsModel params);
+
+  Future<ContestDetailModel> contestDetails(String params);
+
+  Future<ContestLeaderboardModel> contestLeaderboard(String params);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -168,6 +177,50 @@ class HomeRdsImpl extends HomeRds {
       final adsList = jsonList.map((json) => AdsModel.fromJson(json)).toList();
 
       return adsList;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<ClientTeamsResponseModel> teamsClient(JoinContestParamsModel params) async {
+    try {
+      final response =
+          params.isPostApi == true
+              ? client.post(ApiUrls.clientTeams(params.teamId ?? ''), data: params.toJson())
+              : client.get(ApiUrls.clientTeams(params.teamId ?? ''));
+
+      final responseData = (await response).data['data'];
+      final result = ClientTeamsResponseModel.fromJson(responseData);
+      return result;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<ContestDetailModel> contestDetails(String params) async {
+    try {
+      final response = await client.get(ApiUrls.clientContestDetails(params));
+      final data = response.data['data'];
+      return ContestDetailModel.fromJson(data);
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<ContestLeaderboardModel> contestLeaderboard(String params) async {
+    try {
+      final response = await client.get(ApiUrls.clientContestLeaderboard(params));
+      final data = response.data['data'];
+      return ContestLeaderboardModel.fromJson(data);
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:stoxplay/core/di/service_locator.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/stats_page/presentation/cubit/stats_cubit.dart';
 import 'package:stoxplay/features/stats_page/presentation/pages/contest_winner_screen.dart';
 import 'package:stoxplay/features/stats_page/widgets/completed_item_widget.dart';
@@ -11,8 +12,6 @@ import 'package:stoxplay/features/stats_page/widgets/upcoming_item_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/primary_container.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
-import 'package:stoxplay/core/network/api_response.dart';
-import 'package:shimmer/shimmer.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -259,8 +258,10 @@ class _StatsPageState extends State<StatsPage> {
                                         ? state.stats?.live?.isEmpty ?? true
                                             ? Column(children: [SizedBox(height: 200.h), Text("No Live contests")])
                                             : ListView.separated(
+                                              physics: NeverScrollableScrollPhysics(),
                                               shrinkWrap: true,
                                               separatorBuilder: (context, index) => SizedBox(height: 10),
+                                              padding: EdgeInsets.only(bottom: 50),
                                               itemCount: state.stats?.live?.length ?? 0,
                                               itemBuilder:
                                                   (context, index) => LiveItemWidget(data: state.stats!.live![index]),
@@ -268,8 +269,10 @@ class _StatsPageState extends State<StatsPage> {
                                         : state.stats?.completed?.isEmpty ?? true
                                         ? Column(children: [SizedBox(height: 200.h), Text("No Completed contests")])
                                         : ListView.separated(
+                                          physics: NeverScrollableScrollPhysics(),
                                           shrinkWrap: true,
                                           separatorBuilder: (context, index) => SizedBox(height: 10),
+                                          padding: EdgeInsets.only(bottom: 50),
                                           itemCount: state.stats?.completed?.length ?? 0,
                                           itemBuilder:
                                               (context, index) =>

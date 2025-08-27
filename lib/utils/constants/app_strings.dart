@@ -58,6 +58,7 @@ class Strings {
   static const String userProfile = "User Profile";
   static const String timeLeft = "Time Left";
   static const String next = "Next";
+  static const String update = "Update";
   static const String pleaseSelect11Stocks = "Please select 11 stocks";
   static const String pleaseSelectLeaderStock = "Please select leader stock";
   static const String pleaseSelectViceLeaderStock = "Please select vice leader stock";

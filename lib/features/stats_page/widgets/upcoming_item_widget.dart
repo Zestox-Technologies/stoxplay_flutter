@@ -59,8 +59,8 @@ class UpcomingItemWidget extends StatelessWidget {
                       ),
                       Gap(2.h),
                       TextView(
-                        text: data.contest?.sectorName ?? '',
-                        fontSize: 12.sp,
+                        text: data.contest?.name ?? '',
+                        fontSize: 10.sp,
                         fontWeight: FontWeight.w500,
                         fontColor: AppColors.purple5A2F,
                       ),
@@ -230,17 +230,30 @@ class UpcomingItemWidget extends StatelessWidget {
                         Gap(10.w),
 
                         // Edit Button
-                        Row(
-                          children: [
-                            Image.asset(AppAssets.editIcon, height: 16.h, width: 16.w, color: AppColors.black6666),
-                            Gap(4.w),
-                            TextView(
-                              text: "Edit",
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                              fontColor: AppColors.black6666,
-                            ),
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.stockSelectionScreen,
+                              arguments: {
+                                'teamId': data.id,
+                                'contestId': data.contest?.id,
+                                'price': '${data.contest?.entryFee}',
+                              },
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Image.asset(AppAssets.editIcon, height: 16.h, width: 16.w, color: AppColors.black6666),
+                              Gap(4.w),
+                              TextView(
+                                text: "Edit",
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w500,
+                                fontColor: AppColors.black6666,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

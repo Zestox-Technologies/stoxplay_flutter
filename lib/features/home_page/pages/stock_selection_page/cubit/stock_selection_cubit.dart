@@ -1,38 +1,37 @@
-import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meta/meta.dart';
 import 'package:stoxplay/core/network/api_response.dart';
-import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/ws_service.dart';
+import 'package:stoxplay/features/home_page/data/models/client_teams_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
-import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
+import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
-import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
-import 'package:stoxplay/utils/models/contest_model.dart';
-import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
 
 part 'stock_selection_state.dart';
 
 class StockSelectionCubit extends Cubit<StockSelectionState> {
   GetStockListUseCase stockListUseCase;
+  ClientTeamsUseCase clientTeamsUseCase;
   JoinContestUseCase joinContestUseCase;
   WebSocketService ws = WebSocketService();
   TimerCubit timerCubit = TimerCubit();
   String? currentContestId;
 
-  StockSelectionCubit({required this.stockListUseCase, required this.joinContestUseCase})
-    : super(StockSelectionState());
+  StockSelectionCubit({
+    required this.stockListUseCase,
+    required this.joinContestUseCase,
+    required this.clientTeamsUseCase,
+  }) : super(StockSelectionState());
 
   ///APIs
-  Future<List<Stock>?> getStockList(String contestId) async {
+  Future<void> getStockList(String contestId) async {
     emit(state.copyWith(apiStatus: ApiStatus.loading));
 
     final sectorList = await stockListUseCase.call(contestId);
@@ -49,7 +48,6 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
         emit(
           state.copyWith(stockList: stockList, apiStatus: ApiStatus.success, timeLeftToStartModel: r.timeLeftToStart),
         );
-        return stockList;
       },
     );
   }
@@ -95,7 +93,6 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
             joinContestApiStatus: ApiStatus.success,
             message: "Successfully joined contest!",
             joinContestResponse: r,
-            isEdit: true,
           ),
         );
         return r; // Return the response model with the id
@@ -121,14 +118,8 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
       downPredictionPercentage: stockData.downPredictionPercentage,
       upPredictionPercentage: stockData.upPredictionPercentage,
       flexSelectionPercentage: stockData.flexSelectionPercentage,
-      viceCaptainSelectionPercentage: stockData.viceCaptainSelectionPercentage
+      viceCaptainSelectionPercentage: stockData.viceCaptainSelectionPercentage,
     );
-  }
-
-  // Set stock list from API data
-  void setStockListFromApi(List<StockDataModel> stockDataList) {
-    final stockList = stockDataList.map((stockData) => _convertToStockModel(stockData)).toList();
-    emit(state.copyWith(stockList: stockList));
   }
 
   void updateStock({required Stock stock, required int index}) {
@@ -205,5 +196,72 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
   void removeSelectedStock({required Stock stock}) {
     final updatedList = state.selectedStockList.where((s) => s.id != stock.id).toList();
     emit(state.copyWith(selectedStockList: updatedList));
+  }
+
+  Future<void> clientTeams({bool isPostApi = false, required String teamId}) async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading));
+
+    final params = JoinContestParamsModel(
+      contestId: isPostApi ? (state.clientTeamsResponseModel?.contest?.id ?? '') : "contestId",
+      teamName: isPostApi ? "Username-T2" : "teamName",
+      isPostApi: isPostApi,
+      teamId: teamId,
+      selectedStocks:
+          isPostApi
+              ? state.selectedStockList
+                  .map((e) => SelectedStock(stockId: e.id.toString(), prediction: e.stockPrediction.toName))
+                  .toList()
+              : [],
+      captainStockId:
+          isPostApi
+              ? state.selectedStockList.firstWhere((e) => e.stockPosition == StockPosition.leader).id.toString()
+              : "captainStockId",
+      viceCaptainStockId:
+          isPostApi
+              ? state.selectedStockList.firstWhere((e) => e.stockPosition == StockPosition.viceLeader).id.toString()
+              : "viceCaptainStockId",
+      flexStockId:
+          isPostApi
+              ? state.selectedStockList.firstWhere((e) => e.stockPosition == StockPosition.coLeader).id.toString()
+              : "flexStockId",
+    );
+
+    final response = await clientTeamsUseCase.call(params);
+
+    response.fold((l) => emit(state.copyWith(apiStatus: ApiStatus.failed)), (r) {
+      addSelectedStockList(r);
+      emit(state.copyWith(clientTeamsResponseModel: r, apiStatus: ApiStatus.success));
+    });
+  }
+
+  void addSelectedStockList(ClientTeamsResponseModel list) {
+    final tempSelectedStockList = <Stock>[];
+    final tempStockList = list.stocks;
+    print("stockList $tempStockList");
+    for (int i = 0; i < tempStockList!.length; i++) {
+      final index = state.stockList.indexWhere((s) {
+        return s.id == tempStockList[i].stockId;
+      });
+      print(tempStockList[i].prediction);
+      final tempStock = Stock(
+        stockName: tempStockList[i].name,
+        id: tempStockList[i].stockId,
+        stockPrice: state.stockList[index].currentPrice,
+        image: tempStockList[i].logoUrl,
+        stockPrediction: tempStockList[i].prediction?.toUpperCase() == "UP" ? StockPrediction.up : StockPrediction.down,
+        stockPosition: StockPosition.none,
+        currentPrice: state.stockList[index].currentPrice,
+        netChange: state.stockList[index].netChange,
+        percentage: state.stockList[index].percentage,
+        selectionPercentage: state.stockList[index].selectionPercentage,
+        captainSelectionPercentage: state.stockList[index].captainSelectionPercentage,
+        downPredictionPercentage: state.stockList[index].downPredictionPercentage,
+        upPredictionPercentage: state.stockList[index].upPredictionPercentage,
+      );
+      print("index $index");
+      updateStock(stock: tempStock, index: index);
+      tempSelectedStockList.add(tempStock);
+    }
+    emit(state.copyWith(selectedStockList: tempSelectedStockList));
   }
 }

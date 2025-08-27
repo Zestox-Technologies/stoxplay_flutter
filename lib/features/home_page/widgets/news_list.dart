@@ -42,7 +42,7 @@ class NewsList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Full-width image with rounded top corners
-                  Container(
+                  SizedBox(
                     width: double.infinity,
                     height: 130,
                     child: Image.network(

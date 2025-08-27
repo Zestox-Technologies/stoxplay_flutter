@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'app_component_base.dart';
 
 /// A custom page route builder that adds a fade transition between pages.

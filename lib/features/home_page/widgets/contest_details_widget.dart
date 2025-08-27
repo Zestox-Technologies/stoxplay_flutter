@@ -3,9 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
+import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
-import 'package:stoxplay/utils/models/contest_model.dart';
-import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -27,7 +26,7 @@ class ContestDetailsWidget extends StatelessWidget {
           ignoreOnTap
               ? null
               : () {
-                Navigator.pushNamed(context, AppRoutes.contestDataScreen, arguments: data);
+                Navigator.pushNamed(context, AppRoutes.contestDataScreen, arguments: data.id);
               },
       child: Container(
         decoration: boxDecorationForContestWidget,
@@ -39,7 +38,6 @@ class ContestDetailsWidget extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Positioned.fill(child: Image.asset(AppAssets.lightSplashStrokes)),
               Column(
                 children: [
                   Column(
@@ -145,7 +143,11 @@ class ContestDetailsWidget extends StatelessWidget {
                               children: [
                                 Image.asset(AppAssets.firstPrizeIcon, height: 10.h, width: 10.w),
                                 SizedBox(width: 5.w),
-                                TextView(text: "50k", fontColor: AppColors.black6666, fontSize: 12.sp),
+                                TextView(
+                                  text: formatMaxWinIntl(data.firstPrize ?? 0, showRupeeSymbol: false),
+                                  fontColor: AppColors.black6666,
+                                  fontSize: 12.sp,
+                                ),
                               ],
                             ),
                             SizedBox(width: 20.w),

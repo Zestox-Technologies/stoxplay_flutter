@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:stoxplay/core/network/api_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
+
 import 'profile_model.dart';
 
 abstract class ProfileRds {

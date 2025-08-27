@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,16 +12,15 @@ import 'package:share_plus/share_plus.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/ws_service.dart';
-import 'package:stoxplay/features/auth/data/models/user_model.dart';
 import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/widgets/battleground_item_widget.dart';
 import 'package:stoxplay/features/profile_page/data/profile_model.dart';
-import 'package:stoxplay/utils/constants/db_keys.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
+import 'package:stoxplay/utils/constants/db_keys.dart';
 import 'package:web_socket/web_socket.dart';
 
 class BattlegroundPage extends StatefulWidget {

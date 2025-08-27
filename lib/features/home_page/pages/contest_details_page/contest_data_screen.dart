@@ -1,16 +1,22 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:lottie/lottie.dart';
+import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/pages/home_page.dart';
-import 'package:stoxplay/utils/common/widgets/app_button.dart';
+import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
+import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
-import 'package:stoxplay/utils/constants/app_constants.dart';
+import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
+import 'package:stoxplay/features/home_page/pages/contest_details_page/contest_data_shimmer.dart';
 
 class ContestDataScreen extends StatefulWidget {
   const ContestDataScreen({super.key});
@@ -23,6 +29,30 @@ class _ContestDataScreenState extends State<ContestDataScreen> {
   int selectedTab = 0; // 0: Leaderboard, 1: Winnings
   final String currentUser = 'Ravi Mehta';
   ValueNotifier<int> selectedIndex = ValueNotifier(0);
+  late HomeCubit homeCubit;
+  String? contestId;
+
+  @override
+  void initState() {
+    super.initState();
+    homeCubit = BlocProvider.of<HomeCubit>(context);
+
+    // Get contest ID from route arguments
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is String) {
+        contestId = args;
+        _loadContestData();
+      }
+    });
+  }
+
+  void _loadContestData() {
+    if (contestId != null) {
+      homeCubit.getContestDetails(contestId!);
+      homeCubit.getContestLeaderboard(contestId!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,40 +72,61 @@ class _ContestDataScreenState extends State<ContestDataScreen> {
           backgroundColor: AppColors.white,
           actions: [SizedBox(width: kToolbarHeight)],
         ),
-        body: SafeArea(
-          child: ValueListenableBuilder(
-            valueListenable: selectedIndex,
-            builder: (context, selected, _) {
-              return CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(child: Gap(10.h)),
-                  SliverToBoxAdapter(child: _ContestSummaryCard()),
-                  SliverToBoxAdapter(child: Gap(16.h)),
-                  SliverToBoxAdapter(child: _StatsGrid()),
-                  SliverToBoxAdapter(child: Gap(12.h)),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _StickyTabDelegate(child: _TabSwitcher(selectedIndex: selectedIndex)),
+        body: BlocBuilder<HomeCubit, HomeState>(
+          bloc: homeCubit,
+          builder: (context, state) {
+            final startingBreakupList =
+                state.contestDetailModel?.prizeDistributionTemplate?.slabs
+                    ?.where((element) => element.type?.toUpperCase() == "GUARANTEED")
+                    .toList();
+            final maximumBreakupList =
+                state.contestDetailModel?.prizeDistributionTemplate?.slabs
+                    ?.where((element) => element.type?.toUpperCase() == "MAX")
+                    .toList();
+
+            return state.apiStatus.isLoading
+                ? const ContestDetailsShimmer()
+                : SafeArea(
+                  child: ValueListenableBuilder(
+                    valueListenable: selectedIndex,
+                    builder: (context, selected, _) {
+                      return CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(child: Gap(10.h)),
+                          SliverToBoxAdapter(
+                            child: ContestSummaryCard(data: state.contestDetailModel ?? ContestDetailModel()),
+                          ),
+                          SliverToBoxAdapter(child: Gap(16.h)),
+                          SliverToBoxAdapter(child: StatsGrid(data: state.contestDetailModel ?? ContestDetailModel())),
+                          SliverToBoxAdapter(child: Gap(12.h)),
+                          SliverPersistentHeader(
+                            pinned: true,
+                            delegate: _StickyTabDelegate(child: _TabSwitcher(selectedIndex: selectedIndex)),
+                          ),
+                          SliverToBoxAdapter(child: Gap(10.h)),
+                          ..._buildTabContent(
+                            startingBreakupList: startingBreakupList ?? [],
+                            maximumBreakupList: maximumBreakupList ?? [],
+                            leaderboard: state.contestLeaderboardModel ?? ContestLeaderboardModel(),
+                          ),
+                        ],
+                      );
+                    },
                   ),
-                  SliverToBoxAdapter(child: Gap(10.h)),
-                  ..._buildTabContent(),
-                ],
-              );
-            },
-          ),
+                );
+          },
         ),
       ),
     );
   }
 
-  List<Widget> _buildTabContent() {
+  List<Widget> _buildTabContent({
+    required List<Slab> startingBreakupList,
+    required List<Slab> maximumBreakupList,
+    required ContestLeaderboardModel leaderboard,
+  }) {
     if (selectedIndex.value == 0) {
-      return [
-        SliverFillRemaining(
-          hasScrollBody: true,
-          child: _LeaderboardList(leaderboard: leaderboard, currentUser: currentUser),
-        ),
-      ];
+      return [SliverFillRemaining(hasScrollBody: true, child: _LeaderboardList(data: leaderboard))];
     } else {
       return [
         SliverPersistentHeader(
@@ -92,7 +143,12 @@ class _ContestDataScreenState extends State<ContestDataScreen> {
             ),
           ),
         ),
-        SliverFillRemaining(hasScrollBody: true, child: TabBarView(children: [_WinningsList(), _WinningsList()])),
+        SliverFillRemaining(
+          hasScrollBody: true,
+          child: TabBarView(
+            children: [WinningsList(list: startingBreakupList), WinningsList(list: maximumBreakupList)],
+          ),
+        ),
       ];
     }
   }
@@ -121,7 +177,11 @@ class _StickyTabDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class _ContestSummaryCard extends StatelessWidget {
+class ContestSummaryCard extends StatelessWidget {
+  final ContestDetailModel data;
+
+  const ContestSummaryCard({super.key, required this.data});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -144,48 +204,98 @@ class _ContestSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextView(text: 'Rahul Kumar', fontWeight: FontWeight.w600, fontSize: 18.sp),
-          Gap(8.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  TextView(text: 'Prize Pool: ', fontWeight: FontWeight.w500, fontSize: 14.sp),
-                  Gap(4.w),
-                  TextView(text: '30,000', fontWeight: FontWeight.bold, fontSize: 16.sp),
-                  Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextView(text: data.name ?? 'Contest', fontWeight: FontWeight.w600, fontSize: 18.sp),
+                    if (data.sector?.name != null)
+                      TextView(
+                        text: data!.sector!.name.toString(),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12.sp,
+                        fontColor: AppColors.primaryPurple,
+                      ),
+                  ],
+                ),
               ),
-
               Row(
                 children: [
-                  TextView(text: 'Entry Fees: ', fontWeight: FontWeight.w500, fontSize: 14.sp),
+                  TextView(text: 'First prize:', fontWeight: FontWeight.w500, fontSize: 14.sp),
                   Gap(4.w),
-                  TextView(text: '500', fontWeight: FontWeight.bold, fontSize: 16.sp),
-                  Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
+                  TextView(text: formatMaxWinIntl(data.prizePool ?? 0), fontWeight: FontWeight.bold, fontSize: 14.sp),
+                  Image.asset(AppAssets.stoxplayCoin, height: 12.h, width: 12.w),
                 ],
               ),
             ],
           ),
           Gap(8.h),
-          AppButton(text: Strings.join, onPressed: () {}, height: 30.h, fontSize: 12.sp),
+          ProgressBarWidget(value: (data.spotsFilled ?? 0).toDouble(), total: (data.totalSpots ?? 1).toDouble()),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextView(text: "${data.spotsFilled ?? 0} spots filled", fontColor: AppColors.black, fontSize: 12.sp),
+              TextView(
+                text: "${data.totalSpots ?? 0} spots",
+                fontColor: AppColors.black,
+                lineHeight: 1.5,
+                letterSpacing: 0,
+                fontSize: 12.sp,
+              ),
+            ],
+          ),
+          Gap(5.h),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.stockSelectionScreen,
+                arguments: {'contestId': data.id, 'price': data.entryFee.toString()},
+              );
+            },
+            child: Container(
+              height: 28.h,
+              decoration: BoxDecoration(color: AppColors.primaryPurple, borderRadius: BorderRadius.circular(8.r)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    data.entryFee.toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppColors.white, fontSize: 13.sp, fontWeight: FontWeight.w800),
+                  ),
+                  Gap(5.w),
+                  Image.asset(AppAssets.stoxplayCoin, height: 12.h, width: 12.w),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _StatsGrid extends StatelessWidget {
-  const _StatsGrid();
+class StatsGrid extends StatelessWidget {
+  final ContestDetailModel data;
+
+  const StatsGrid({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
     final stats = [
-      {'icon': AppAssets.chartJson, 'title': '6,000', 'subtitle': 'spots left', 'highlight': true},
-      {'icon': AppAssets.trophyJson, 'title': 'Top 25%', 'subtitle': 'Winners'},
-      {'icon': AppAssets.graphJson, 'title': '₹7.5 Lakhs', 'subtitle': 'Total Payout'},
-      {'icon': AppAssets.targetJson, 'title': '20', 'subtitle': 'Teams Max Entry'},
+      {
+        'icon': AppAssets.chartJson,
+        'title': data.spotsFilled.toString(),
+        'subtitle': 'spots filled',
+        'highlight': true,
+      },
+      {'icon': AppAssets.trophyJson, 'title': 'Top ${data.teamsPerUser}%', 'subtitle': 'Winners'},
+      {'icon': AppAssets.graphJson, 'title': formatMaxWinIntl(data.prizePool ?? 0), 'subtitle': 'Total Payout'},
+      {'icon': AppAssets.targetJson, 'title': data.teamsPerUser.toString(), 'subtitle': 'Teams Max Entry'},
     ];
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -318,81 +428,32 @@ class _TabSwitcher extends StatelessWidget {
   }
 }
 
-class WinningsTabList extends StatelessWidget {
-  const WinningsTabList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _StickyTabDelegate(
-              child: TabBar(
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Colors.blue,
-                tabs: const [Tab(text: 'Starting Breakup'), Tab(text: 'Maximum Breakup')],
-              ),
-            ),
-          ),
-          SliverFillRemaining(child: Expanded(child: TabBarView(children: [_WinningsList(), _WinningsList()]))),
-        ],
-      ),
-    );
-  }
-}
-
 class _LeaderboardList extends StatelessWidget {
-  final List<Map<String, dynamic>> leaderboard;
-  final String currentUser;
+  final ContestLeaderboardModel data;
 
-  const _LeaderboardList({required this.leaderboard, required this.currentUser});
+  const _LeaderboardList({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final topN = 5;
-    final youIndex = leaderboard.indexWhere((u) => u['isCurrentUser'] == true);
-    final topList = leaderboard.take(topN).toList();
-    final youUser = youIndex >= 0 ? leaderboard[youIndex] : null;
-    final youInTop = youIndex < topN && youIndex >= 0;
     return Column(
       children: [
         Expanded(
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-            itemCount: topList.length,
+            itemCount: data.leaderboard?.length ?? 0,
             physics: NeverScrollableScrollPhysics(),
             separatorBuilder: (_, __) => Gap(8.h),
             itemBuilder: (context, index) {
-              final user = topList[index];
+              final user = data.leaderboard?[index];
               return _LeaderboardItem(
                 rank: index + 1,
-                name: user['name'],
-                avatar: user['avatar'],
-                points: user['points'],
-                isCrown: user['isCrown'],
-                isCurrentUser: user['isCurrentUser'],
+                name: user?.user?.name ?? '',
+                avatar: user?.user?.profilePictureUrl ?? '',
+                points: user?.points?.toInt() ?? 0,
               );
             },
           ),
         ),
-        if (!youInTop && youUser != null) ...[
-          Divider(height: 1, color: AppColors.blackD7D7.withOpacity(0.3)),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-            child: _LeaderboardItem(
-              rank: youIndex + 1,
-              name: youUser['name'],
-              avatar: youUser['avatar'],
-              points: youUser['points'],
-              isCrown: youUser['isCrown'],
-              isCurrentUser: true,
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -403,28 +464,16 @@ class _LeaderboardItem extends StatelessWidget {
   final String name;
   final String avatar;
   final int points;
-  final bool isCrown;
-  final bool isCurrentUser;
 
-  const _LeaderboardItem({
-    required this.rank,
-    required this.name,
-    required this.avatar,
-    required this.points,
-    required this.isCrown,
-    required this.isCurrentUser,
-  });
+  const _LeaderboardItem({required this.rank, required this.name, required this.avatar, required this.points});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isCurrentUser ? AppColors.purple5A2F.withOpacity(0.05) : AppColors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: isCurrentUser ? AppColors.purple5A2F : AppColors.blackD7D7.withOpacity(0.6),
-          width: isCurrentUser ? 1.5 : 1,
-        ),
+        border: Border.all(color: AppColors.blackD7D7.withOpacity(0.6), width: 1),
       ),
       child: Row(
         children: [
@@ -432,7 +481,7 @@ class _LeaderboardItem extends StatelessWidget {
           TextView(text: "#", fontWeight: FontWeight.w600, fontSize: 16.sp),
           Expanded(
             child: ListTile(
-              leading: CircleAvatar(backgroundImage: NetworkImage(avatar), radius: 22.r),
+              leading: CircleAvatar(backgroundImage: NetworkImage(avatar), radius: 18.r),
               title: Row(
                 children: [
                   TextView(text: name, fontWeight: FontWeight.w600, fontSize: 16.sp),
@@ -443,18 +492,10 @@ class _LeaderboardItem extends StatelessWidget {
                       color: AppColors.purple5A2F.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
-                    child: Text("T1"),
+                    child: Text("T1", style: TextStyle(fontSize: 12.sp)),
                   ),
                 ],
               ),
-              // subtitle: TextView(text: '$points Points', fontSize: 14.sp, fontColor: AppColors.black6666),
-              // trailing:
-              //     isCrown
-              //         ? Icon(Icons.emoji_events, color: AppColors.orangeF6A6, size: 28)
-              //         : rank == 1
-              //         ? Icon(Icons.emoji_events, color: AppColors.orangeF6A6, size: 28)
-              //         : null,
-              leadingAndTrailingTextStyle: null,
               contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
               minVerticalPadding: 0,
               horizontalTitleGap: 12.w,
@@ -466,18 +507,20 @@ class _LeaderboardItem extends StatelessWidget {
   }
 }
 
-class _WinningsList extends StatelessWidget {
+class WinningsList extends StatelessWidget {
+  final List<Slab> list;
+
+  const WinningsList({super.key, required this.list});
+
   @override
   Widget build(BuildContext context) {
-    // Dummy winnings data
-    final winnings = List.generate(18, (i) => {'rank': i + 1, 'amount': 1000});
     return ListView.separated(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: winnings.length,
+      itemCount: list.length,
       physics: NeverScrollableScrollPhysics(),
       separatorBuilder: (_, __) => Gap(8.h),
       itemBuilder: (context, index) {
-        final item = winnings[index];
+        final item = list[index];
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(
@@ -487,11 +530,16 @@ class _WinningsList extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextView(text: 'Rank - ${item['rank']}', fontWeight: FontWeight.w400, fontSize: 14.sp),
+              TextView(
+                text: item.rankStart == item.rankEnd ? '${item.rankStart}' : '${item.rankStart} - ${item.rankEnd}',
+                fontWeight: FontWeight.w400,
+                fontSize: 14.sp,
+              ),
+
               Row(
                 children: [
                   TextView(
-                    text: '${item['amount']}',
+                    text: '${item.prizeAmount}',
                     fontWeight: FontWeight.w500,
                     fontSize: 16.sp,
                     fontColor: AppColors.primaryPurple,

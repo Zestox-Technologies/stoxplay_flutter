@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
@@ -17,6 +19,8 @@ class HomeCubit extends Cubit<HomeState> {
   GetContestListUseCase getContestListUseCase;
   LearningListUseCase learningListUseCase;
   GetAdsUseCase getAdsUseCase;
+  ContestLeaderboardUseCase contestLeaderboardUseCase;
+  ContestDetailsUseCase contestDetailsUseCase;
 
   HomeCubit({
     required this.sectorListUseCase,
@@ -24,6 +28,8 @@ class HomeCubit extends Cubit<HomeState> {
     required this.contestStatusUseCase,
     required this.learningListUseCase,
     required this.getAdsUseCase,
+    required this.contestLeaderboardUseCase,
+    required this.contestDetailsUseCase,
   }) : super(HomeState());
 
   void getSectorList() async {
@@ -68,6 +74,24 @@ class HomeCubit extends Cubit<HomeState> {
     learningList.fold(
       (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
       (r) => emit(state.copyWith(adsList: r, apiStatus: ApiStatus.success)),
+    );
+  }
+
+  Future<void> getContestDetails(String contestId) async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading));
+    final contestDetails = await contestDetailsUseCase.call(contestId);
+    contestDetails.fold(
+      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
+      (r) => emit(state.copyWith(contestDetailModel: r, apiStatus: ApiStatus.success)),
+    );
+  }
+
+  Future<void> getContestLeaderboard(String contestId) async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading));
+    final contestDetails = await contestLeaderboardUseCase.call(contestId);
+    contestDetails.fold(
+      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
+      (r) => emit(state.copyWith(contestLeaderboardModel: r, apiStatus: ApiStatus.success)),
     );
   }
 }

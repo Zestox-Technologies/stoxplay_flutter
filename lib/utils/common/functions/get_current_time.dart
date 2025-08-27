@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
-import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 
 final Dio _dio = Dio();
@@ -23,8 +22,8 @@ Future<DateTime?> getCurrentTime() async {
   return null;
 }
 
-String formatMaxWinIntl(int amount) {
-  final format = NumberFormat.compactCurrency(decimalDigits: 1, symbol: '₹', locale: 'en_IN');
+String formatMaxWinIntl(int amount, {bool showRupeeSymbol = true}) {
+  final format = NumberFormat.compactCurrency(decimalDigits: 1, symbol: showRupeeSymbol ? '₹' : '', locale: 'en_IN');
   return format.format(amount);
 }
 

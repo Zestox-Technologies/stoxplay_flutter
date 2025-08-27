@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
-import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/core/network/use_case.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/client_teams_response_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
@@ -88,6 +90,7 @@ class UpdateTeamUseCase extends UseCase<String, JoinContestParamsModel> {
     return await repo.updateTeam(params);
   }
 }
+
 class LearningListUseCase extends UseCase<List<LearningModel>, String> {
   final HomeRepo repo;
 
@@ -107,5 +110,38 @@ class GetAdsUseCase extends UseCase<List<AdsModel>, String> {
   @override
   Future<Either<AppError, List<AdsModel>>> call(String params) async {
     return await repo.getAds();
+  }
+}
+
+class ClientTeamsUseCase extends UseCase<ClientTeamsResponseModel, JoinContestParamsModel> {
+  final HomeRepo repo;
+
+  ClientTeamsUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, ClientTeamsResponseModel>> call(JoinContestParamsModel params) async {
+    return await repo.clientTeams(params);
+  }
+}
+
+class ContestDetailsUseCase extends UseCase<ContestDetailModel, String> {
+  final HomeRepo repo;
+
+  ContestDetailsUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, ContestDetailModel>> call(String params) async {
+    return await repo.clientContestDetails(params);
+  }
+}
+
+class ContestLeaderboardUseCase extends UseCase<ContestLeaderboardModel, String> {
+  final HomeRepo repo;
+
+  ContestLeaderboardUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, ContestLeaderboardModel>> call(String params) async {
+    return await repo.clientContestLeaderboard(params);
   }
 }

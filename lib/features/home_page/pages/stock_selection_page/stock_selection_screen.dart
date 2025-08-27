@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/cubit/stock_selection_cubit.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/widgets/confirmation_bottom_sheet.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/widgets/stock_selection_shimmer.dart';
 import 'package:stoxplay/features/home_page/widgets/stock_selection_widget.dart';
-import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
-import 'package:stoxplay/utils/models/contest_model.dart';
-import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_bottom_navbar.dart';
 import 'package:stoxplay/utils/common/widgets/primary_container.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_constants.dart';
-import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
+import 'package:stoxplay/utils/models/contest_model.dart';
 
 class StockSelectionScreen extends StatefulWidget {
   const StockSelectionScreen({super.key});
@@ -31,20 +26,30 @@ class StockSelectionScreen extends StatefulWidget {
 }
 
 class _StockSelectionScreenState extends State<StockSelectionScreen> {
-  StockSelectionCubit cubit = StockSelectionCubit(stockListUseCase: sl(), joinContestUseCase: sl());
+  StockSelectionCubit cubit = StockSelectionCubit(
+    stockListUseCase: sl(),
+    joinContestUseCase: sl(),
+    clientTeamsUseCase: sl(),
+  );
   ValueNotifier<int> stepper = ValueNotifier<int>(0);
-  late HomeCubit homeCubit;
   String? contestId;
   String? price;
+  String? teamId;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final map = ModalRoute.of(context)!.settings.arguments as Map<String, String>;
+      final map = ModalRoute.of(context)!.settings.arguments as Map<String?, String?>;
       contestId = map['contestId'];
-      price = map['price'];
       cubit.getStockList(contestId!);
+
+      price = map['price'];
+      Future.delayed(Duration(seconds: 1), () {
+        if (map['teamId'] != null) {
+          cubit.clientTeams(teamId: map['teamId'] ?? '',isPostApi: false);
+        }
+      });
     });
   }
 
@@ -56,6 +61,8 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final map = ModalRoute.of(context)!.settings.arguments as Map<String?, String?>;
+
     return ValueListenableBuilder(
       valueListenable: stepper,
       builder: (context, steps, _) {
@@ -93,13 +100,13 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 15.h),
                       child: GestureDetector(
-                        onTap: () {
+                        onTap: () async {
                           if (stepper.value == 0) {
                             if (state.selectedStockList.length == 11) {
                               stepper.value++;
                             }
                           } else {
-                            if (isPositionSelectionComplete && !state.isEdit) {
+                            if (isPositionSelectionComplete && map['teamId'] == null) {
                               showModalBottomSheet(
                                 context: context,
                                 builder: (context) {
@@ -112,7 +119,10 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                 },
                               );
                             } else {
-                              return;
+                              if (map['teamId'] != null) {
+                                await cubit.clientTeams(isPostApi: true, teamId: map['teamId'] ?? '');
+                                Navigator.pop(context);
+                              }
                             }
                           }
                         },
@@ -122,7 +132,10 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                             padding: EdgeInsets.all(3.h),
                             child: TextView(
                               textAlign: TextAlign.center,
-                              text: Strings.next.toUpperCase(),
+                              text:
+                                  (stepper.value == 1 && map['teamId'] != null)
+                                      ? Strings.update
+                                      : Strings.next.toUpperCase(),
                               fontColor: buttonColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 20.sp,

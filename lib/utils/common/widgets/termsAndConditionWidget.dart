@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
-import 'package:stoxplay/utils/extensions/extensions.dart';
 
 class TermsConditionWidget extends StatelessWidget {
   const TermsConditionWidget({super.key});

@@ -19,4 +19,5 @@ class AppRoutes {
   static const String contestDataScreen = '/contestDataScreen';
   static const String personalInfoPage = '/personalInfoPage';
   static const String playingHistoryPage = '/playingHistoryPage';
+  static const String completedDetailsScreen = '/completedDetailsScreen';
 }

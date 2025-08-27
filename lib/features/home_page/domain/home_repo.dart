@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
-import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/features/home_page/data/home_rds.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/client_teams_response_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
@@ -29,6 +31,12 @@ abstract class HomeRepo {
   Future<Either<AppError, String>> updateTeam(JoinContestParamsModel params);
 
   Future<Either<AppError, List<LearningModel>>> getLearningList(String params);
+
+  Future<Either<AppError, ClientTeamsResponseModel>> clientTeams(JoinContestParamsModel params);
+
+  Future<Either<AppError, ContestDetailModel>> clientContestDetails(String params);
+
+  Future<Either<AppError, ContestLeaderboardModel>> clientContestLeaderboard(String params);
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -117,9 +125,39 @@ class HomeRepoImpl extends HomeRepo {
   }
 
   @override
-  Future<Either<AppError, List<AdsModel>>> getAds() async{
+  Future<Either<AppError, List<AdsModel>>> getAds() async {
     try {
       final result = await homeRds.getAds();
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, ClientTeamsResponseModel>> clientTeams(JoinContestParamsModel params) async {
+    try {
+      final result = await homeRds.teamsClient(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, ContestDetailModel>> clientContestDetails(String params) async {
+    try {
+      final result = await homeRds.contestDetails(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, ContestLeaderboardModel>> clientContestLeaderboard(String params) async {
+    try {
+      final result = await homeRds.contestLeaderboard(params);
       return Right(result);
     } catch (e) {
       return handleException(e);
