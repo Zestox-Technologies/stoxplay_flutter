@@ -189,7 +189,7 @@ class HomeRdsImpl extends HomeRds {
     try {
       final response =
           params.isPostApi == true
-              ? client.post(ApiUrls.clientTeams(params.teamId ?? ''), data: params.toJson())
+              ? client.put(ApiUrls.clientTeams(params.teamId ?? ''), data: params.toJson())
               : client.get(ApiUrls.clientTeams(params.teamId ?? ''));
 
       final responseData = (await response).data['data'];

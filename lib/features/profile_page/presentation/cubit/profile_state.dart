@@ -8,6 +8,7 @@ class ProfileState {
   final String? gender;
   final ProfileModel? profileModel;
   final String profileUrl;
+  final PlayingHistoryModel? playingHistory;
 
   const ProfileState({
     this.apiStatus = ApiStatus.initial,
@@ -16,6 +17,7 @@ class ProfileState {
     this.dob,
     this.profileUrl = "",
     this.profileModel,
+    this.playingHistory,
   });
 
   ProfileState copyWith({
@@ -25,6 +27,7 @@ class ProfileState {
     DateTime? dob,
     ProfileModel? profileModel,
     String? gender,
+    PlayingHistoryModel? playingHistory,
   }) {
     return ProfileState(
       apiStatus: apiStatus ?? this.apiStatus,
@@ -33,6 +36,7 @@ class ProfileState {
       profileModel: profileModel ?? this.profileModel,
       gender: gender ?? this.gender,
       profileUrl: profileUrl ?? this.profileUrl,
+      playingHistory: playingHistory ?? this.playingHistory,
     );
   }
 }

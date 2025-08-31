@@ -15,9 +15,10 @@ import 'package:stoxplay/utils/extensions/extensions.dart';
 
 class ContestDetailsWidget extends StatelessWidget {
   final ContestModel data;
+  final String date;
   bool ignoreOnTap = false;
 
-  ContestDetailsWidget({required this.data, super.key, required this.ignoreOnTap});
+  ContestDetailsWidget({required this.date, required this.data, super.key, required this.ignoreOnTap});
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +47,7 @@ class ContestDetailsWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           TextView(text: Strings.prizePool, fontSize: 16.sp, fontWeight: FontWeight.w500),
+                          TextView(text: date, fontSize: 14.sp, fontWeight: FontWeight.w500),
                           Row(
                             children: [
                               Image.asset(AppAssets.flexibleIcon, height: 15.h, width: 15.w),
@@ -62,7 +64,7 @@ class ContestDetailsWidget extends StatelessWidget {
                           Row(
                             children: [
                               TextView(
-                                text: (data.prizePool ?? 0).toString(),
+                                text: formatMaxWinIntl(data.prizePool ?? 0).toString(),
                                 fontSize: 18.sp,
                                 fontColor: AppColors.black,
                               ),

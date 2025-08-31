@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 import 'package:stoxplay/features/profile_page/presentation/pages/profile_page.dart';
 import 'package:stoxplay/utils/common/widgets/glow_icon.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
@@ -81,3 +82,16 @@ List<ProfileItemModel> profileItems = [
   ProfileItemModel(icon: AppAssets.logoutIcon, title: "Logout"),
 ];
 
+StockPosition getPositionByRole(String role) {
+  switch (role) {
+    case "NORMAL":
+      return StockPosition.none;
+    case "CAPTAIN":
+      return StockPosition.leader;
+    case "VICE_CAPTAIN":
+      return StockPosition.viceLeader;
+    case "FLEX":
+      return StockPosition.coLeader;
+  }
+  return StockPosition.none;
+}

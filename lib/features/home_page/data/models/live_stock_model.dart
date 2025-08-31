@@ -1,7 +1,7 @@
 class LiveStock {
   final String stockId;
   final String symbol;
-  final int points;
+  final double points;
   final double currentPrice;
   final double netChange;
   final bool isPredictionCorrect;
@@ -25,7 +25,7 @@ class LiveStock {
     return LiveStock(
       stockId: json['stockId'],
       symbol: json['symbol'],
-      points: json['points'],
+      points: json['points'].toDouble(),
       currentPrice: json['currentPrice'].toDouble(),
       netChange: json['netChange'].toDouble(),
       isPredictionCorrect: json['isPredictionCorrect'],
@@ -52,7 +52,7 @@ class LiveStock {
 
 class ScoreUpdatePayload {
   final String userTeamId;
-  final int totalPoints;
+  final double totalPoints;
   final int rank;
   final List<LiveStock> liveStocks;
 

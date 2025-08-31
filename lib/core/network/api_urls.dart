@@ -37,4 +37,5 @@ class ApiUrls {
   static const String getAds = 'ads-management/client';
 
   static clientTeams(String teamId) => '/client/teams/$teamId';
+  static const String getPlayingHistory = 'client/history';
 }

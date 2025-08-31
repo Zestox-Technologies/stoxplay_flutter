@@ -12,6 +12,7 @@ import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_sel
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
+import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/models/contest_model.dart';
 
 part 'stock_selection_state.dart';
@@ -236,32 +237,41 @@ class StockSelectionCubit extends Cubit<StockSelectionState> {
 
   void addSelectedStockList(ClientTeamsResponseModel list) {
     final tempSelectedStockList = <Stock>[];
-    final tempStockList = list.stocks;
-    print("stockList $tempStockList");
-    for (int i = 0; i < tempStockList!.length; i++) {
-      final index = state.stockList.indexWhere((s) {
-        return s.id == tempStockList[i].stockId;
-      });
-      print(tempStockList[i].prediction);
+    final tempStockList = list.stocks ?? [];
+
+    for (int i = 0; i < tempStockList.length; i++) {
+      final index = state.stockList.indexWhere((s) => s.id == tempStockList[i].stockId);
+
+      if (index == -1) {
+        // stock not found in state.stockList → skip or handle default
+        print("Stock with id ${tempStockList[i].stockId} not found in state.stockList");
+        continue;
+      }
+
+      final position = getPositionByRole(tempStockList[i].role ?? "NORMAL");
+
+      final baseStock = state.stockList[index];
+
       final tempStock = Stock(
         stockName: tempStockList[i].name,
         id: tempStockList[i].stockId,
-        stockPrice: state.stockList[index].currentPrice,
+        stockPrice: baseStock.currentPrice,
         image: tempStockList[i].logoUrl,
         stockPrediction: tempStockList[i].prediction?.toUpperCase() == "UP" ? StockPrediction.up : StockPrediction.down,
-        stockPosition: StockPosition.none,
-        currentPrice: state.stockList[index].currentPrice,
-        netChange: state.stockList[index].netChange,
-        percentage: state.stockList[index].percentage,
-        selectionPercentage: state.stockList[index].selectionPercentage,
-        captainSelectionPercentage: state.stockList[index].captainSelectionPercentage,
-        downPredictionPercentage: state.stockList[index].downPredictionPercentage,
-        upPredictionPercentage: state.stockList[index].upPredictionPercentage,
+        stockPosition: position,
+        currentPrice: baseStock.currentPrice,
+        netChange: baseStock.netChange,
+        percentage: baseStock.percentage,
+        selectionPercentage: baseStock.selectionPercentage,
+        captainSelectionPercentage: baseStock.captainSelectionPercentage,
+        downPredictionPercentage: baseStock.downPredictionPercentage,
+        upPredictionPercentage: baseStock.upPredictionPercentage,
       );
-      print("index $index");
+
       updateStock(stock: tempStock, index: index);
       tempSelectedStockList.add(tempStock);
     }
+
     emit(state.copyWith(selectedStockList: tempSelectedStockList));
   }
 }

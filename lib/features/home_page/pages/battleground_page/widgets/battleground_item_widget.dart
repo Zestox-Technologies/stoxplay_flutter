@@ -17,7 +17,7 @@ class BattlegroundItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 102.h,
-      width: 88.w,
+      width: 94.w,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -77,12 +77,12 @@ class BattlegroundItemWidget extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: data.points.toString(),
-                    style: TextStyle(color: AppColors.black, fontSize: 10.sp, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: AppColors.black, fontSize: 9.sp, fontWeight: FontWeight.w600),
                   ),
                   WidgetSpan(
                     child: Transform.translate(
                       offset: const Offset(0.0, -5.0),
-                      child: Text('p', style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w600)),
+                      child: Text('p', style: TextStyle(fontSize: 9.sp, fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ],
@@ -120,7 +120,7 @@ class BattlegroundItemWidget extends StatelessWidget {
                 Gap(5.h),
                 TextView(text: data.currentPrice.toString(), fontColor: AppColors.black, fontSize: 10.sp),
                 TextView(
-                  text: data.netChange.toString(),
+                  text: "${data.netChange.toString()}%",
                   fontColor: (data.netChange ?? 0) < 0 ? AppColors.red : AppColors.green,
                   fontSize: 8.sp,
                 ),

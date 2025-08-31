@@ -2,8 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_response.dart';
-import 'package:stoxplay/features/profile_page/data/profile_model.dart';
+import 'package:stoxplay/features/profile_page/data/models/profile_model.dart';
 import 'package:stoxplay/features/profile_page/domain/profile_usecase.dart';
+import 'package:stoxplay/features/profile_page/data/models/playing_history_model.dart';
 import 'package:stoxplay/utils/constants/db_keys.dart';
 
 part 'profile_state.dart';
@@ -12,6 +13,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   final GetProfileUseCase getProfileUseCase;
   final UpdateProfileUseCase updateProfileUseCase;
   final FileUploadUseCase fileUploadUseCase;
+  final GetPlayingHistoryUseCase getPlayingHistoryUseCase;
 
   // Controllers for profile fields
   final TextEditingController firstNameController = TextEditingController();
@@ -20,7 +22,8 @@ class ProfileCubit extends Cubit<ProfileState> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
-  ProfileCubit(this.getProfileUseCase, this.updateProfileUseCase, this.fileUploadUseCase) : super(ProfileState());
+  ProfileCubit(this.getProfileUseCase, this.updateProfileUseCase, this.fileUploadUseCase, this.getPlayingHistoryUseCase)
+    : super(ProfileState());
 
   @override
   Future<void> close() {
@@ -87,6 +90,16 @@ class ProfileCubit extends Cubit<ProfileState> {
     try {
       final profile = await fileUploadUseCase.call({"type": "profiles", "file": imagePath});
       emit(state.copyWith(apiStatus: ApiStatus.success, profileUrl: profile));
+    } catch (e) {
+      emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> getPlayingHistory({required int page, required int limit}) async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
+    try {
+      final result = await getPlayingHistoryUseCase({'page': page, 'limit': limit});
+      emit(state.copyWith(apiStatus: ApiStatus.success, playingHistory: result));
     } catch (e) {
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }

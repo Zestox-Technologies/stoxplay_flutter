@@ -1,4 +1,5 @@
-import '../data/profile_model.dart';
+import '../data/models/playing_history_model.dart';
+import '../data/models/profile_model.dart';
 import 'profile_repo.dart';
 
 class GetProfileUseCase {
@@ -28,5 +29,15 @@ class FileUploadUseCase {
 
   Future<String> call(Map<String, dynamic> data) async {
     return await repo.fileUpload(data);
+  }
+}
+
+class GetPlayingHistoryUseCase {
+  final ProfileRepo repo;
+
+  GetPlayingHistoryUseCase(this.repo);
+
+  Future<PlayingHistoryModel> call(Map<String, dynamic> params) async {
+    return await repo.getPlayingHistory(params);
   }
 }

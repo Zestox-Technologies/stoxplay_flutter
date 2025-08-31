@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (context) => TimerCubit()),
-            BlocProvider(create: (context) => ProfileCubit(sl(), sl(), sl())),
+            BlocProvider(create: (context) => ProfileCubit(sl(), sl(), sl(),sl())),
             BlocProvider(create: (context) => StatsCubit(getMyContestUseCase: sl())),
             BlocProvider(
               create:

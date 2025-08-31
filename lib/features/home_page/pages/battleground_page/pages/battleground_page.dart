@@ -14,7 +14,7 @@ import 'package:stoxplay/core/network/api_urls.dart';
 import 'package:stoxplay/core/network/ws_service.dart';
 import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/pages/battleground_page/widgets/battleground_item_widget.dart';
-import 'package:stoxplay/features/profile_page/data/profile_model.dart';
+import 'package:stoxplay/features/profile_page/data/models/profile_model.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -146,6 +146,9 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                     LiveStock? findByRole(String role) =>
                         data?.liveStocks.firstWhere((s) => s.role == role, orElse: () => fallbackStock);
 
+                    final normalList =
+                        data?.liveStocks.where((element) => element.role.toUpperCase() == "NORMAL").toList();
+
                     return Column(
                       children: [
                         SizedBox(height: MediaQuery.of(context).padding.top + 5),
@@ -265,22 +268,13 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.isNotEmpty)
-                                      ? data.liveStocks[0]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.isNotEmpty) ? normalList[0] : fallbackStock,
                             ),
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.length > 1)
-                                      ? data.liveStocks[1]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.length > 1) ? normalList[1] : fallbackStock,
                             ),
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.length > 2)
-                                      ? data.liveStocks[2]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.length > 2) ? normalList[2] : fallbackStock,
                             ),
                           ],
                         ),
@@ -292,10 +286,7 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                             SizedBox(width: 20.w),
                             BattlegroundItemWidget(data: findByRole("FLEX") ?? fallbackStock),
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.length > 3)
-                                      ? data.liveStocks[3]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.length > 3) ? normalList[3] : fallbackStock,
                             ),
                             SizedBox(width: 20.w),
                           ],
@@ -308,10 +299,7 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                           children: [
                             SizedBox(width: 20.w),
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.length > 4)
-                                      ? data.liveStocks[4]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.length > 4) ? normalList[4] : fallbackStock,
                             ),
                             BattlegroundItemWidget(data: findByRole("VICE_CAPTAIN") ?? fallbackStock),
                             SizedBox(width: 20.w),
@@ -322,22 +310,13 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.length > 5)
-                                      ? data.liveStocks[5]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.length > 5) ? normalList[5] : fallbackStock,
                             ),
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.length > 6)
-                                      ? data.liveStocks[6]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.length > 6) ? normalList[6] : fallbackStock,
                             ),
                             BattlegroundItemWidget(
-                              data:
-                                  (data?.liveStocks != null && data!.liveStocks.length > 7)
-                                      ? data.liveStocks[7]
-                                      : fallbackStock,
+                              data: (normalList != null && normalList.length > 7) ? normalList[7] : fallbackStock,
                             ),
                           ],
                         ),

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
+import 'package:stoxplay/utils/constants/app_strings.dart';
 
 class CompletedItemWidget extends StatelessWidget {
   final StatsDataModel data;
@@ -16,7 +18,7 @@ class CompletedItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, AppRoutes.completedDetailsScreen);
+        Navigator.pushNamed(context, AppRoutes.completedDetailsScreen, arguments: data);
       },
       child: Container(
         decoration: BoxDecoration(
@@ -33,7 +35,17 @@ class CompletedItemWidget extends StatelessWidget {
               child: Row(
                 children: [
                   // HDFC Bank Logo
-                  _buildIcon(),
+                  Container(
+                    width: 50.w,
+                    height: 50.h,
+                    padding: EdgeInsets.all(5.w),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                      border: Border.all(color: AppColors.blackD7D7, width: 1),
+                    ),
+                    child: ClipOval(child: CachedImageWidget(imageUrl: data.contest?.sectorLogo ?? '')),
+                  ),
                   Gap(12.w),
 
                   // Event Information
@@ -42,7 +54,7 @@ class CompletedItemWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         TextView(
-                          text: "Stock Market Championship",
+                          text: data.name ?? '',
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w700,
                           fontColor: AppColors.black,
@@ -69,14 +81,12 @@ class CompletedItemWidget extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Expanded(
-                  //   child: TextView(
-                  //     text: "Date: 21 March,2025",
-                  //     fontSize: 12.sp,
-                  //     fontWeight: FontWeight.w500,
-                  //     fontColor: AppColors.black,
-                  //   ),
-                  // ),
+                  TextView(
+                    text: 'Points: ${data.points != null ? data.points.toStringAsFixed(2) : '0.0'}',
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  TextView(text: 'Rank: ${data.rank.toString()}', fontSize: 12.sp, fontWeight: FontWeight.w500),
                   TextView(
                     text: "Time: 4:15 PM",
                     fontSize: 12.sp,
@@ -94,19 +104,26 @@ class CompletedItemWidget extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+
                   TextView(
-                    text: "1-Team",
+                    text: Strings.indianStockMarketChampionship,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                     fontColor: AppColors.black9999,
                   ),
-                  Gap(16.w),
-                  TextView(
-                    text: "1-Contest",
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                    fontColor: AppColors.black9999,
+                  Row(
+                    children: [
+                      TextView(
+                        text: "Won ${data.prize.toString()}",
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        fontColor: AppColors.black9999,
+                      ),
+                      Gap(2.w),
+                      Image.asset(AppAssets.stoxplayCoin, height: 12.h, width: 12.w),
+                    ],
                   ),
                 ],
               ),
@@ -114,20 +131,6 @@ class CompletedItemWidget extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildIcon() {
-    return Container(
-      width: 50.w,
-      height: 50.h,
-      padding: EdgeInsets.all(5.w),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.white,
-        border: Border.all(color: AppColors.blackD7D7, width: 1),
-      ),
-      child: Image.asset(AppAssets.appIcon),
     );
   }
 }

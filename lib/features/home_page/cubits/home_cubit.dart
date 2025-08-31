@@ -37,7 +37,7 @@ class HomeCubit extends Cubit<HomeState> {
     final sectorList = await sectorListUseCase.call('');
     sectorList.fold(
       (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
-      (r) => emit(state.copyWith(sectorModel: r, apiStatus: ApiStatus.success)),
+      (r) => emit(state.copyWith(sectorModel: r, apiStatus:  ApiStatus.success)),
     );
   }
 

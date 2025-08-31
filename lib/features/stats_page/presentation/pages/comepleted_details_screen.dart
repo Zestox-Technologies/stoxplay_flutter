@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
+import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
+import 'package:stoxplay/features/stats_page/data/stats_model.dart';
+import 'package:stoxplay/utils/common/functions/get_current_time.dart';
+import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
@@ -8,11 +16,27 @@ import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
-class CompletedDetailsScreen extends StatelessWidget {
+class CompletedDetailsScreen extends StatefulWidget {
   const CompletedDetailsScreen({super.key});
 
   @override
+  State<CompletedDetailsScreen> createState() => _CompletedDetailsScreenState();
+}
+
+class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
+  late HomeCubit cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    cubit = BlocProvider.of<HomeCubit>(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    StatsDataModel data = ModalRoute.of(context)!.settings.arguments as StatsDataModel;
+    cubit.getContestLeaderboard(data.contest?.id ?? '');
+
     return Scaffold(
       appBar: AppBar(
         forceMaterialTransparency: true,
@@ -40,12 +64,43 @@ class CompletedDetailsScreen extends StatelessWidget {
             Gap(16.h),
 
             // Contest Card
-            _buildContestCard(),
+            _buildContestCard(data: data),
 
             Gap(16.h),
 
-            // Leaderboard Section
-            _buildLeaderboardSection(),
+            TextView(text: 'Leaderboard', fontSize: 16.sp, fontWeight: FontWeight.w700, fontColor: AppColors.black),
+            Gap(12.h),
+            BlocBuilder<HomeCubit, HomeState>(
+              bloc: cubit,
+              builder: (context, state) {
+                final data = state.contestLeaderboardModel ?? ContestLeaderboardModel();
+                if (state.apiStatus.isLoading) {
+                  // show shimmer placeholders
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: 4,
+                    itemBuilder: (_, __) => const LeaderboardItemShimmer(),
+                  );
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: data.leaderboard?.length,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final item = data.leaderboard?[index];
+                    return _buildLeaderboardItem(
+                      rank: item?.rank ?? 1,
+                      profileUrl: item?.user?.profilePictureUrl ?? '',
+                      name: item?.user?.name ?? '',
+                      points: item?.points?.toInt() ?? 0,
+                      prize: item?.prize?.toInt() ?? 0,
+                    );
+                  },
+                );
+              },
+            ),
 
             Gap(16.h),
           ],
@@ -54,7 +109,7 @@ class CompletedDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContestCard() {
+  Widget _buildContestCard({required StatsDataModel data}) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -77,9 +132,11 @@ class CompletedDetailsScreen extends StatelessWidget {
             Row(
               children: [
                 Container(
+                  width: 50.w,
+                  height: 50.h,
                   padding: EdgeInsets.all(6.w),
                   decoration: BoxDecoration(border: Border.all(color: AppColors.blackD7D7), shape: BoxShape.circle),
-                  child: ClipOval(child: Image.asset(AppAssets.bankWars, height: 20.h, width: 20.w, fit: BoxFit.cover)),
+                  child: ClipOval(child: CachedImageWidget(imageUrl: data.contest?.sectorLogo ?? '')),
                 ),
                 Gap(12.w),
                 Expanded(
@@ -87,13 +144,13 @@ class CompletedDetailsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextView(
-                        text: 'HDFC Bank Ltd.',
+                        text: data.name ?? '',
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
                         fontColor: AppColors.black,
                       ),
                       TextView(
-                        text: 'Bank wars',
+                        text: data.contest?.name ?? '',
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
                         fontColor: AppColors.primaryPurple,
@@ -107,14 +164,8 @@ class CompletedDetailsScreen extends StatelessWidget {
             Gap(12.h),
 
             // Progress section
-            Row(
-              children: [
-                TextView(text: 'Complete', fontSize: 12.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
-                Gap(6.w),
-                Expanded(child: ProgressBarWidget(value: 0.9, total: 1.0)),
-              ],
-            ),
-
+            ProgressBarWidget(value: 0.1, total: 1.0),
+            // Text(data.contest?.spotsRemaining.toString() ?? ''),
             Gap(12.h),
 
             // Team and details section
@@ -145,7 +196,7 @@ class CompletedDetailsScreen extends StatelessWidget {
                           Image.asset(AppAssets.championIcon, height: 14.h, width: 14.w),
                           Gap(4.w),
                           TextView(
-                            text: '50%',
+                            text: "${data.contest?.winningPercentage.toString() ?? ''}%",
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             fontColor: AppColors.black,
@@ -169,10 +220,10 @@ class CompletedDetailsScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Image.asset(AppAssets.cupIcon, height: 14.h, width: 14.w),
+                        Image.asset(AppAssets.championIcon, height: 14.h, width: 14.w),
                         Gap(4.w),
                         TextView(
-                          text: 'Prize: ₹8,10,000',
+                          text: 'Prize: ₹${formatMaxWinIntl(data.contest?.prizePool ?? 0)}',
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                           fontColor: AppColors.black,
@@ -181,24 +232,24 @@ class CompletedDetailsScreen extends StatelessWidget {
                     ),
                     Gap(8.h),
                     TextView(
-                      text: '2000 Spots Remaining',
+                      text: '${data.contest?.spotsRemaining} Spots Remaining',
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w500,
                       fontColor: AppColors.black6666,
                     ),
                     Gap(8.h),
-                    Row(
-                      children: [
-                        Icon(Icons.visibility, size: 14.sp, color: AppColors.black6666),
-                        Gap(4.w),
-                        TextView(
-                          text: 'View',
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          fontColor: AppColors.black6666,
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   children: [
+                    //     Icon(Icons.visibility, size: 14.sp, color: AppColors.black6666),
+                    //     Gap(4.w),
+                    //     TextView(
+                    //       text: 'View',
+                    //       fontSize: 12.sp,
+                    //       fontWeight: FontWeight.w500,
+                    //       fontColor: AppColors.black6666,
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
               ],
@@ -209,94 +260,39 @@ class CompletedDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLeaderboardSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextView(text: 'Leaderboard', fontSize: 16.sp, fontWeight: FontWeight.w700, fontColor: AppColors.black),
-        Gap(12.h),
-
-        // Leaderboard items
-        _buildLeaderboardItem(
-          rank: 1,
-          name: 'Rajesh Kumar',
-          points: 120,
-          isTopRank: true,
-          rankColor: AppColors.orangeF1BE,
-          showCrown: true,
-        ),
-        _buildLeaderboardItem(
-          rank: 2,
-          name: 'Amit Sharma',
-          points: 120,
-          isTopRank: true,
-          rankColor: AppColors.blackC2C2,
-          showCrown: true,
-        ),
-        _buildLeaderboardItem(
-          rank: 3,
-          name: 'Vikram Singh',
-          points: 120,
-          isTopRank: true,
-          rankColor: AppColors.orangeF99E,
-          showCrown: true,
-        ),
-        _buildLeaderboardItem(rank: 4, name: 'Arjun Patel', points: 120, isTopRank: false),
-        _buildLeaderboardItem(rank: 5, name: 'Oliver Johnson', points: 120, isTopRank: false),
-        _buildLeaderboardItem(rank: 10, name: 'Ravi Mehta', points: 120, isTopRank: false, isCurrentUser: true),
-      ],
-    );
-  }
-
   Widget _buildLeaderboardItem({
     required int rank,
+    required String profileUrl,
     required String name,
     required int points,
-    required bool isTopRank,
-    Color? rankColor,
-    bool showCrown = false,
-    bool isCurrentUser = false,
+    required int prize,
   }) {
     return Container(
       margin: EdgeInsets.only(bottom: 8.h),
       decoration: BoxDecoration(
-        color: isCurrentUser ? AppColors.primaryPurple.withOpacity(0.1) : AppColors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(
-          color: isCurrentUser ? AppColors.primaryPurple : AppColors.blackD7D7,
-          width: isCurrentUser ? 2 : 1,
-        ),
+        border: Border.all(color: AppColors.blackD7D7, width: 1),
       ),
       child: Padding(
         padding: EdgeInsets.all(10.w),
         child: Row(
           children: [
-                        // Rank
-            Container(
-              width: 28.w,
-              height: 28.w,
-              decoration: BoxDecoration(color: rankColor ?? AppColors.blackD7D7, shape: BoxShape.circle),
-              child: Center(
-                child: TextView(
-                  text: rank.toString(),
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w700,
-                  fontColor: AppColors.white,
-                ),
-              ),
-            ),
- 
+            Gap(5.w),
+            // Rank
+            TextView(text: "#${rank.toString()}", fontWeight: FontWeight.w700),
+
             Gap(10.w),
 
-                        // Profile picture
+            // Profile picture
             CircleAvatar(
               radius: 18.r,
               backgroundColor: AppColors.blackD7D7,
               child: ClipOval(
-                child: Image.asset(AppAssets.userProfileIcon, height: 36.h, width: 36.w, fit: BoxFit.cover),
+                child: CachedImageWidget(imageUrl: profileUrl, height: 36.h, width: 36.w, fit: BoxFit.cover),
               ),
             ),
- 
+
             Gap(10.w),
 
             // Name and points
@@ -320,16 +316,83 @@ class CompletedDetailsScreen extends StatelessWidget {
                 ],
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextView(text: prize.toString() ?? '0', fontSize: 14.sp),
+                Gap(5.w),
+                Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-            // Crown or user indicator
-            if (showCrown)
-              Image.asset(AppAssets.championIcon, height: 20.h, width: 20.w)
-            else if (isCurrentUser)
-                              Container(
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
-                  decoration: BoxDecoration(color: AppColors.primaryPurple, borderRadius: BorderRadius.circular(8.r)),
-                  child: TextView(text: 'You', fontSize: 11.sp, fontWeight: FontWeight.w600, fontColor: AppColors.white),
-                ),
+class LeaderboardItemShimmer extends StatelessWidget {
+  const LeaderboardItemShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 8.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(10.w),
+        child: Row(
+          children: [
+            SizedBox(width: 5.w),
+
+            // Rank shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Container(width: 30.w, height: 14.h, color: Colors.grey),
+            ),
+
+            SizedBox(width: 10.w),
+
+            // Profile shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: CircleAvatar(radius: 18.r, backgroundColor: Colors.grey),
+            ),
+
+            SizedBox(width: 10.w),
+
+            // Name + points shimmer
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Container(width: 100.w, height: 14.h, color: Colors.grey),
+                  ),
+                  SizedBox(height: 6.h),
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey.shade300,
+                    highlightColor: Colors.grey.shade100,
+                    child: Container(width: 80.w, height: 12.h, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+
+            // Prize shimmer
+            Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Container(width: 50.w, height: 14.h, color: Colors.grey),
+            ),
           ],
         ),
       ),

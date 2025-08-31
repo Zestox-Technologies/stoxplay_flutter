@@ -89,8 +89,8 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                     ),
                     Gap(10.h),
                     CircleAvatar(
-                      radius: 70,
-                      backgroundColor: AppColors.primaryPurple,
+                      radius: 60,
+                      backgroundColor: AppColors.redFF00.withOpacity(0.2),
                       child: ClipOval(
                         child: CachedImageWidget(
                           imageUrl: contest.sectorLogo,
@@ -139,7 +139,6 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                     BlocBuilder<HomeCubit, HomeState>(
                       bloc: cubit,
                       builder: (context, state) {
-                        final isSuccess = state.apiStatus.isSuccess;
                         final isLoading = state.apiStatus.isLoading;
 
                         if (isLoading) {
@@ -155,22 +154,18 @@ class _ContestDetailsPageState extends State<ContestDetailsPage> {
                         } else {
                           return state.contestList!.isEmpty
                               ? Center(child: Text("There are no contest available"))
-                              : RefreshIndicator(
-                                onRefresh: () async {
-                                  // await cubit.getContestList(contest.id.toString());
+                              : ListView.separated(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                separatorBuilder: (context, index) => Gap(15.h),
+                                itemCount: state.contestList!.length,
+                                itemBuilder: (context, index) {
+                                  return ContestDetailsWidget(
+                                    ignoreOnTap: false,
+                                    date: state.sectorModel?.nextMatchDate ?? '',
+                                    data: state.contestList![index],
+                                  ).paddingSymmetric(horizontal: 20.w);
                                 },
-                                child: ListView.separated(
-                                  physics: NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  separatorBuilder: (context, index) => Gap(15.h),
-                                  itemCount: state.contestList!.length,
-                                  itemBuilder: (context, index) {
-                                    return ContestDetailsWidget(
-                                      ignoreOnTap: false,
-                                      data: state.contestList![index],
-                                    ).paddingSymmetric(horizontal: 20.w);
-                                  },
-                                ),
                               );
                         }
                       },

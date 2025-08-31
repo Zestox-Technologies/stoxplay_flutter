@@ -1,4 +1,5 @@
-import 'package:stoxplay/features/profile_page/data/profile_model.dart';
+import 'package:stoxplay/features/profile_page/data/models/profile_model.dart';
+import 'package:stoxplay/features/profile_page/data/models/playing_history_model.dart';
 import 'package:stoxplay/features/profile_page/data/profile_rds.dart';
 
 abstract class ProfileRepo {
@@ -7,6 +8,8 @@ abstract class ProfileRepo {
   Future<ProfileModel> updateProfile(Map<String, dynamic> data);
 
   Future<String> fileUpload(Map<String, dynamic> data);
+
+  Future<PlayingHistoryModel> getPlayingHistory(Map<String, dynamic> params);
 }
 
 class ProfileRepoImpl implements ProfileRepo {
@@ -23,5 +26,10 @@ class ProfileRepoImpl implements ProfileRepo {
   @override
   Future<String> fileUpload(Map<String, dynamic> data) async {
     return rds.fileUpload(data);
+  }
+
+  @override
+  Future<PlayingHistoryModel> getPlayingHistory(Map<String, dynamic> params) {
+    return rds.getPlayingHistory(params);
   }
 }

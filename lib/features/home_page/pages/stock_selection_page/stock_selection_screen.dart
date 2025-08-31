@@ -47,7 +47,7 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
       price = map['price'];
       Future.delayed(Duration(seconds: 1), () {
         if (map['teamId'] != null) {
-          cubit.clientTeams(teamId: map['teamId'] ?? '',isPostApi: false);
+          cubit.clientTeams(teamId: map['teamId'] ?? '', isPostApi: false);
         }
       });
     });
