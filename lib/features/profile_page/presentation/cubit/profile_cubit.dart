@@ -2,9 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/profile_page/data/models/playing_history_model.dart';
 import 'package:stoxplay/features/profile_page/data/models/profile_model.dart';
 import 'package:stoxplay/features/profile_page/domain/profile_usecase.dart';
-import 'package:stoxplay/features/profile_page/data/models/playing_history_model.dart';
 import 'package:stoxplay/utils/constants/db_keys.dart';
 
 part 'profile_state.dart';

@@ -68,7 +68,7 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
     return SafeArea(
       child: Container(
         padding: EdgeInsets.only(top: 10),
-        height: 55.h,
+        height: 67.h,
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -82,23 +82,28 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
               children: List.generate(_menuItems.length, (index) {
                 final item = _menuItems[index];
                 final isSelected = selectedIndex == index;
-                return GestureDetector(
-                  onTap: () => _onItemTapped(index),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        item['icon'],
-                        height: 22.h,
-                        width: 22.w,
-                        color: isSelected ? AppColors.primaryPurple : AppColors.black6767,
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        item['label'],
-                        style: TextStyle(fontSize: 12.sp, color: isSelected ? AppColors.primaryPurple : Colors.black),
-                      ),
-                    ],
+
+                return Expanded(
+                  child: InkWell(
+                    // better than GestureDetector for ripple effect
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => _onItemTapped(index),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          item['icon'],
+                          height: 22.h,
+                          width: 22.w,
+                          color: isSelected ? AppColors.primaryPurple : AppColors.black6767,
+                        ),
+                        SizedBox(height: 4.h),
+                        Text(
+                          item['label'],
+                          style: TextStyle(fontSize: 12.sp, color: isSelected ? AppColors.primaryPurple : Colors.black),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }),

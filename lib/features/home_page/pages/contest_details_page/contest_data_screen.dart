@@ -7,6 +7,7 @@ import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
+import 'package:stoxplay/features/home_page/pages/contest_details_page/contest_data_shimmer.dart';
 import 'package:stoxplay/features/home_page/pages/home_page.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
@@ -16,7 +17,6 @@ import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
-import 'package:stoxplay/features/home_page/pages/contest_details_page/contest_data_shimmer.dart';
 
 class ContestDataScreen extends StatefulWidget {
   const ContestDataScreen({super.key});

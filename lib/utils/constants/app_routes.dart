@@ -1,7 +1,8 @@
 class AppRoutes {
   AppRoutes._();
 
-  static const String onBoardingPage = '/';
+  static const String onBoardingPage = '/onboarding';
+  static const String booksListScreen = '/';
   static const String loginPage = '/loginPage';
   static const String signUpPage = '/signUpPage';
   static const String otpScreen = '/otpScreen';

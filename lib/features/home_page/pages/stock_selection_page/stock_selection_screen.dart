@@ -148,381 +148,412 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                   body:
                       state.apiStatus.isLoading
                           ? StockSelectionShimmer()
-                          : Stack(
-                            children: [
-                              Positioned(top: 0.0, child: Image.asset(AppAssets.lightSplashStrokes, height: 250.h)),
-                              SafeArea(
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        top: stepper.value == 0 ? 10.h : 0,
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                      ),
-                                      child:
-                                          stepper.value == 0
-                                              ? Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    icon: Icon(Icons.arrow_back_ios_new),
-                                                  ),
-                                                  Center(
-                                                    child: Text(
-                                                      Strings.selectStocks,
-                                                      style: selectStocksStyle,
-                                                      textAlign: TextAlign.center,
-                                                    ),
-                                                  ),
-                                                  Gap(10.h),
-                                                  Padding(
-                                                    padding: EdgeInsets.symmetric(horizontal: 40.w),
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          Strings.pick11StocksFrom30,
-                                                          style: TextStyle(
-                                                            fontSize: 13.sp,
-                                                            fontWeight: FontWeight.w500,
-                                                          ),
+                          : LayoutBuilder(
+                            builder: (context, constraints) {
+                              final width = constraints.maxWidth;
+                              final height = constraints.maxHeight;
+                              final double horizontalPadding = ((width * 0.04).clamp(12.0, 28.0)).toDouble();
+                              final double headerImageHeight = ((height * 0.3).clamp(160.0, 280.0)).toDouble();
+                              final double bottomInset = MediaQuery.of(context).padding.bottom.toDouble();
+                              final double listBottomPadding = bottomInset + 90.0;
+                              return Stack(
+                                children: [
+                                  Positioned(
+                                    top: 0.0,
+                                    child: Image.asset(
+                                      AppAssets.lightSplashStrokes,
+                                      height: headerImageHeight,
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                  ),
+                                  SafeArea(
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            top: stepper.value == 0 ? 10.h : 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                          ),
+                                          child:
+                                              stepper.value == 0
+                                                  ? Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      IconButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        },
+                                                        icon: Icon(Icons.arrow_back_ios_new),
+                                                      ),
+                                                      Center(
+                                                        child: Text(
+                                                          Strings.selectStocks,
+                                                          style: selectStocksStyle,
+                                                          textAlign: TextAlign.center,
                                                         ),
-                                                        BlocBuilder<TimerCubit, TimerState>(
-                                                          builder: (context, timerState) {
-                                                            if (timerState.isRunning) {
-                                                              final duration = Duration(
-                                                                seconds: timerState.secondsRemaining,
-                                                              );
-                                                              final hours = duration.inHours
-                                                                  .remainder(24)
-                                                                  .toString()
-                                                                  .padLeft(2, '0');
-                                                              final minutes = duration.inMinutes
-                                                                  .remainder(60)
-                                                                  .toString()
-                                                                  .padLeft(2, '0');
-                                                              final seconds = duration.inSeconds
-                                                                  .remainder(60)
-                                                                  .toString()
-                                                                  .padLeft(2, '0');
-
-                                                              return Text('Time Left: $hours:$minutes:$seconds');
-                                                            } else {
-                                                              return const Text('');
-                                                            }
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Gap(5.h),
-                                                  Center(
-                                                    child: SizedBox(
-                                                      height: 12.h,
-                                                      child: ListView.builder(
-                                                        itemCount: 11,
-                                                        shrinkWrap: true,
-                                                        scrollDirection: Axis.horizontal,
-                                                        itemBuilder: (context, index) {
-                                                          return Container(
-                                                            width: 23.w,
-                                                            margin: EdgeInsets.symmetric(horizontal: 3.w),
-                                                            decoration: BoxDecoration(
-                                                              color:
-                                                                  index >= state.selectedStockList.length
-                                                                      ? AppColors.black9A9A.withOpacity(0.5)
-                                                                      : AppColors.primaryPurple,
-                                                              borderRadius: BorderRadius.circular(4.r),
+                                                      ),
+                                                      Gap(10.h),
+                                                      Padding(
+                                                        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              Strings.pick11StocksFrom30,
+                                                              style: TextStyle(
+                                                                fontSize: 13.sp,
+                                                                fontWeight: FontWeight.w500,
+                                                              ),
                                                             ),
-                                                            child: Center(
-                                                              child: Text(
-                                                                '${index + 1}',
-                                                                style: TextStyle(
-                                                                  fontSize: 10.sp,
-                                                                  fontWeight: FontWeight.bold,
+                                                            BlocBuilder<TimerCubit, TimerState>(
+                                                              builder: (context, timerState) {
+                                                                if (timerState.isRunning) {
+                                                                  final duration = Duration(
+                                                                    seconds: timerState.secondsRemaining,
+                                                                  );
+                                                                  final hours = duration.inHours
+                                                                      .remainder(24)
+                                                                      .toString()
+                                                                      .padLeft(2, '0');
+                                                                  final minutes = duration.inMinutes
+                                                                      .remainder(60)
+                                                                      .toString()
+                                                                      .padLeft(2, '0');
+                                                                  final seconds = duration.inSeconds
+                                                                      .remainder(60)
+                                                                      .toString()
+                                                                      .padLeft(2, '0');
+
+                                                                  return Text('Time Left: $hours:$minutes:$seconds');
+                                                                } else {
+                                                                  return const Text('');
+                                                                }
+                                                              },
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Gap(5.h),
+                                                      Center(
+                                                        child: SizedBox(
+                                                          height: 15.h,
+                                                          child: ListView.builder(
+                                                            itemCount: 11,
+                                                            shrinkWrap: true,
+                                                            scrollDirection: Axis.horizontal,
+                                                            itemBuilder: (context, index) {
+                                                              return Container(
+                                                                width: 23.w,
+                                                                margin: EdgeInsets.symmetric(horizontal: 3.w),
+                                                                decoration: BoxDecoration(
                                                                   color:
                                                                       index >= state.selectedStockList.length
-                                                                          ? AppColors.black
-                                                                          : AppColors.white,
+                                                                          ? AppColors.black9A9A.withOpacity(0.5)
+                                                                          : AppColors.primaryPurple,
+                                                                  borderRadius: BorderRadius.circular(4.r),
                                                                 ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    '${index + 1}',
+                                                                    style: TextStyle(
+                                                                      fontSize: 10.sp,
+                                                                      fontWeight: FontWeight.bold,
+                                                                      color:
+                                                                          index >= state.selectedStockList.length
+                                                                              ? AppColors.black
+                                                                              : AppColors.white,
+                                                                    ),
+                                                                    textAlign: TextAlign.center,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Gap(18.h),
+                                                    ],
+                                                  )
+                                                  : Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding: EdgeInsets.only(left: horizontalPadding * 0.5),
+                                                        child: Row(
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          children: [
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                stepper.value--;
+                                                              },
+                                                              child: Icon(Icons.arrow_back_ios_new),
+                                                            ),
+                                                            Gap(5.w),
+                                                            TextView(
+                                                              text: "Select",
+                                                              fontSize: 20.sp,
+                                                              textAlign: TextAlign.center,
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
+                                                            Gap(2.w),
+                                                            Padding(
+                                                              padding: EdgeInsets.only(top: 3.h),
+                                                              child: TextView(
+                                                                text: "(Pick your 3 dominating stocks)",
                                                                 textAlign: TextAlign.center,
+                                                                fontSize: 10.sp,
+                                                                fontWeight: FontWeight.w600,
                                                               ),
                                                             ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      IntrinsicHeight(
+                                                        child: Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                            children: [
+                                                              Column(
+                                                                children: [
+                                                                  TextView(
+                                                                    text: "Leader",
+                                                                    fontSize: 18.sp,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    fontColor: AppColors.primaryPurple,
+                                                                  ),
+                                                                  TextView(
+                                                                    text: "Get 10X Points",
+                                                                    fontSize: 12.sp,
+                                                                    fontWeight: FontWeight.w400,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              VerticalDivider(width: 2),
+                                                              Column(
+                                                                children: [
+                                                                  TextView(
+                                                                    text: "Co-Leader",
+                                                                    fontSize: 18.sp,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    fontColor: AppColors.primaryPurple,
+                                                                  ),
+                                                                  TextView(
+                                                                    text: "Get 7.5X Points",
+                                                                    fontSize: 12.sp,
+                                                                    fontWeight: FontWeight.w400,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              VerticalDivider(width: 2),
+                                                              Column(
+                                                                children: [
+                                                                  TextView(
+                                                                    text: "Vice-Leader",
+                                                                    fontSize: 18.sp,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    fontColor: AppColors.primaryPurple,
+                                                                  ),
+                                                                  TextView(
+                                                                    text: "Get 5X Points",
+                                                                    fontSize: 12.sp,
+                                                                    fontWeight: FontWeight.w400,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                        ),
+                                        if (stepper.value == 1) Gap(8.h),
+                                        if (stepper.value == 0)
+                                          Container(
+                                            width: double.infinity,
+                                            height:
+                                                MediaQuery.of(context).size.width >= 600
+                                                    ? 15
+                                                        .h // Tablet
+                                                                         : (MediaQuery.of(context).size.width > 400 && MediaQuery.of(context).size.height < 900)
+
+                              ? 25
+                                                        .h // Foldable / medium screens
+                                                    : 15.h,
+                                            // Normal phones
+                                            margin: EdgeInsets.symmetric(horizontal: 15.w),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.black9A9A.withOpacity(0.5),
+                                              borderRadius: BorderRadius.circular(5.r),
+                                            ),
+                                            child: Table(
+                                              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                                              columnWidths: const {
+                                                0: FlexColumnWidth(0.8),
+                                                1: FlexColumnWidth(2.0),
+                                                2: FlexColumnWidth(0.8),
+                                                3: FlexColumnWidth(1.2),
+                                              },
+                                              children: [
+                                                TableRow(
+                                                  children: [
+                                                    TextView(text: "", fontSize: 11.sp),
+                                                    TextView(text: "Stock", fontSize: 11.sp),
+                                                    TextView(text: "Sel %", fontSize: 11.sp),
+                                                    TextView(text: "Analysis", fontSize: 11.sp),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        else
+                                          Container(
+                                            width: double.infinity,
+                                            height: 15.h,
+                                            margin: EdgeInsets.symmetric(horizontal: 15.w),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.black9A9A.withOpacity(0.5),
+                                              borderRadius: BorderRadius.circular(5.r),
+                                            ),
+                                            child: Table(
+                                              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                                              columnWidths: const {
+                                                0: FlexColumnWidth(0.7),
+                                                1: FlexColumnWidth(2.3),
+                                                2: FlexColumnWidth(0.5),
+                                                3: FlexColumnWidth(0.5),
+                                                4: FlexColumnWidth(0.5),
+                                              },
+                                              children: [
+                                                TableRow(
+                                                  children: [
+                                                    TextView(text: "", fontSize: 11.sp),
+                                                    TextView(text: "Stock", fontSize: 11.sp),
+                                                    TextView(text: "L%", fontSize: 11.sp),
+                                                    TextView(text: "CL%", fontSize: 11.sp),
+                                                    TextView(text: "VL%", fontSize: 11.sp),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        Gap(5.h),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 0.w),
+                                            child: ListView.separated(
+                                              padding: EdgeInsets.fromLTRB(
+                                                horizontalPadding,
+                                                10.h,
+                                                horizontalPadding,
+                                                listBottomPadding,
+                                              ),
+                                              separatorBuilder: (context, index) => Gap(8.h),
+                                              itemCount:
+                                                  stepper.value == 0
+                                                      ? state.stockList.length
+                                                      : state.selectedStockList.length,
+                                              itemBuilder:
+                                                  (context, index) => StockSelectionWidget(
+                                                    cubit: cubit,
+                                                    stock:
+                                                        stepper.value == 0
+                                                            ? state.stockList[index]
+                                                            : state.selectedStockList[index],
+                                                    stepper: stepper,
+                                                    index: index,
+                                                    onUpPressed: () {
+                                                      final oldStock = state.stockList[index];
+                                                      final isSelected = state.selectedStockList.any(
+                                                        (stock) => stock.id == oldStock.id,
+                                                      );
+                                                      if (state.selectedStockList.length >= 11 && !isSelected) {
+                                                        return;
+                                                      }
+                                                      final currentPrediction = oldStock.stockPrediction;
+                                                      if (isSelected) {
+                                                        if (currentPrediction == StockPrediction.up) {
+                                                          cubit.removeSelectedStock(stock: oldStock);
+                                                          final updatedStock = oldStock.copyWith(
+                                                            stockPrediction: StockPrediction.none,
                                                           );
-                                                        },
-                                                      ),
-                                                    ),
+                                                          cubit.updateStock(stock: updatedStock, index: index);
+                                                        } else if (currentPrediction == StockPrediction.down) {
+                                                          cubit.updateSelectedStockPrediction(
+                                                            stockPrediction: StockPrediction.up,
+                                                            stock: oldStock,
+                                                          );
+                                                          final updatedStock = oldStock.copyWith(
+                                                            stockPrediction: StockPrediction.up,
+                                                          );
+                                                          cubit.updateStock(stock: updatedStock, index: index);
+                                                        }
+                                                      } else {
+                                                        if (!isSelected) {
+                                                          final updatedStock = oldStock.copyWith(
+                                                            stockPrediction: StockPrediction.up,
+                                                          );
+                                                          cubit.addSelectedStock(stock: updatedStock);
+                                                        }
+                                                        final updatedStock = oldStock.copyWith(
+                                                          stockPrediction: StockPrediction.up,
+                                                        );
+                                                        cubit.updateStock(stock: updatedStock, index: index);
+                                                      }
+                                                    },
+                                                    onDownPressed: () {
+                                                      final oldStock = state.stockList[index];
+
+                                                      final isSelected = state.selectedStockList.any(
+                                                        (stock) => stock.id == oldStock.id,
+                                                      );
+
+                                                      final currentPrediction = oldStock.stockPrediction;
+
+                                                      if (state.selectedStockList.length >= 11 && !isSelected) {
+                                                        return;
+                                                      }
+
+                                                      if (isSelected) {
+                                                        if (currentPrediction == StockPrediction.down) {
+                                                          cubit.removeSelectedStock(stock: oldStock);
+
+                                                          final updatedStock = oldStock.copyWith(
+                                                            stockPrediction: StockPrediction.none,
+                                                          );
+                                                          cubit.updateStock(stock: updatedStock, index: index);
+                                                        } else if (currentPrediction == StockPrediction.up) {
+                                                          cubit.updateSelectedStockPrediction(
+                                                            stockPrediction: StockPrediction.down,
+                                                            stock: oldStock,
+                                                          );
+                                                          final updatedStock = oldStock.copyWith(
+                                                            stockPrediction: StockPrediction.down,
+                                                          );
+                                                          cubit.updateStock(stock: updatedStock, index: index);
+                                                        }
+                                                      } else {
+                                                        final updatedStock = oldStock.copyWith(
+                                                          stockPrediction: StockPrediction.down,
+                                                        );
+                                                        cubit.addSelectedStock(stock: updatedStock);
+                                                        cubit.updateStock(stock: updatedStock, index: index);
+                                                      }
+                                                    },
                                                   ),
-                                                  Gap(18.h),
-                                                ],
-                                              )
-                                              : Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.only(left: 10.w),
-                                                    child: Row(
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            stepper.value--;
-                                                          },
-                                                          child: Icon(Icons.arrow_back_ios_new),
-                                                        ),
-                                                        Gap(5.w),
-                                                        TextView(
-                                                          text: "Select",
-                                                          fontSize: 20.sp,
-                                                          textAlign: TextAlign.center,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                        Gap(2.w),
-                                                        Padding(
-                                                          padding: EdgeInsets.only(top: 3.h),
-                                                          child: TextView(
-                                                            text: "(Pick your 3 dominating stocks)",
-                                                            textAlign: TextAlign.center,
-                                                            fontSize: 10.sp,
-                                                            fontWeight: FontWeight.w600,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  IntrinsicHeight(
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                        children: [
-                                                          Column(
-                                                            children: [
-                                                              TextView(
-                                                                text: "Leader",
-                                                                fontSize: 18.sp,
-                                                                fontWeight: FontWeight.w600,
-                                                                fontColor: AppColors.primaryPurple,
-                                                              ),
-                                                              TextView(
-                                                                text: "Get 10X Points",
-                                                                fontSize: 12.sp,
-                                                                fontWeight: FontWeight.w400,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          VerticalDivider(width: 2),
-                                                          Column(
-                                                            children: [
-                                                              TextView(
-                                                                text: "Co-Leader",
-                                                                fontSize: 18.sp,
-                                                                fontWeight: FontWeight.w600,
-                                                                fontColor: AppColors.primaryPurple,
-                                                              ),
-                                                              TextView(
-                                                                text: "Get 7.5X Points",
-                                                                fontSize: 12.sp,
-                                                                fontWeight: FontWeight.w400,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          VerticalDivider(width: 2),
-                                                          Column(
-                                                            children: [
-                                                              TextView(
-                                                                text: "Vice-Leader",
-                                                                fontSize: 18.sp,
-                                                                fontWeight: FontWeight.w600,
-                                                                fontColor: AppColors.primaryPurple,
-                                                              ),
-                                                              TextView(
-                                                                text: "Get 5X Points",
-                                                                fontSize: 12.sp,
-                                                                fontWeight: FontWeight.w400,
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                    ),
-                                    if (stepper.value == 1) Gap(8.h),
-                                    if (stepper.value == 0)
-                                      Container(
-                                        width: double.infinity,
-                                        height: 15.h,
-                                        margin: EdgeInsets.symmetric(horizontal: 15.w),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.black9A9A.withOpacity(0.5),
-                                          borderRadius: BorderRadius.circular(5.r),
-                                        ),
-                                        child: Table(
-                                          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                                          columnWidths: {
-                                            0: FixedColumnWidth(60.w), // ID or Icon space
-                                            1: FixedColumnWidth(150.w), // Stock name
-                                            2: FixedColumnWidth(60.w), // Sel %
-                                            3: FixedColumnWidth(100.w), // Analysis
-                                          },
-                                          children: [
-                                            TableRow(
-                                              children: [
-                                                TextView(text: "", fontSize: 11.sp),
-                                                TextView(text: "Stock", fontSize: 11.sp),
-                                                TextView(text: "Sel %", fontSize: 11.sp),
-                                                TextView(text: "Analysis", fontSize: 11.sp),
-                                              ],
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      )
-                                    else
-                                      Container(
-                                        width: double.infinity,
-                                        height: 15.h,
-                                        margin: EdgeInsets.symmetric(horizontal: 15.w),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.black9A9A.withOpacity(0.5),
-                                          borderRadius: BorderRadius.circular(5.r),
-                                        ),
-                                        child: Table(
-                                          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                                          columnWidths: {
-                                            0: FixedColumnWidth(50.w),
-                                            1: FixedColumnWidth(160.w),
-                                            2: FixedColumnWidth(20.w),
-                                            3: FixedColumnWidth(20.w),
-                                            4: FixedColumnWidth(20.w),
-                                          },
-                                          children: [
-                                            TableRow(
-                                              children: [
-                                                TextView(text: "", fontSize: 11.sp),
-                                                TextView(text: "Stock", fontSize: 11.sp),
-                                                TextView(text: "L%", fontSize: 11.sp),
-                                                TextView(text: "CL%", fontSize: 11.sp),
-                                                TextView(text: "VL%", fontSize: 11.sp),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    Gap(5.h),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 0.w),
-                                        child: ListView.separated(
-                                          padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
-                                          separatorBuilder: (context, index) => Gap(8.h),
-                                          itemCount:
-                                              stepper.value == 0
-                                                  ? state.stockList.length
-                                                  : state.selectedStockList.length,
-                                          itemBuilder:
-                                              (context, index) => StockSelectionWidget(
-                                                cubit: cubit,
-                                                stock:
-                                                    stepper.value == 0
-                                                        ? state.stockList[index]
-                                                        : state.selectedStockList[index],
-                                                stepper: stepper,
-                                                index: index,
-                                                onUpPressed: () {
-                                                  final oldStock = state.stockList[index];
-                                                  final isSelected = state.selectedStockList.any(
-                                                    (stock) => stock.id == oldStock.id,
-                                                  );
-                                                  if (state.selectedStockList.length >= 11 && !isSelected) {
-                                                    return;
-                                                  }
-                                                  final currentPrediction = oldStock.stockPrediction;
-                                                  if (isSelected) {
-                                                    if (currentPrediction == StockPrediction.up) {
-                                                      cubit.removeSelectedStock(stock: oldStock);
-                                                      final updatedStock = oldStock.copyWith(
-                                                        stockPrediction: StockPrediction.none,
-                                                      );
-                                                      cubit.updateStock(stock: updatedStock, index: index);
-                                                    } else if (currentPrediction == StockPrediction.down) {
-                                                      cubit.updateSelectedStockPrediction(
-                                                        stockPrediction: StockPrediction.up,
-                                                        stock: oldStock,
-                                                      );
-                                                      final updatedStock = oldStock.copyWith(
-                                                        stockPrediction: StockPrediction.up,
-                                                      );
-                                                      cubit.updateStock(stock: updatedStock, index: index);
-                                                    }
-                                                  } else {
-                                                    if (!isSelected) {
-                                                      final updatedStock = oldStock.copyWith(
-                                                        stockPrediction: StockPrediction.up,
-                                                      );
-                                                      cubit.addSelectedStock(stock: updatedStock);
-                                                    }
-                                                    final updatedStock = oldStock.copyWith(
-                                                      stockPrediction: StockPrediction.up,
-                                                    );
-                                                    cubit.updateStock(stock: updatedStock, index: index);
-                                                  }
-                                                },
-                                                onDownPressed: () {
-                                                  final oldStock = state.stockList[index];
-
-                                                  final isSelected = state.selectedStockList.any(
-                                                    (stock) => stock.id == oldStock.id,
-                                                  );
-
-                                                  final currentPrediction = oldStock.stockPrediction;
-
-                                                  if (state.selectedStockList.length >= 11 && !isSelected) {
-                                                    return;
-                                                  }
-
-                                                  if (isSelected) {
-                                                    if (currentPrediction == StockPrediction.down) {
-                                                      cubit.removeSelectedStock(stock: oldStock);
-
-                                                      final updatedStock = oldStock.copyWith(
-                                                        stockPrediction: StockPrediction.none,
-                                                      );
-                                                      cubit.updateStock(stock: updatedStock, index: index);
-                                                    } else if (currentPrediction == StockPrediction.up) {
-                                                      cubit.updateSelectedStockPrediction(
-                                                        stockPrediction: StockPrediction.down,
-                                                        stock: oldStock,
-                                                      );
-                                                      final updatedStock = oldStock.copyWith(
-                                                        stockPrediction: StockPrediction.down,
-                                                      );
-                                                      cubit.updateStock(stock: updatedStock, index: index);
-                                                    }
-                                                  } else {
-                                                    final updatedStock = oldStock.copyWith(
-                                                      stockPrediction: StockPrediction.down,
-                                                    );
-                                                    cubit.addSelectedStock(stock: updatedStock);
-                                                    cubit.updateStock(stock: updatedStock, index: index);
-                                                  }
-                                                },
-                                              ),
-                                        ),
-                                      ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                                  ),
+                                ],
+                              );
+                            },
                           ),
                 );
               },

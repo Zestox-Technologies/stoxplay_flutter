@@ -7,22 +7,13 @@ import 'package:stoxplay/utils/constants/app_colors.dart';
 
 import 'application/application.dart';
 
-GlobalKey<ScaffoldMessengerState> snackBarKey =
-    GlobalKey<ScaffoldMessengerState>();
+GlobalKey<ScaffoldMessengerState> snackBarKey = GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // try {
-  //   await Firebase.initializeApp();
-  //   print('Firebase initialized successfully');
-  // } catch (e) {
-  //   print('Firebase initialization failed: $e');
-  // }
-  
-  // Initialize dependency injection
+
   await init();
-  
+
   await AppComponentBase().init();
   await StorageService().init();
   SystemChrome.setSystemUIOverlayStyle(
@@ -33,9 +24,6 @@ void main() async {
     ),
   );
 
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
 }

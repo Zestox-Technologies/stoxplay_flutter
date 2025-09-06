@@ -10,10 +10,10 @@ import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
-import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
-import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
+import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
 class CompletedDetailsScreen extends StatefulWidget {
@@ -83,7 +83,6 @@ class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
                     itemBuilder: (_, __) => const LeaderboardItemShimmer(),
                   );
                 }
-
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount: data.leaderboard?.length,
@@ -93,7 +92,7 @@ class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
                     return _buildLeaderboardItem(
                       rank: item?.rank ?? 1,
                       profileUrl: item?.user?.profilePictureUrl ?? '',
-                      name: item?.user?.name ?? '',
+                      name: item?.teamName ?? '',
                       points: item?.points?.toInt() ?? 0,
                       prize: item?.prize?.toInt() ?? 0,
                     );
@@ -164,7 +163,10 @@ class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
             Gap(12.h),
 
             // Progress section
-            ProgressBarWidget(value: 0.1, total: 1.0),
+            ProgressBarWidget(
+              value: data.contest?.spotsFilled?.toDouble() ?? 0.0,
+              total: data.contest?.totalSpots?.toDouble() ?? 0.0,
+            ),
             // Text(data.contest?.spotsRemaining.toString() ?? ''),
             Gap(12.h),
 

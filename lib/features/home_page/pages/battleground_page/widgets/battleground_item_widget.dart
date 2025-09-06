@@ -6,6 +6,7 @@ import 'package:stoxplay/features/home_page/pages/battleground_page/pages/battle
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
 
 class BattlegroundItemWidget extends StatelessWidget {
@@ -15,9 +16,23 @@ class BattlegroundItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double dynamicHeight =
+        Device.isTablet(context)
+            ? 102.h
+            : Device.isFoldable(context)
+            ? 125.h
+            : 102.h;
+
+    final double dynamicWidth =
+        Device.isTablet(context)
+            ? 94.w
+            : Device.isFoldable(context)
+            ? 85.w
+            : 94.w;
+
     return Container(
-      height: 102.h,
-      width: 94.w,
+      height: dynamicHeight,
+      width: dynamicWidth,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -27,7 +42,7 @@ class BattlegroundItemWidget extends StatelessWidget {
                     : AppColors.red.withOpacity(0.6),
             spreadRadius: 3.0,
             blurRadius: 3.0,
-            offset: Offset(0, 1),
+            offset: const Offset(0, 1),
           ),
         ],
         color: AppColors.white,

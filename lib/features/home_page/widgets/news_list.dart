@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class NewsList extends StatelessWidget {
+class LearnList extends StatelessWidget {
   List<LearningModel> list;
 
-  NewsList({super.key, required this.list});
+  LearnList({super.key, required this.list});
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);

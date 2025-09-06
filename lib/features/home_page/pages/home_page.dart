@@ -9,6 +9,7 @@ import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
+import 'package:stoxplay/features/home_page/widgets/learn_list_shimmer.dart';
 import 'package:stoxplay/features/home_page/widgets/news_list.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
@@ -238,7 +239,13 @@ class _HomePageState extends State<HomePage> {
                                         physics: NeverScrollableScrollPhysics(),
                                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                           crossAxisCount: 2,
-                                          childAspectRatio: 0.7,
+                                          childAspectRatio:
+                                              MediaQuery.of(context).size.width >= 600
+                                                  ? 1.5 // Tablet
+                                                  : (MediaQuery.of(context).size.width > 400 &&
+                                                      MediaQuery.of(context).size.height < 900)
+                                                  ? 1.5
+                                                  : 0.7,
                                           crossAxisSpacing: 20,
                                           mainAxisSpacing: 20,
                                         ),
@@ -324,7 +331,10 @@ class _HomePageState extends State<HomePage> {
                           : BlocBuilder<HomeCubit, HomeState>(
                             bloc: homeCubit,
                             builder: (context, state) {
-                              return NewsList(list: state.learningList ?? []);
+                              if (state.apiStatus.isLoading) {
+                                return const LearnListShimmer();
+                              }
+                              return LearnList(list: state.learningList ?? []);
                             },
                           ),
                     ],

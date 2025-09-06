@@ -52,8 +52,12 @@ class LiveStock {
 
 class ScoreUpdatePayload {
   final String userTeamId;
-  final double totalPoints;
+  final String contestId;
+  final String contestName;
+  final int totalPoints;
   final int rank;
+  final int entryFee;
+  final bool isLive;
   final List<LiveStock> liveStocks;
 
   ScoreUpdatePayload({
@@ -61,6 +65,10 @@ class ScoreUpdatePayload {
     required this.totalPoints,
     required this.rank,
     required this.liveStocks,
+    required this.contestId,
+    required this.contestName,
+    required this.entryFee,
+    required this.isLive,
   });
 
   factory ScoreUpdatePayload.fromJson(Map<String, dynamic> json) {
@@ -69,6 +77,10 @@ class ScoreUpdatePayload {
       totalPoints: json['totalPoints'],
       rank: json['rank'],
       liveStocks: (json['liveStocks'] as List<dynamic>).map((e) => LiveStock.fromJson(e)).toList(),
+      contestId: json['contestId'],
+      contestName: json['contestName'],
+      entryFee: json['entryFee'],
+      isLive: json['isLive'],
     );
   }
 
@@ -78,6 +90,10 @@ class ScoreUpdatePayload {
       'totalPoints': totalPoints,
       'rank': rank,
       'liveStocks': liveStocks.map((e) => e.toJson()).toList(),
+      'contestId': contestId,
+      'contestName': contestName,
+      'entryFee': entryFee,
+      'isLive': isLive,
     };
   }
 }

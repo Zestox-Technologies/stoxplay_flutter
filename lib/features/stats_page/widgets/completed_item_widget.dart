@@ -106,7 +106,6 @@ class CompletedItemWidget extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   TextView(
                     text: Strings.indianStockMarketChampionship,
                     fontSize: 12.sp,

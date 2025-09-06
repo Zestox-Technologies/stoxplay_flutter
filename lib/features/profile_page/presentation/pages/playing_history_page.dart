@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
+import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/widgets/common_back_button.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';

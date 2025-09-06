@@ -90,7 +90,10 @@ class HomePageShimmer extends StatelessWidget {
             physics: NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.7,
+              childAspectRatio:
+                  MediaQuery.of(context).size.width >= 600
+                      ? 1.5 // Tablet
+                      : 0.7,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
             ),
@@ -105,21 +108,14 @@ class HomePageShimmer extends StatelessWidget {
 class ContestDetailsCardShimmer extends StatelessWidget {
   const ContestDetailsCardShimmer({super.key});
 
-  Widget _shimmerContainer({
-    double? width,
-    double? height,
-    BorderRadius? borderRadius,
-  }) {
+  Widget _shimmerContainer({double? width, double? height, BorderRadius? borderRadius}) {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
       child: Container(
         width: width,
         height: height,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: borderRadius ?? BorderRadius.circular(4),
-        ),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: borderRadius ?? BorderRadius.circular(4)),
       ),
     );
   }
@@ -129,7 +125,7 @@ class ContestDetailsCardShimmer extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      margin:  EdgeInsets.symmetric(vertical: 5.h, horizontal: 8),
+      margin: EdgeInsets.symmetric(vertical: 5.h, horizontal: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -191,10 +187,7 @@ class ContestDetailsCardShimmer extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-            ),
+            decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(8)),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return Column(
@@ -224,4 +217,3 @@ class ContestDetailsCardShimmer extends StatelessWidget {
     );
   }
 }
-

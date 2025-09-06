@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
-import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
+import 'package:stoxplay/utils/common/cubits/multi_timer_cubit.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
@@ -79,17 +79,59 @@ class UpcomingItemWidget extends StatelessWidget {
                       fontColor: AppColors.purple5A2F,
                     ),
                     Gap(2.h),
-                    BlocBuilder<TimerCubit, TimerState>(
+                    BlocBuilder<MultiTimerCubit, MultiTimerState>(
+                      bloc: MultiTimerCubit.instance,
                       builder: (context, timerState) {
-                        if (timerState.isRunning) {
-                          final duration = Duration(seconds: timerState.secondsRemaining);
+                        final contestId = data.id ?? '';
+                        final remainingSeconds = timerState.getRemainingSeconds(contestId);
+
+                        if (timerState.isTimerRunning(contestId) && remainingSeconds > 0) {
+                          final duration = Duration(seconds: remainingSeconds);
+                          final days = duration.inDays;
                           final hours = duration.inHours.remainder(24).toString().padLeft(2, '0');
                           final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
                           final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
 
-                          return Text('Time Left: $hours:$minutes:$seconds');
+                          String timeText;
+                          if (days > 0) {
+                            timeText = '${days}d $hours:$minutes:$seconds';
+                          } else {
+                            timeText = '$hours:$minutes:$seconds';
+                          }
+
+                          return TextView(
+                            text: "Time Left: $timeText",
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w500,
+                            fontColor: AppColors.purple5A2F,
+                          );
                         } else {
-                          return const Text('');
+                          // Fallback to static time display if timer is not running
+                          if (data.contest?.timeLeft != null) {
+                            final timeLeft = data.contest!.timeLeft!;
+                            String timeText = '';
+
+                            if (timeLeft.days != null && timeLeft.days! > 0) {
+                              timeText += '${timeLeft.days}d ';
+                            }
+                            if (timeLeft.hours != null) {
+                              timeText += '${timeLeft.hours.toString().padLeft(2, '0')}:';
+                            }
+                            if (timeLeft.minutes != null) {
+                              timeText += '${timeLeft.minutes.toString().padLeft(2, '0')}:';
+                            }
+                            if (timeLeft.seconds != null) {
+                              timeText += timeLeft.seconds.toString().padLeft(2, '0');
+                            }
+
+                            return TextView(
+                              text: "Time Left: $timeText",
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w500,
+                              fontColor: AppColors.purple5A2F,
+                            );
+                          }
+                          return const SizedBox.shrink();
                         }
                       },
                     ),
@@ -139,9 +181,11 @@ class UpcomingItemWidget extends StatelessWidget {
             child: Column(
               children: [
                 // Progress Bar
-                ProgressBarWidget(value: 1000, total: 5000),
+                ProgressBarWidget(
+                  value: data.contest?.spotsFilled?.toDouble() ?? 0.0,
+                  total: data.contest?.totalSpots?.toDouble() ?? 0.0,
+                ),
                 Gap(8.h),
-
                 // Team and Spots
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

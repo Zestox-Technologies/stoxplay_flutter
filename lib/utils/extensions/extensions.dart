@@ -168,3 +168,9 @@ extension StockPositionExtension on StockPosition {
     }
   }
 }
+extension ResponsiveContext on BuildContext {
+  bool get isTablet => MediaQuery.of(this).size.width >= 600;
+  bool get isFoldable =>
+      MediaQuery.of(this).size.width > 400 && MediaQuery.of(this).size.height < 900;
+  bool get isPhone => !isTablet && !isFoldable;
+}

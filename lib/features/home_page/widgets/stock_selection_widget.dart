@@ -73,8 +73,29 @@ class StockSelectionWidget extends StatelessWidget {
                     ),
                   ),
                   child: Container(
-                    padding: EdgeInsets.fromLTRB(10.w, 5.h, 10.w, 3.h),
-                    margin: EdgeInsets.all(3.h),
+                    padding: EdgeInsets.fromLTRB(
+                      10.w,
+                      MediaQuery.of(context).size.width >= 600
+                          ? 5
+                              .h // Tablet
+                          : (MediaQuery.of(context).size.width > 400 && MediaQuery.of(context).size.height < 900)
+
+                          ? 10
+                              .h // Foldable / medium screens
+                          : 5.h, // Normal phones
+                      10.w,
+                      3.h,
+                    ),
+                    margin: EdgeInsets.all(
+                      MediaQuery.of(context).size.width >= 600
+                          ? 3
+                              .h // Tablet
+                          : (MediaQuery.of(context).size.width > 400 && MediaQuery.of(context).size.height < 900)
+
+                          ? 10
+                              .h // Foldable / mid-size
+                          : 3.h, // Normal phone
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(color: AppColors.black.withOpacity(0.1)),

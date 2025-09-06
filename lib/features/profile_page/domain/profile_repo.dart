@@ -1,5 +1,5 @@
-import 'package:stoxplay/features/profile_page/data/models/profile_model.dart';
 import 'package:stoxplay/features/profile_page/data/models/playing_history_model.dart';
+import 'package:stoxplay/features/profile_page/data/models/profile_model.dart';
 import 'package:stoxplay/features/profile_page/data/profile_rds.dart';
 
 abstract class ProfileRepo {

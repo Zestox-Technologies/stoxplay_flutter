@@ -95,3 +95,18 @@ StockPosition getPositionByRole(String role) {
   }
   return StockPosition.none;
 }
+class Device {
+  static bool isTablet(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.width >= 600;
+  }
+
+  static bool isFoldable(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.width > 400 && size.height < 900;
+  }
+
+  static bool isPhone(BuildContext context) {
+    return !isTablet(context) && !isFoldable(context);
+  }
+}
