@@ -150,7 +150,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 32.w),
                         child: Text(
-                          _errorMessage!,
+                          _errorMessage ?? 'error',
                           style: TextStyle(fontSize: 12.sp, color: AppColors.black9999, fontFamily: 'Sofia Sans'),
                           textAlign: TextAlign.center,
                         ),

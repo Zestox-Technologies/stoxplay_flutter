@@ -1,16 +1,35 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
+}
 
+// Load keystore properties (if present)
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+} else {
+    println("⚠️  key.properties not found at ${keystorePropertiesFile.path}. Release signing will fail unless you add it.")
 }
 
 android {
-    namespace = "com.example.stoxplay"
+    namespace = "com.zestox.stoxbook"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
+
+    defaultConfig {
+        applicationId = "com.zestox.stoxbook"
+        minSdk = 23
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -21,43 +40,50 @@ android {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
-    defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.stoxplay"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+    signingConfigs {
+        // Kotlin DSL: use create("release") and assign with =
+        create("release") {
+            // Only assign if key.properties exists; otherwise leave nulls
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"] as String?
+                keyPassword = keystoreProperties["keyPassword"] as String?
+                storePassword = keystoreProperties["storePassword"] as String?
+                val storePath = keystoreProperties["storeFile"] as String?
+                storeFile = storePath?.let { file(storePath) }
+            }
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Kotlin DSL: assign signingConfig via getByName
+            signingConfig = signingConfigs.getByName("release")
+
+            // Kotlin DSL uses boolean properties with isXxx
+            isMinifyEnabled = true
+            isShrinkResources = true
+
+            // Use the optimized default ProGuard file with AGP 8+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
+        // (Optional) debug config if you need it:
+        // debug {
+        //     signingConfig = signingConfigs.getByName("debug")
+        // }
     }
-//    signingConfigs {
-//        debug {
-//            storeFile file("debug.keystore")
-//            storePassword "android"
-//            keyAlias "androiddebugkey"
-//            keyPassword "android"
-//        }
-//    }
 }
 
 flutter {
     source = "../.."
 }
+
 dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:34.0.0"))
-    // TODO: Add the dependencies for Firebase products you want to use
-    // When using the BoM, don't specify versions in Firebase dependencies
+    // Firebase Analytics (version comes from the BoM)
     implementation("com.google.firebase:firebase-analytics")
-    // Add the dependencies for any other desired Firebase products
-    // https://firebase.google.com/docs/android/setup#available-libraries
+    // Add more Firebase libs as needed, without versions.
 }

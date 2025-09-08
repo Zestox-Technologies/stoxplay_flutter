@@ -7,6 +7,7 @@ import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dar
 import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
+import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
@@ -21,6 +22,7 @@ class HomeCubit extends Cubit<HomeState> {
   GetAdsUseCase getAdsUseCase;
   ContestLeaderboardUseCase contestLeaderboardUseCase;
   ContestDetailsUseCase contestDetailsUseCase;
+  GetMostPickedStockUseCase getMostPickedStockUseCase;
 
   HomeCubit({
     required this.sectorListUseCase,
@@ -30,14 +32,15 @@ class HomeCubit extends Cubit<HomeState> {
     required this.getAdsUseCase,
     required this.contestLeaderboardUseCase,
     required this.contestDetailsUseCase,
+    required this.getMostPickedStockUseCase,
   }) : super(HomeState());
 
   void getSectorList() async {
-    emit(state.copyWith(apiStatus: ApiStatus.loading));
+    emit(state.copyWith(sectorListApiStatus: ApiStatus.loading));
     final sectorList = await sectorListUseCase.call('');
     sectorList.fold(
-      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
-      (r) => emit(state.copyWith(sectorModel: r, apiStatus:  ApiStatus.success)),
+      (l) => emit(state.copyWith(sectorListApiStatus: ApiStatus.failed)),
+      (r) => emit(state.copyWith(sectorModel: r, sectorListApiStatus: ApiStatus.success)),
     );
   }
 
@@ -92,6 +95,15 @@ class HomeCubit extends Cubit<HomeState> {
     contestDetails.fold(
       (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
       (r) => emit(state.copyWith(contestLeaderboardModel: r, apiStatus: ApiStatus.success)),
+    );
+  }
+
+  Future<void> getMostPickedStock() async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading));
+    final mostPickedStock = await getMostPickedStockUseCase.call('');
+    mostPickedStock.fold(
+      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
+      (r) => emit(state.copyWith(mostPickedStock: r, apiStatus: ApiStatus.success)),
     );
   }
 }

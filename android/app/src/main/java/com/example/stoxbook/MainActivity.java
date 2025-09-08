@@ -1,4 +1,4 @@
-package com.example.stoxplay;
+package com.zestox.stoxbook;
 
 import io.flutter.embedding.android.FlutterActivity;
 

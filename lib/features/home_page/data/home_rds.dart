@@ -10,6 +10,7 @@ import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
+import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/models/QueryParams.dart';
@@ -41,6 +42,8 @@ abstract class HomeRds {
   Future<ContestDetailModel> contestDetails(String params);
 
   Future<ContestLeaderboardModel> contestLeaderboard(String params);
+
+  Future<List<MostPickedStock>> getMostPickedStocks();
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -221,6 +224,20 @@ class HomeRdsImpl extends HomeRds {
       final response = await client.get(ApiUrls.clientContestLeaderboard(params));
       final data = response.data['data'];
       return ContestLeaderboardModel.fromJson(data);
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<MostPickedStock>> getMostPickedStocks() async {
+    try {
+      final response = await client.get(ApiUrls.mostPickedStocks);
+      final List<dynamic> jsonList = response.data['data'];
+      final mostPickedList = jsonList.map((json) => MostPickedStock.fromJson(json)).toList();
+      return mostPickedList;
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

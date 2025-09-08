@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/features/profile_page/data/models/playing_history_model.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/widgets/common_back_button.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -125,15 +126,7 @@ class _PlayingHistoryPageState extends State<PlayingHistoryPage> {
                             }
 
                             final item = items[index];
-                            return Padding(
-                              padding: EdgeInsets.only(bottom: 12.h),
-                              child: _GameHistoryCard(
-                                title: item.contest?.name ?? item.name ?? '-',
-                                date: '',
-                                rank: item.rank ?? 0,
-                                score: (item.points ?? 0).toStringAsFixed(2),
-                              ),
-                            );
+                            return Padding(padding: EdgeInsets.only(bottom: 12.h), child: _GameHistoryCard(data: item));
                           },
                         ),
                       );
@@ -150,12 +143,9 @@ class _PlayingHistoryPageState extends State<PlayingHistoryPage> {
 }
 
 class _GameHistoryCard extends StatelessWidget {
-  final String title;
-  final String date;
-  final int rank;
-  final String score;
+  final Datum data;
 
-  const _GameHistoryCard({required this.title, required this.date, required this.rank, required this.score});
+  const _GameHistoryCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -172,23 +162,36 @@ class _GameHistoryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextView(text: title, fontSize: 16.sp, fontWeight: FontWeight.w700, fontColor: AppColors.purple5A2F),
+                TextView(
+                  text: data.contest?.name ?? '',
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  fontColor: AppColors.purple5A2F,
+                ),
                 Gap(4.h),
-                TextView(text: date.isNotEmpty ? "Date: $date" : '', fontSize: 12.sp, fontColor: AppColors.black9999),
+                TextView(
+                  text: 'Points ${data.points?.toStringAsFixed(2) ?? 0.0}',
+                  fontSize: 12.sp,
+                  fontColor: AppColors.blue7E,
+                ),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              TextView(text: "Rank: #$rank", fontSize: 14.sp, fontWeight: FontWeight.w600),
+              TextView(text: "Rank: #${data.rank ?? 0}", fontSize: 14.sp, fontWeight: FontWeight.w600),
               Gap(4.h),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(AppAssets.stoxplayCoin, height: 16.h, width: 16.w),
                   Gap(4.w),
-                  TextView(text: "$score", fontSize: 14.sp, fontWeight: FontWeight.w600),
+                  TextView(
+                    text: "${data.prize?.toStringAsFixed(2) ?? 0}",
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ],
               ),
             ],

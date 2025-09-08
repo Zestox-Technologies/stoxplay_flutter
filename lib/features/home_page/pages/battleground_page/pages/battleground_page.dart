@@ -274,13 +274,13 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     TextView(
-                                      text: "Points - ${data?.totalPoints}",
+                                      text: "Points - ${data?.totalPoints ?? 'NA'}",
                                       fontSize: 15.sp,
                                       fontWeight: FontWeight.bold,
                                       fontColor: AppColors.white,
                                     ),
                                     TextView(
-                                      text: "Rank - ${data?.rank}",
+                                      text: "Rank - ${data?.rank ?? 'NA'}",
                                       fontSize: 15.sp,
                                       fontWeight: FontWeight.bold,
                                       fontColor: AppColors.white,

@@ -9,6 +9,7 @@ import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
+import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
@@ -37,6 +38,8 @@ abstract class HomeRepo {
   Future<Either<AppError, ContestDetailModel>> clientContestDetails(String params);
 
   Future<Either<AppError, ContestLeaderboardModel>> clientContestLeaderboard(String params);
+
+  Future<Either<AppError, List<MostPickedStock>>> getMostPickedStock();
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -158,6 +161,16 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<AppError, ContestLeaderboardModel>> clientContestLeaderboard(String params) async {
     try {
       final result = await homeRds.contestLeaderboard(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, List<MostPickedStock>>> getMostPickedStock() async {
+    try {
+      final result = await homeRds.getMostPickedStocks();
       return Right(result);
     } catch (e) {
       return handleException(e);

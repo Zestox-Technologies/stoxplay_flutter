@@ -70,17 +70,12 @@ class ContestWidget extends StatelessWidget {
                   lineBarsData: [
                     LineChartBarData(
                       spots: [
-                        FlSpot(0, 1),
-                        FlSpot(1, 1.1),
-                        FlSpot(2, 1.4),
-                        FlSpot(3, 1.6),
-                        FlSpot(4, 1.7),
-                        FlSpot(5, 2),
+                        for (int i = 0; i < data.joinCountDistribution!.length; i++)
+                          FlSpot(i.toDouble(), data.joinCountDistribution![i].toDouble()),
                       ],
                       isCurved: true,
                       color: Colors.green,
                       dotData: FlDotData(show: false),
-
                       belowBarData: BarAreaData(
                         show: true,
                         gradient: LinearGradient(

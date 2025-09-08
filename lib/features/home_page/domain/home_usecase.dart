@@ -9,6 +9,7 @@ import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
+import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
@@ -143,5 +144,16 @@ class ContestLeaderboardUseCase extends UseCase<ContestLeaderboardModel, String>
   @override
   Future<Either<AppError, ContestLeaderboardModel>> call(String params) async {
     return await repo.clientContestLeaderboard(params);
+  }
+}
+
+class GetMostPickedStockUseCase extends UseCase<List<MostPickedStock>, String> {
+  final HomeRepo repo;
+
+  GetMostPickedStockUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, List<MostPickedStock>>> call(String params) async {
+    return await repo.getMostPickedStock();
   }
 }

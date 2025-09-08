@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
                         getAdsUseCase: sl(),
                         contestLeaderboardUseCase: sl(),
                         contestDetailsUseCase: sl(),
+                        getMostPickedStockUseCase: sl(),
                       ),
                 ),
               ],

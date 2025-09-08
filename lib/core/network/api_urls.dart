@@ -38,4 +38,5 @@ class ApiUrls {
 
   static clientTeams(String teamId) => '/client/teams/$teamId';
   static const String getPlayingHistory = 'client/history';
+  static const String mostPickedStocks = '/market/stats/most-picked';
 }

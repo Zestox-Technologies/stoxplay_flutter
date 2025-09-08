@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/learn_list_shimmer.dart';
+import 'package:stoxplay/features/home_page/widgets/most_picked_stock_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/news_list.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
@@ -64,6 +67,7 @@ class _HomePageState extends State<HomePage> {
     profileCubit.fetchProfile();
     homeCubit.getSectorList();
     homeCubit.getAdsList();
+    homeCubit.getMostPickedStock();
   }
 
   void showWithdrawDialog() async {
@@ -220,16 +224,16 @@ class _HomePageState extends State<HomePage> {
                               BlocBuilder<HomeCubit, HomeState>(
                                 bloc: homeCubit,
                                 builder: (context, state) {
-                                  final isLoading = state.apiStatus.isLoading;
+                                  final isLoading = state.sectorListApiStatus.isLoading;
                                   final sectorList = state.sectorModel?.sectors ?? [];
 
                                   if (isLoading) {
                                     return const HomePageShimmer();
                                   }
 
-                                  if (sectorList.isEmpty) {
-                                    return Column(children: [Gap(100.h), Text("No contest found")]);
-                                  }
+                                  // if (sectorList.isEmpty) {
+                                  //   return Column(children: [Gap(100.h), Text("No contest found")]);
+                                  // }
 
                                   return Column(
                                     children: [
@@ -264,64 +268,25 @@ class _HomePageState extends State<HomePage> {
                                         fontSize: 16.sp,
                                       ),
                                       Gap(10.h),
-                                      Container(
-                                        padding: EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                          borderRadius: BorderRadius.circular(12.r),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppColors.green38EE.withOpacity(0.5),
-                                              offset: const Offset(0, 0),
-                                              blurRadius: 1,
-                                              spreadRadius: 0.5,
-                                            ),
-                                          ],
-                                          border: Border.all(color: AppColors.green9FFF, width: 0.5),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Container(
-                                                  height: 35.h,
-                                                  width: 35.w,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(color: AppColors.black6767, width: 0.5),
-                                                  ),
-                                                  child: Image.asset(AppAssets.appIcon),
-                                                ),
-                                                SizedBox(width: 15.w),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  children: [
-                                                    TextView(
-                                                      text: 'HDFC BANK',
-                                                      fontWeight: FontWeight.w500,
-                                                      fontSize: 16.sp,
-                                                    ),
-                                                    TextView(
-                                                      text: '₹1340 (-1.05%) ',
-                                                      fontWeight: FontWeight.w500,
-                                                      fontSize: 12.sp,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            TextView(
-                                              text: 'Bank Wars',
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 16.sp,
-                                              fontColor: AppColors.primaryPurple,
-                                            ),
-                                          ],
-                                        ),
+                                      BlocBuilder<HomeCubit, HomeState>(
+                                        bloc: homeCubit,
+                                        builder: (context, state) {
+                                          if (state.mostPickedStockApiStatus.isLoading) {
+                                            return shimmerStockCard();
+                                          }
+                                          return ListView.separated(
+                                            shrinkWrap: true,
+                                            separatorBuilder: (context, index) => Gap(10.h),
+                                            physics: NeverScrollableScrollPhysics(),
+                                            itemCount: state.mostPickedStock?.length ?? 0,
+                                            itemBuilder: (context, index) {
+                                              final stock = state.mostPickedStock?[index];
+                                              return MostPickedStockWidget(data: stock ?? MostPickedStock());
+                                            },
+                                          );
+                                        },
                                       ),
-                                      Gap(100.h),
+                                      Gap(50.h),
                                     ],
                                   );
                                 },
@@ -344,6 +309,56 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget shimmerStockCard() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.green38EE.withOpacity(0.2),
+              offset: const Offset(0, 0),
+              blurRadius: 1,
+              spreadRadius: 0.5,
+            ),
+          ],
+          border: Border.all(color: AppColors.green9FFF, width: 0.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                // Circle shimmer
+                Container(
+                  height: 35.h,
+                  width: 35.w,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade400),
+                ),
+                SizedBox(width: 15.w),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(width: 100.w, height: 16.h, color: Colors.grey.shade400),
+                    SizedBox(height: 6.h),
+                    Container(width: 60.w, height: 12.h, color: Colors.grey.shade400),
+                  ],
+                ),
+              ],
+            ),
+            // Right side shimmer text
+            Container(width: 80.w, height: 16.h, color: Colors.grey.shade400),
+          ],
+        ),
       ),
     );
   }

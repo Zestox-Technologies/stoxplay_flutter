@@ -54,7 +54,7 @@ class ScoreUpdatePayload {
   final String userTeamId;
   final String contestId;
   final String contestName;
-  final int totalPoints;
+  final num totalPoints;
   final int rank;
   final int entryFee;
   final bool isLive;
