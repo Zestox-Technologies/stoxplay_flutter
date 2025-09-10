@@ -21,4 +21,6 @@ class AppRoutes {
   static const String personalInfoPage = '/personalInfoPage';
   static const String playingHistoryPage = '/playingHistoryPage';
   static const String completedDetailsScreen = '/completedDetailsScreen';
+  static const String howToPlayWebView = '/howToPlayWebView';
+  static const String privacyPolicyScreen = '/privacyPolicyScreen';
 }

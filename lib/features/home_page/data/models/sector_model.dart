@@ -18,6 +18,7 @@ class SectorModel {
   final DateTime? updatedAt;
   final int? maxWin;
   final List<int>? joinCountDistribution;
+  final int? totalJoined;
 
   SectorModel({
     this.id,
@@ -29,6 +30,7 @@ class SectorModel {
     this.updatedAt,
     this.maxWin,
     this.joinCountDistribution,
+    this.totalJoined,
   });
 
   factory SectorModel.fromJson(Map<String, dynamic> json) => SectorModel(
@@ -40,6 +42,7 @@ class SectorModel {
     createdAt: json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
     updatedAt: json["updatedAt"] == null ? null : DateTime.parse(json["updatedAt"]),
     maxWin: json["maxWin"],
+    totalJoined: json["totalJoined"],
     joinCountDistribution: List<int>.from(json["joinCountDistribution"].map((x) => x)),
   );
 
@@ -52,6 +55,7 @@ class SectorModel {
     "createdAt": createdAt?.toIso8601String(),
     "updatedAt": updatedAt?.toIso8601String(),
     "maxWin": maxWin,
+    "totalJoined": totalJoined,
     "joinCountDistribution": List<dynamic>.from(joinCountDistribution!.map((x) => x)),
   };
 }

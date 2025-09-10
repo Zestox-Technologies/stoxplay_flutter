@@ -94,11 +94,11 @@ class ContestWidget extends StatelessWidget {
             ),
             Gap(20.h),
             TextView(text: '💰Win ${formatMaxWinIntl(data.maxWin ?? 0)}', fontSize: 12.sp, fontWeight: FontWeight.w600),
-            TextView(text: '👥${data.maxWin.toString()} joined', fontSize: 12.sp, fontWeight: FontWeight.w600),
+            TextView(text: '👥${data.totalJoined ?? 0} joined', fontSize: 12.sp, fontWeight: FontWeight.w600),
             Spacer(),
             AppButton(
               key: _buttonKey,
-              borderRadius: 999.r,
+              borderRadius: 100.r,
               fontSize: 14.sp,
               height: 30.h,
               text: Strings.join,

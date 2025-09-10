@@ -191,10 +191,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     _ProfileListTile(icon: "🔔", title: "Notification", onTap: () {}),
                     _SectionHeader(title: "Support & Help"),
-                    _ProfileListTile(icon: "🎮", title: "How to Play", onTap: () {}),
+                    _ProfileListTile(
+                      icon: "🎮",
+                      title: "How to Play",
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.howToPlayWebView);
+                      },
+                    ),
                     _ProfileListTile(icon: "❓", title: "Help Center", onTap: () {}),
                     _SectionHeader(title: "Legal"),
-                    _ProfileListTile(icon: "👤", title: "T&C of Technologies Pvt Ltd", onTap: () {}),
+                    _ProfileListTile(
+                      icon: "👤",
+                      title: "Privacy Policy",
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.privacyPolicyScreen);
+                      },
+                    ),
                     _ProfileListTile(
                       icon: "⏻",
                       title: "Logout",

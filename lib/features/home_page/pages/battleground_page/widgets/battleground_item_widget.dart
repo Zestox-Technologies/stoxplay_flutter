@@ -141,8 +141,8 @@ class BattlegroundItemWidget extends StatelessWidget {
                 Gap(5.h),
                 TextView(text: data.currentPrice.toString(), fontColor: AppColors.black, fontSize: 10.sp),
                 TextView(
-                  text: "${data.netChange.toString()}%",
-                  fontColor: (data.netChange ?? 0) < 0 ? AppColors.red : AppColors.green,
+                  text: "${data.percentageChange ?? ''}%",
+                  fontColor: (data.percentageChange ?? 0) < 0 ? AppColors.red : AppColors.green,
                   fontSize: 8.sp,
                 ),
               ],

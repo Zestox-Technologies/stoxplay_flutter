@@ -146,6 +146,7 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                   builder: (context, data, _) {
                     final fallbackStock = LiveStock(
                       stockId: '0',
+                      percentageChange: 0,
                       symbol: '',
                       currentPrice: 0,
                       netChange: 0,

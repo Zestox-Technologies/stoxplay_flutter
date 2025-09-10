@@ -1,9 +1,10 @@
 class LiveStock {
   final String stockId;
   final String symbol;
-  final double points;
-  final double currentPrice;
-  final double netChange;
+  final num points;
+  final num currentPrice;
+  final num netChange;
+  final num? percentageChange;
   final bool isPredictionCorrect;
   final String role;
   final String logoUrl;
@@ -19,6 +20,7 @@ class LiveStock {
     required this.role,
     required this.logoUrl,
     required this.prediction,
+    required this.percentageChange,
   });
 
   factory LiveStock.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class LiveStock {
       role: json['role'],
       logoUrl: json['logoUrl'],
       prediction: json['prediction'],
+      percentageChange: json['percentageChange'].toDouble(),
     );
   }
 
@@ -46,6 +49,7 @@ class LiveStock {
       'role': role,
       'logoUrl': logoUrl,
       'prediction': prediction,
+      'percentageChange': percentageChange,
     };
   }
 }
