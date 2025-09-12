@@ -64,7 +64,10 @@ class _HomePageState extends State<HomePage> {
         );
       }
     });
-    profileCubit.fetchProfile();
+    // Load cached profile for app bar display (fast loading)
+    profileCubit.loadCachedProfile();
+    
+    // Load home data with smart caching
     homeCubit.getSectorList();
     homeCubit.getAdsList();
     homeCubit.getMostPickedStock();
@@ -77,6 +80,18 @@ class _HomePageState extends State<HomePage> {
         return Dialog(child: WithdrawDialog());
       },
     );
+  }
+
+  Future<void> _refreshHomeData() async {
+    print('🔄 Home page: Starting refresh...');
+    // Force refresh all home data
+    await Future.wait([
+      homeCubit.getSectorList(forceRefresh: true),
+      homeCubit.getAdsList(forceRefresh: true),
+      homeCubit.getMostPickedStock(forceRefresh: true),
+      profileCubit.fetchProfile(forceRefresh: true),
+    ]);
+    print('✅ Home page: Refresh completed');
   }
 
   @override
@@ -118,8 +133,11 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: CustomScrollView(
-        slivers: [
+      body: RefreshIndicator(
+        color: AppColors.primaryPurple,
+        onRefresh: _refreshHomeData,
+        child: CustomScrollView(
+          slivers: [
           SliverToBoxAdapter(
             child: Column(
               children: [
@@ -263,7 +281,7 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Gap(20.h),
                                       TextView(
-                                        text: 'MOST PICKED STOCKS',
+                                        text: 'TOP 5 MOST PICKED STOCKS',
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16.sp,
                                       ),
@@ -309,6 +327,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

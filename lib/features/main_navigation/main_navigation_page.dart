@@ -44,10 +44,7 @@ class MainNavigationPage extends StatelessWidget {
         body: ValueListenableBuilder(
           valueListenable: NavigationState().currentIndex,
           builder: (context, selectedIndex, _) {
-            return IndexedStack(
-              index: selectedIndex,
-              children: [HomePage(), StatsPage(),ProfilePage()],
-            );
+            return IndexedStack(index: selectedIndex, children: [HomePage(), StatsPage(), ProfilePage()]);
           },
         ),
         bottomNavigationBar: const CustomBottomNavbar(),

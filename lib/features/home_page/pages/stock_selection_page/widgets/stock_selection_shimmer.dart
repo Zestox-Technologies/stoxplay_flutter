@@ -50,17 +50,6 @@ class StockSelectionShimmer extends StatelessWidget {
       child: Column(
         children: [
           // Back button shimmer
-          Padding(
-            padding: EdgeInsets.only(left: 10.w),
-            child: Container(
-              width: 24.w,
-              height: 24.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-            ),
-          ),
           Gap(10.h),
           // Title shimmer
           Container(

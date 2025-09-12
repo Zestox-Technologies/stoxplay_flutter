@@ -29,7 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     profileCubit = BlocProvider.of<ProfileCubit>(context);
-    profileCubit.fetchProfile(); // Fetch profile when page loads
+    // Use smart loading - fetch only if not already loaded
+    profileCubit.fetchProfile();
     super.initState();
   }
 

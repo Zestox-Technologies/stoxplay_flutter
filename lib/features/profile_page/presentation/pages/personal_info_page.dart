@@ -67,7 +67,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                           decoration: BoxDecoration(
                             border: Border.all(
                               color:
-                                  (state.profileModel?.profilePictureUrl != '')
+                                  (state.profileModel?.profilePictureUrl != null && 
+                                   state.profileModel!.profilePictureUrl!.isNotEmpty) ||
+                                  (state.profileUrl.isNotEmpty)
                                       ? AppColors.primaryPurple
                                       : AppColors.blackD7D7,
                             ),
@@ -80,7 +82,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                               shape: BoxShape.circle,
                             ),
                             child: buildProfileAvatar(
-                              profilePictureUrl: state.profileModel?.profilePictureUrl,
+                              profilePictureUrl: state.profileUrl.isNotEmpty 
+                                  ? state.profileUrl 
+                                  : state.profileModel?.profilePictureUrl,
                               pickedImage: profileImage.value,
                             ),
                           ),

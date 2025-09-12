@@ -35,15 +35,42 @@ class ProfileCubit extends Cubit<ProfileState> {
     return super.close();
   }
 
-  Future<void> fetchProfile() async {
+  Future<void> fetchProfile({bool forceRefresh = false}) async {
+    // Check if we already have valid cached data
+    if (!forceRefresh && state.profileModel != null) {
+      return; // Profile already loaded, no need to fetch again
+    }
+
+    // Try to load from cache first
+    if (!forceRefresh) {
+      final cachedProfile = StorageService().getCachedData<Map<String, dynamic>>(
+        DBKeys.profileCacheKey,
+        maxAge: const Duration(minutes: 10), // Profile cache valid for 10 minutes
+      );
+      
+      if (cachedProfile != null) {
+        final profile = ProfileModel.fromJson(cachedProfile);
+        _updateControllers(profile);
+        emit(
+          state.copyWith(
+            apiStatus: ApiStatus.success,
+            gender: profile.gender ?? "SELECT",
+            profileModel: profile,
+            profileUrl: profile.profilePictureUrl ?? "",
+            dob: profile.dateOfBirth,
+          ),
+        );
+        return;
+      }
+    }
+
     emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
     try {
       final profile = await getProfileUseCase();
-      // Set controllers
-      firstNameController.text = profile.firstName ?? '';
-      usernameController.text = profile.username ?? '';
-      emailController.text = profile.email ?? '';
-      phoneController.text = profile.phoneNumber ?? '';
+      _updateControllers(profile);
+      
+      // Cache the profile data
+      await StorageService().setCachedData(DBKeys.profileCacheKey, profile.toJson());
       StorageService().write(DBKeys.user, profile.toJson());
 
       emit(
@@ -51,11 +78,40 @@ class ProfileCubit extends Cubit<ProfileState> {
           apiStatus: ApiStatus.success,
           gender: profile.gender ?? "SELECT",
           profileModel: profile,
+          profileUrl: profile.profilePictureUrl ?? "",
           dob: profile.dateOfBirth,
         ),
       );
     } catch (e) {
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
+    }
+  }
+
+  void _updateControllers(ProfileModel profile) {
+    firstNameController.text = profile.firstName ?? '';
+    usernameController.text = profile.username ?? '';
+    emailController.text = profile.email ?? '';
+    phoneController.text = profile.phoneNumber ?? '';
+  }
+
+  // Load profile from cache only (for app bar display)
+  void loadCachedProfile() {
+    final cachedProfile = StorageService().getCachedData<Map<String, dynamic>>(
+      DBKeys.profileCacheKey,
+      maxAge: const Duration(hours: 1), // More lenient for cached profile display
+    );
+    
+    if (cachedProfile != null) {
+      final profile = ProfileModel.fromJson(cachedProfile);
+      emit(
+        state.copyWith(
+          apiStatus: ApiStatus.success,
+          gender: profile.gender ?? "SELECT",
+          profileModel: profile,
+          profileUrl: profile.profilePictureUrl ?? "",
+          dob: profile.dateOfBirth,
+        ),
+      );
     }
   }
 
@@ -70,16 +126,42 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> updateProfile() async {
     emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
     try {
+      // Use the profile picture URL from state.profileUrl (if user uploaded new image) 
+      // or fall back to existing profile picture URL
+      final profilePictureUrl = state.profileUrl.isNotEmpty 
+          ? state.profileUrl 
+          : state.profileModel?.profilePictureUrl ?? '';
+      
       final updatedProfile = {
         "firstName": firstNameController.text,
         "username": usernameController.text,
-        "profilePictureUrl": state.profileUrl,
+        "profilePictureUrl": profilePictureUrl,
         "dateOfBirth": state.dob?.toUtc().toIso8601String(),
         "email": emailController.text,
         "gender": state.gender ?? 'SELECT',
       };
+      
+      print('📝 Profile Update Data: $updatedProfile');
+      
       final profile = await updateProfileUseCase(updatedProfile);
-      emit(state.copyWith(apiStatus: ApiStatus.success));
+      
+      // Update the controllers with the updated profile data
+      _updateControllers(profile);
+      
+      // Cache the updated profile data
+      await StorageService().setCachedData(DBKeys.profileCacheKey, profile.toJson());
+      StorageService().write(DBKeys.user, profile.toJson());
+      
+      // Update the state with the new profile data
+      emit(
+        state.copyWith(
+          apiStatus: ApiStatus.success,
+          gender: profile.gender ?? "SELECT",
+          profileModel: profile,
+          profileUrl: profile.profilePictureUrl ?? "",
+          dob: profile.dateOfBirth,
+        ),
+      );
     } catch (e) {
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }
@@ -88,9 +170,12 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> uploadProfilePicture(String imagePath) async {
     emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
     try {
-      final profile = await fileUploadUseCase.call({"type": "profiles", "file": imagePath});
-      emit(state.copyWith(apiStatus: ApiStatus.success, profileUrl: profile));
+      print('📸 Uploading profile picture: $imagePath');
+      final profilePictureUrl = await fileUploadUseCase.call({"type": "profiles", "file": imagePath});
+      print('✅ Profile picture uploaded successfully: $profilePictureUrl');
+      emit(state.copyWith(apiStatus: ApiStatus.success, profileUrl: profilePictureUrl));
     } catch (e) {
+      print('❌ Profile picture upload failed: $e');
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }
   }

@@ -255,22 +255,27 @@ class UpcomingItemWidget extends StatelessWidget {
                       children: [
                         // View Button
                         GestureDetector(
+                          behavior: HitTestBehavior.translucent, // 👈 expands tap area to full bounds
                           onTap: () {
                             Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: data.id ?? '');
                           },
-                          child: Row(
-                            children: [
-                              Icon(Icons.visibility_outlined, size: 16.sp, color: AppColors.black6666),
-                              Gap(4.w),
-                              TextView(
-                                text: "View",
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w500,
-                                fontColor: AppColors.black6666,
-                              ),
-                            ],
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h), // 👈 add padding
+                            child: Row(
+                              children: [
+                                Icon(Icons.visibility_outlined, size: 16.sp, color: AppColors.black6666),
+                                Gap(4.w),
+                                TextView(
+                                  text: "View",
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w500,
+                                  fontColor: AppColors.black6666,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+
                         Gap(10.w),
 
                         // Edit Button

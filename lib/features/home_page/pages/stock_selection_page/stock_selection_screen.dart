@@ -39,17 +39,18 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final map = ModalRoute.of(context)!.settings.arguments as Map<String?, String?>;
       contestId = map['contestId'];
-      cubit.getStockList(contestId!);
-
       price = map['price'];
-      Future.delayed(Duration(seconds: 1), () {
-        if (map['teamId'] != null) {
-          cubit.clientTeams(teamId: map['teamId'] ?? '', isPostApi: false);
+      teamId = map['teamId'];
+
+      if (contestId != null && contestId!.isNotEmpty) {
+        await cubit.getStockList(contestId!);
+        if (teamId != null && teamId!.isNotEmpty) {
+          await cubit.clientTeams(teamId: teamId!, isPostApi: false);
         }
-      });
+      }
     });
   }
 
@@ -379,9 +380,9 @@ class _StockSelectionScreenState extends State<StockSelectionScreen> {
                                                 MediaQuery.of(context).size.width >= 600
                                                     ? 15
                                                         .h // Tablet
-                                                                         : (MediaQuery.of(context).size.width > 400 && MediaQuery.of(context).size.height < 900)
-
-                              ? 25
+                                                    : (MediaQuery.of(context).size.width > 400 &&
+                                                        MediaQuery.of(context).size.height < 900)
+                                                    ? 25
                                                         .h // Foldable / medium screens
                                                     : 15.h,
                                             // Normal phones

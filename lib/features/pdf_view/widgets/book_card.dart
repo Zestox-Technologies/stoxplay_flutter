@@ -1,8 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class BookCard extends StatelessWidget {
   final LearningModel book;

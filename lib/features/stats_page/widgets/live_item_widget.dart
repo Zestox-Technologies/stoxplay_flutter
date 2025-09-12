@@ -169,35 +169,6 @@ class LiveItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem({required String icon, required String text, required double iconSize}) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(icon, height: iconSize, width: iconSize),
-        Gap(4.w),
-        TextView(text: text, fontSize: 12.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
-      ],
-    );
-  }
-
-  Widget _buildRupeeItem() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 16.w,
-          height: 16.h,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.purple5A2F),
-          child: Center(
-            child: TextView(text: "₹", fontSize: 8.sp, fontWeight: FontWeight.w700, fontColor: AppColors.white),
-          ),
-        ),
-        Gap(4.w),
-        TextView(text: "Flexible", fontSize: 12.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
-      ],
-    );
-  }
-
   Widget _buildViewAction(BuildContext context, StatsDataModel data) {
     return GestureDetector(
       onTap: () {

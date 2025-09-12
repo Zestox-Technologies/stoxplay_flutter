@@ -56,10 +56,16 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
     if (currentIndex == index) return;
     NavigationState().updateIndex(index);
 
-    if (index != 1) {
-      profileCubit.fetchProfile();
+    // Smart loading based on tab selection
+    if (index == 0) {
+      // Home tab - load cached profile for app bar, don't force refresh
+      profileCubit.loadCachedProfile();
     } else if (index == 1) {
+      // Stats tab - load stats with smart caching
       statsCubit.getMyContests();
+    } else if (index == 2) {
+      // Profile tab - fetch fresh profile data only if not already loaded
+      profileCubit.fetchProfile();
     }
   }
 

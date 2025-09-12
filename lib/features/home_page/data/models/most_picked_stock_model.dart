@@ -4,27 +4,49 @@
 
 import 'dart:convert';
 
-List<MostPickedStock> mostPickedStockFromJson(String str) =>
-    List<MostPickedStock>.from(json.decode(str).map((x) => MostPickedStock.fromJson(x)));
+MostPickedStock mostPickedStockFromJson(String str) => MostPickedStock.fromJson(json.decode(str));
 
-String mostPickedStockToJson(List<MostPickedStock> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String mostPickedStockToJson(MostPickedStock data) => json.encode(data.toJson());
 
 class MostPickedStock {
   String? id;
   String? symbol;
   String? name;
   String? logoUrl;
+  String? sectorName;
+  double? currentPrice;
+  double? netChange;
+  double? percentageChange;
   int? selectionCount;
+  int? upPredictionCount;
+  int? downPredictionCount;
 
-  MostPickedStock({this.id, this.symbol, this.name, this.logoUrl, this.selectionCount});
+  MostPickedStock({
+    this.id,
+    this.symbol,
+    this.name,
+    this.logoUrl,
+    this.sectorName,
+    this.currentPrice,
+    this.netChange,
+    this.percentageChange,
+    this.selectionCount,
+    this.upPredictionCount,
+    this.downPredictionCount,
+  });
 
   factory MostPickedStock.fromJson(Map<String, dynamic> json) => MostPickedStock(
     id: json["id"],
     symbol: json["symbol"],
     name: json["name"],
     logoUrl: json["logoUrl"],
+    sectorName: json["sectorName"],
+    currentPrice: json["currentPrice"]?.toDouble(),
+    netChange: json["netChange"]?.toDouble(),
+    percentageChange: json["percentageChange"]?.toDouble(),
     selectionCount: json["selectionCount"],
+    upPredictionCount: json["upPredictionCount"],
+    downPredictionCount: json["downPredictionCount"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -32,6 +54,12 @@ class MostPickedStock {
     "symbol": symbol,
     "name": name,
     "logoUrl": logoUrl,
+    "sectorName": sectorName,
+    "currentPrice": currentPrice,
+    "netChange": netChange,
+    "percentageChange": percentageChange,
     "selectionCount": selectionCount,
+    "upPredictionCount": upPredictionCount,
+    "downPredictionCount": downPredictionCount,
   };
 }

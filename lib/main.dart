@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:stoxplay/core/cache/cache_manager.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/utils/common/widgets/app_component_base.dart';
@@ -16,6 +17,7 @@ void main() async {
 
   await AppComponentBase().init();
   await StorageService().init();
+  await CacheManager().initialize();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: AppColors.white,

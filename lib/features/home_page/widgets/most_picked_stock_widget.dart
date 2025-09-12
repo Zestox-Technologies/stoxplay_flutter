@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
-import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 
 class MostPickedStockWidget extends StatelessWidget {
@@ -20,7 +19,10 @@ class MostPickedStockWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.green38EE.withOpacity(0.5),
+            color:
+                ((data.upPredictionCount?.toInt() ?? 0) > (data.downPredictionCount?.toInt() ?? 0))
+                    ? AppColors.green38EE
+                    : AppColors.red,
             offset: const Offset(0, 0),
             blurRadius: 1,
             spreadRadius: 0.5,
@@ -48,12 +50,21 @@ class MostPickedStockWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextView(text: data.name ?? '', fontWeight: FontWeight.w500, fontSize: 16.sp),
-                  TextView(text: '₹1340 (-1.05%) ', fontWeight: FontWeight.w500, fontSize: 12.sp),
+                  TextView(
+                    text: '₹${data.currentPrice ?? 0} (${data.percentageChange ?? 0}%) ',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12.sp,
+                  ),
                 ],
               ),
             ],
           ),
-          TextView(text: 'Bank Wars', fontWeight: FontWeight.w600, fontSize: 16.sp, fontColor: AppColors.primaryPurple),
+          TextView(
+            text: data.sectorName ?? '',
+            fontWeight: FontWeight.w600,
+            fontSize: 16.sp,
+            fontColor: AppColors.primaryPurple,
+          ),
         ],
       ),
     );

@@ -59,7 +59,6 @@ class SectorModel {
     "joinCountDistribution": List<dynamic>.from(joinCountDistribution!.map((x) => x)),
   };
 }
-
 class SectorListResponse {
   final String nextMatchDate;
   final List<SectorModel> sectors;
@@ -78,4 +77,12 @@ class SectorListResponse {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "data": {
+      "nextMatchDate": nextMatchDate,
+      "data": List<dynamic>.from(sectors.map((x) => x.toJson())),
+    }
+  };
 }
+

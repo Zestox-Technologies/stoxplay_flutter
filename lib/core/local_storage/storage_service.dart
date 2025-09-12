@@ -16,6 +16,49 @@ class StorageService {
     _box = GetStorage();
   }
 
+  // Cache management methods
+  bool _isCacheValid(String cacheKey, {Duration maxAge = const Duration(minutes: 5)}) {
+    final timestampKey = '${cacheKey}_timestamp';
+    final timestamp = _box.read<int>(timestampKey);
+    if (timestamp == null) return false;
+    
+    final cacheTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    return DateTime.now().difference(cacheTime) < maxAge;
+  }
+
+  void _setCacheTimestamp(String cacheKey) {
+    final timestampKey = '${cacheKey}_timestamp';
+    _box.write(timestampKey, DateTime.now().millisecondsSinceEpoch);
+  }
+
+  T? getCachedData<T>(String key, {Duration maxAge = const Duration(minutes: 5)}) {
+    if (_isCacheValid(key, maxAge: maxAge)) {
+      return _box.read<T>(key);
+    }
+    return null;
+  }
+
+  Future<void> setCachedData<T>(String key, T data) async {
+    await _box.write(key, data);
+    _setCacheTimestamp(key);
+  }
+
+  Future<void> invalidateCache(String key) async {
+    await _box.remove(key);
+    await _box.remove('${key}_timestamp');
+  }
+
+  Future<void> clearAllCache() async {
+    final keys = _box.getKeys();
+    for (final key in keys) {
+      if (key.endsWith('_timestamp') || 
+          key.contains('_cache_') ||
+          key == DBKeys.user) {
+        await _box.remove(key);
+      }
+    }
+  }
+
   // ----------- Setters -----------
   Future<void> saveUserToken(String token) async {
     await write(DBKeys.userTokenKey, token);
