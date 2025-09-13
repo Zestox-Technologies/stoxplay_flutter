@@ -45,8 +45,10 @@ class _PlayingHistoryPageState extends State<PlayingHistoryPage> {
     if (_isFetchingMore) return;
     _isFetchingMore = true;
     _page++;
+    print('🔄 Loading page $_page with limit $_limit');
     _profileCubit.getPlayingHistory(page: _page, limit: _limit).whenComplete(() {
       _isFetchingMore = false;
+      print('✅ Page $_page loaded successfully');
     });
   }
 
@@ -103,19 +105,23 @@ class _PlayingHistoryPageState extends State<PlayingHistoryPage> {
 
                       return NotificationListener<ScrollNotification>(
                         onNotification: (scrollInfo) {
-                          if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent * 0.9 &&
-                              !_isFetchingMore &&
-                              !state.apiStatus.isLoading) {
-                            if ((state.playingHistory?.meta?.totalPages ?? 0) >= _page) {
-                              return true;
+                          // Only trigger pagination when scrolling down
+                          if (scrollInfo is ScrollEndNotification) {
+                            if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent * 0.8 &&
+                                !_isFetchingMore &&
+                                !state.apiStatus.isLoading) {
+                              // Check if there are more pages available
+                              final totalPages = state.playingHistory?.meta?.totalPages ?? 0;
+                              if (_page < totalPages) {
+                                _loadMore();
+                              }
                             }
-                            _loadMore();
                           }
                           return false;
                         },
                         child: ListView.builder(
                           padding: EdgeInsets.zero,
-                          itemCount: items.length + (state.apiStatus.isLoading ? 1 : 0),
+                          itemCount: items.length + (_isFetchingMore ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index >= items.length) {
                               // Loader at bottom while fetching more

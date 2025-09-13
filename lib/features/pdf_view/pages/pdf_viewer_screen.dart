@@ -78,17 +78,32 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: AppColors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          widget.title,
-          style: TextStyle(
-            color: AppColors.black,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Sofia Sans',
+        leading: IconButton(icon: Icon(Icons.arrow_back_ios_new, color: AppColors.black), onPressed: () => Navigator.pop(context)),
+        title: Hero(
+          tag: 'book_${widget.index}',
+          flightShuttleBuilder: (context, anim, direction, fromCtx, toCtx) {
+            return Material(color: Colors.transparent, child: direction == HeroFlightDirection.push ? toCtx.widget : fromCtx.widget);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 28.w,
+                width: 28.w,
+                decoration: BoxDecoration(color: AppColors.primaryPurple.withOpacity(0.1), shape: BoxShape.circle),
+                child: Icon(Icons.menu_book_rounded, color: AppColors.primaryPurple, size: 16.w),
+              ),
+              SizedBox(width: 8.w),
+              Flexible(
+                child: Text(
+                  widget.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: AppColors.black, fontSize: 16.sp, fontWeight: FontWeight.w600, fontFamily: 'Sofia Sans'),
+                ),
+              ),
+            ],
           ),
         ),
         centerTitle: true,

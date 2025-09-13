@@ -79,22 +79,22 @@ class _BooksListScreenState extends State<BooksListScreen> {
     return Scaffold(
       backgroundColor: AppColors.whiteF7F9,
       appBar: AppBar(
-        forceMaterialTransparency: true,
-        automaticallyImplyLeading: false, // Disable back button
+        automaticallyImplyLeading: true,
         title: Text(
           'Free Books Library',
           style: TextStyle(
-            color: AppColors.black,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
+            fontSize: 20.sp,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryPurple,
             fontFamily: 'Sofia Sans',
           ),
         ),
         centerTitle: true,
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        actions: [SizedBox(width: kToolbarHeight)],
+        backgroundColor: Colors.white,
+        elevation: 2,
+        shadowColor: AppColors.primaryPurple.withOpacity(0.1),
       ),
+
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
           if (state.apiStatus == ApiStatus.loading) {
@@ -186,6 +186,22 @@ class _BooksListScreenState extends State<BooksListScreen> {
     );
   }
 
+  void _openPdfViewer(LearningModel book, int index) {
+    if (book.pdfUrl != null && book.pdfUrl.toString().isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => PdfViewerScreen(title: book.title ?? 'Book', index: index, pdfUrl: book.pdfUrl.toString()),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('PDF not available for this book'), backgroundColor: AppColors.orangeF6A6));
+    }
+  }
+
   Widget _buildBookGrid(List<LearningModel> books) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -202,26 +218,119 @@ class _BooksListScreenState extends State<BooksListScreen> {
           ),
           itemCount: books.length,
           itemBuilder: (context, index) {
-            return BookCard(book: books[index], onTap: () => _openPdfViewer(books[index], index));
+            final book = books[index];
+            final title = book.title ?? 'Book';
+            final String thumbnailUrl = (book.thumbnailUrl ?? '').toString();
+
+            return GestureDetector(
+              onTap: () => _openPdfViewer(book, index),
+              child: Hero(
+                tag: 'book_$index',
+                flightShuttleBuilder: (context, anim, direction, fromCtx, toCtx) {
+                  return Material(
+                    color: Colors.transparent,
+                    child: direction == HeroFlightDirection.push ? toCtx.widget : fromCtx.widget,
+                  );
+                },
+                child: _BookTile(
+                  title: title,
+                  thumbnailUrl: thumbnailUrl,
+                  accentColor: AppColors.primaryPurple,
+                  index: index,
+                ),
+              ),
+            );
           },
         );
       },
     );
   }
+}
 
-  void _openPdfViewer(LearningModel book, int index) {
-    if (book.pdfUrl != null && book.pdfUrl.toString().isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => PdfViewerScreen(title: book.title ?? 'Book', index: index, pdfUrl: book.pdfUrl.toString()),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('PDF not available for this book'), backgroundColor: AppColors.orangeF6A6));
-    }
+class _BookTile extends StatelessWidget {
+  final String title;
+  final String? thumbnailUrl;
+  final Color accentColor;
+  final int index;
+
+  const _BookTile({super.key, required this.title, this.thumbnailUrl, required this.accentColor, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 6))],
+        border: Border.all(color: AppColors.blackD7D7.withOpacity(0.25), width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(16.r), topRight: Radius.circular(16.r)),
+            child:
+                (thumbnailUrl != null && thumbnailUrl!.isNotEmpty)
+                    ? Image.network(thumbnailUrl!, height: 140.h, width: double.infinity, fit: BoxFit.cover)
+                    : Container(
+                      height: 140.h,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [accentColor.withOpacity(0.15), accentColor.withOpacity(0.05)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: Container(
+                          height: 56.w,
+                          width: 56.w,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [BoxShadow(color: accentColor.withOpacity(0.25), blurRadius: 10)],
+                            border: Border.all(color: accentColor.withOpacity(0.3), width: 1),
+                          ),
+                          child: Icon(Icons.menu_book_rounded, color: accentColor, size: 28.w),
+                        ),
+                      ),
+                    ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(12.w, 10.h, 12.w, 8.h),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: accentColor.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.picture_as_pdf, color: accentColor, size: 14.w),
+                      SizedBox(width: 4.w),
+                      Text('PDF', style: TextStyle(color: accentColor, fontSize: 11.sp, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+            child: Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700, color: AppColors.black),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -84,12 +84,37 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
-  Future<void> getLearningList(String type) async {
-    emit(state.copyWith(apiStatus: ApiStatus.loading));
+  Future<void> getLearningList(String type, {bool forceRefresh = false}) async {
+    // Check if we already have valid cached data for this type
+    if (!forceRefresh && state.learningList != null && state.learningList!.isNotEmpty) {
+      return; // Data already loaded
+    }
+
+    // Try to load from cache first
+    if (!forceRefresh) {
+      final cachedData = StorageService().getCachedData<Map<String, dynamic>>(
+        '${DBKeys.learningDataCacheKey}_$type',
+        maxAge: const Duration(minutes: 30), // Learning data cache valid for 30 minutes
+      );
+
+      if (cachedData != null) {
+        final List<dynamic> jsonList = cachedData['data'];
+        final learningList = jsonList.map((json) => LearningModel.fromJson(json)).toList();
+        emit(state.copyWith(learningList: learningList, learningListApiStatus: ApiStatus.success));
+        return;
+      }
+    }
+
+    emit(state.copyWith(learningListApiStatus: ApiStatus.loading));
     final learningList = await learningListUseCase.call(type);
     learningList.fold(
-      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
-      (r) => emit(state.copyWith(learningList: r, apiStatus: ApiStatus.success)),
+      (l) => emit(state.copyWith(learningListApiStatus: ApiStatus.failed)),
+      (r) {
+        // Cache the data
+        final cacheData = {'data': r.map((item) => item.toJson()).toList()};
+        StorageService().setCachedData('${DBKeys.learningDataCacheKey}_$type', cacheData);
+        emit(state.copyWith(learningList: r, learningListApiStatus: ApiStatus.success));
+      },
     );
   }
 

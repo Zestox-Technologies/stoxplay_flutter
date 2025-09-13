@@ -11,4 +11,5 @@ class DBKeys{
   static const String statsCacheKey = '_cache_stats';
   static const String adsCacheKey = '_cache_ads';
   static const String mostPickedStockCacheKey = '_cache_most_picked_stocks';
+  static const String learningDataCacheKey = '_cache_learning_data';
 }

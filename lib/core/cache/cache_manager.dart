@@ -37,6 +37,8 @@ class CacheManager {
     await _storageService.invalidateCache(DBKeys.statsCacheKey);
     await _storageService.invalidateCache(DBKeys.adsCacheKey);
     await _storageService.invalidateCache(DBKeys.mostPickedStockCacheKey);
+    // Clear all learning cache variations
+    await _storageService.clearAllCache(); // This will clear all learning cache keys
   }
 
   /// Get cache statistics
@@ -49,6 +51,7 @@ class CacheManager {
         DBKeys.statsCacheKey,
         DBKeys.adsCacheKey,
         DBKeys.mostPickedStockCacheKey,
+        DBKeys.learningDataCacheKey,
       ],
     };
   }

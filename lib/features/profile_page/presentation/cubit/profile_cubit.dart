@@ -47,7 +47,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         DBKeys.profileCacheKey,
         maxAge: const Duration(minutes: 10), // Profile cache valid for 10 minutes
       );
-      
+
       if (cachedProfile != null) {
         final profile = ProfileModel.fromJson(cachedProfile);
         _updateControllers(profile);
@@ -68,7 +68,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     try {
       final profile = await getProfileUseCase();
       _updateControllers(profile);
-      
+
       // Cache the profile data
       await StorageService().setCachedData(DBKeys.profileCacheKey, profile.toJson());
       StorageService().write(DBKeys.user, profile.toJson());
@@ -100,9 +100,10 @@ class ProfileCubit extends Cubit<ProfileState> {
       DBKeys.profileCacheKey,
       maxAge: const Duration(hours: 1), // More lenient for cached profile display
     );
-    
+
     if (cachedProfile != null) {
       final profile = ProfileModel.fromJson(cachedProfile);
+      _updateControllers(profile); // Update controllers with cached data
       emit(
         state.copyWith(
           apiStatus: ApiStatus.success,
@@ -123,15 +124,21 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(state.copyWith(gender: gender));
   }
 
+  // Initialize controllers with current profile data
+  void initializeControllers() {
+    if (state.profileModel != null) {
+      _updateControllers(state.profileModel!);
+    }
+  }
+
   Future<void> updateProfile() async {
     emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
     try {
-      // Use the profile picture URL from state.profileUrl (if user uploaded new image) 
+      // Use the profile picture URL from state.profileUrl (if user uploaded new image)
       // or fall back to existing profile picture URL
-      final profilePictureUrl = state.profileUrl.isNotEmpty 
-          ? state.profileUrl 
-          : state.profileModel?.profilePictureUrl ?? '';
-      
+      final profilePictureUrl =
+          state.profileUrl.isNotEmpty ? state.profileUrl : state.profileModel?.profilePictureUrl ?? '';
+
       final updatedProfile = {
         "firstName": firstNameController.text,
         "username": usernameController.text,
@@ -140,18 +147,18 @@ class ProfileCubit extends Cubit<ProfileState> {
         "email": emailController.text,
         "gender": state.gender ?? 'SELECT',
       };
-      
+
       print('📝 Profile Update Data: $updatedProfile');
-      
+
       final profile = await updateProfileUseCase(updatedProfile);
-      
+
       // Update the controllers with the updated profile data
       _updateControllers(profile);
-      
+
       // Cache the updated profile data
       await StorageService().setCachedData(DBKeys.profileCacheKey, profile.toJson());
       StorageService().write(DBKeys.user, profile.toJson());
-      
+
       // Update the state with the new profile data
       emit(
         state.copyWith(
@@ -181,10 +188,30 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> getPlayingHistory({required int page, required int limit}) async {
-    emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
+    // For first page, show loading. For subsequent pages, keep existing data
+    if (page == 1) {
+      emit(state.copyWith(apiStatus: ApiStatus.loading, errorMessage: ''));
+    }
+
     try {
       final result = await getPlayingHistoryUseCase({'page': page, 'limit': limit});
-      emit(state.copyWith(apiStatus: ApiStatus.success, playingHistory: result));
+
+      if (page == 1) {
+        // First page - replace data
+        emit(state.copyWith(apiStatus: ApiStatus.success, playingHistory: result));
+      } else {
+        // Subsequent pages - append data
+        final existingData = state.playingHistory?.data ?? [];
+        final newData = result.data ?? [];
+        final combinedData = [...existingData, ...newData];
+
+        final updatedHistory = PlayingHistoryModel(
+          data: combinedData,
+          meta: result.meta, // Use the latest meta from the new request
+        );
+
+        emit(state.copyWith(apiStatus: ApiStatus.success, playingHistory: updatedHistory));
+      }
     } catch (e) {
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }

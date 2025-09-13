@@ -44,6 +44,12 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
   void initState() {
     super.initState();
     _initializeSmsAutofill();
+    // Try to fetch phone hint when the phone field gains focus and is empty
+    mobileFocusNode.addListener(() {
+      if (mobileFocusNode.hasFocus && mobileNoController.text.isEmpty) {
+        _getPhoneHint();
+      }
+    });
   }
 
   void _resetFormState(AuthCubit authCubit) {
@@ -57,7 +63,17 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
 
   Future<void> _initializeSmsAutofill() async {
     try {
-      await SmsAutoFill().hint;
+      // Request phone number hint and populate the field if user selects one
+      final hint = await SmsAutoFill().hint;
+      if (hint != null && hint.isNotEmpty && mounted) {
+        final phoneNumber = hint.replaceAll(RegExp(r'\D'), '');
+        if (phoneNumber.length >= 10) {
+          final lastTenDigits = phoneNumber.substring(phoneNumber.length - 10);
+          setState(() {
+            mobileNoController.text = lastTenDigits;
+          });
+        }
+      }
       listenForCode();
     } catch (e) {
       print('SMS autofill initialization error: $e');
@@ -122,7 +138,7 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
 
   Future<void> _onVerifyOtp(BuildContext context, AuthCubit authCubit) async {
     final otp = otpController.text.trim();
-    if (otp.length != 6) {
+    if (otp.length != 4) {
       showSnackBar(context: context, message: Strings.pleaseEnter4DigitOTP);
       return;
     }
@@ -202,6 +218,12 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
                   _handlePhoneNumberValidation(value, authCubit);
                 } else {
                   authCubit.clearInitiateSignUpStatus();
+                }
+              },
+              onTap: () async {
+                // If empty on tap, open hint picker to let user select the number
+                if (mobileNoController.text.isEmpty) {
+                  await _getPhoneHint();
                 }
               },
               suffix: Row(

@@ -28,177 +28,194 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   ValueNotifier<XFile?> profileImage = ValueNotifier(null);
 
   @override
+  void initState() {
+    super.initState();
+    // Initialize controllers when the page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cubit = context.read<ProfileCubit>();
+      cubit.initializeControllers();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProfileCubit, ProfileState>(
-      builder: (context, state) {
-        final cubit = context.read<ProfileCubit>();
-        return Scaffold(
-          backgroundColor: AppColors.white,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                  child: Row(
-                    children: [
-                      CommonBackButton(onTap: () => Navigator.of(context).pop()),
-                      Expanded(
-                        child: Center(
-                          child: TextView(
-                            text: 'Personal Info',
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.5,
-                            lineHeight: 1,
+    return BlocListener<ProfileCubit, ProfileState>(
+      listener: (context, state) {
+        // Update controllers when profile data becomes available
+        if (state.profileModel != null) {
+          final cubit = context.read<ProfileCubit>();
+          cubit.initializeControllers();
+        }
+      },
+      child: BlocBuilder<ProfileCubit, ProfileState>(
+        builder: (context, state) {
+          final cubit = context.read<ProfileCubit>();
+          return Scaffold(
+            backgroundColor: AppColors.white,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                    child: Row(
+                      children: [
+                        CommonBackButton(onTap: () => Navigator.of(context).pop()),
+                        Expanded(
+                          child: Center(
+                            child: TextView(
+                              text: 'Personal Info',
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 1.5,
+                              lineHeight: 1,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 36.w),
-                    ],
+                        SizedBox(width: 36.w),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                ValueListenableBuilder(
-                  valueListenable: profileImage,
-                  builder: (context, image, _) {
-                    return Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color:
-                                  (state.profileModel?.profilePictureUrl != null && 
-                                   state.profileModel!.profilePictureUrl!.isNotEmpty) ||
-                                  (state.profileUrl.isNotEmpty)
-                                      ? AppColors.primaryPurple
-                                      : AppColors.blackD7D7,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          padding: EdgeInsets.all(5.w),
-                          child: Container(
+                  SizedBox(height: 8.h),
+                  ValueListenableBuilder(
+                    valueListenable: profileImage,
+                    builder: (context, image, _) {
+                      return Column(
+                        children: [
+                          Container(
                             decoration: BoxDecoration(
-                              border: Border.all(color: AppColors.primaryPurple),
+                              border: Border.all(
+                                color:
+                                    (state.profileModel?.profilePictureUrl != null &&
+                                                state.profileModel!.profilePictureUrl!.isNotEmpty) ||
+                                            (state.profileUrl.isNotEmpty)
+                                        ? AppColors.primaryPurple
+                                        : AppColors.blackD7D7,
+                              ),
                               shape: BoxShape.circle,
                             ),
-                            child: buildProfileAvatar(
-                              profilePictureUrl: state.profileUrl.isNotEmpty 
-                                  ? state.profileUrl 
-                                  : state.profileModel?.profilePictureUrl,
-                              pickedImage: profileImage.value,
+                            padding: EdgeInsets.all(5.w),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: AppColors.primaryPurple),
+                                shape: BoxShape.circle,
+                              ),
+                              child: buildProfileAvatar(
+                                profilePictureUrl:
+                                    state.profileUrl.isNotEmpty
+                                        ? state.profileUrl
+                                        : state.profileModel?.profilePictureUrl,
+                                pickedImage: profileImage.value,
+                              ),
                             ),
                           ),
-                        ),
-                        Gap(10.h),
-                        AppButton(
-                          text: 'Change Image',
-                          onPressed: () async {
-                            final imagePicker = ImagePicker();
-                            final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-                            if (pickedFile != null) {
-                              profileImage.value = pickedFile;
-                              await cubit.uploadProfilePicture(pickedFile.path);
+                          Gap(10.h),
+                          AppButton(
+                            text: 'Change Image',
+                            onPressed: () async {
+                              final imagePicker = ImagePicker();
+                              final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+                              if (pickedFile != null) {
+                                profileImage.value = pickedFile;
+                                await cubit.uploadProfilePicture(pickedFile.path);
+                              }
+                            },
+                            height: 32.h,
+                            width: 110.w,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w500,
+                            borderRadius: 8.r,
+                            backgroundColor: AppColors.primaryPurple,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  SizedBox(height: 15.h),
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      children: [
+                        SizedBox(height: 20.h),
+                        _buildTextField(cubit.firstNameController, title: "Full Name"),
+                        SizedBox(height: 16.h),
+                        _buildTextField(cubit.usernameController, title: "UserName"),
+                        SizedBox(height: 16.h),
+                        _buildTextField(cubit.emailController, title: "Email"),
+                        SizedBox(height: 16.h),
+                        TextView(text: 'Gender', fontColor: AppColors.black),
+                        SizedBox(height: 5.h),
+                        _buildDropdownField(state.gender ?? "SELECT", (val) {
+                          cubit.updateGender(val);
+                        }),
+
+                        SizedBox(height: 16.h),
+                        TextView(text: 'Date of birth', fontColor: AppColors.black),
+                        SizedBox(height: 5.h),
+                        _buildDateField(
+                          state.dob == null ? 'Select Date' : DateFormat('dd/MM/yyyy').format(state.dob!),
+                          context,
+                          () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate: state.dob ?? DateTime.now().subtract(Duration(days: 6570)),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now().subtract(Duration(days: 6570)),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    dialogBackgroundColor: Colors.white,
+                                    colorScheme: ColorScheme.light(
+                                      primary: Colors.deepPurple,
+                                      onPrimary: Colors.white,
+                                      onSurface: Colors.black,
+                                    ),
+                                    textButtonTheme: TextButtonThemeData(
+                                      style: TextButton.styleFrom(foregroundColor: Colors.deepPurple),
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (date != null) {
+                              cubit.updateDOB(date);
                             }
                           },
-                          height: 32.h,
-                          width: 110.w,
-                          fontSize: 12.sp,
-                          fontWeight: FontWeight.w500,
-                          borderRadius: 8.r,
-                          backgroundColor: AppColors.primaryPurple,
                         ),
+                        SizedBox(height: 32.h),
                       ],
-                    );
-                  },
-                ),
-                SizedBox(height: 15.h),
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    children: [
-                      SizedBox(height: 20.h),
-                      _buildTextField(cubit.firstNameController, title: "Full Name"),
-                      SizedBox(height: 16.h),
-                      _buildTextField(cubit.usernameController, title: "UserName"),
-                      SizedBox(height: 16.h),
-                      _buildTextField(cubit.emailController, title: "Email"),
-                      SizedBox(height: 16.h),
-                      TextView(text: 'Gender', fontColor: AppColors.black),
-                      SizedBox(height: 5.h),
-                      _buildDropdownField(state.gender ?? "SELECT", (val) {
-                        cubit.updateGender(val);
-                      }),
-
-                      SizedBox(height: 16.h),
-                      TextView(text: 'Date of birth', fontColor: AppColors.black),
-                      SizedBox(height: 5.h),
-                      _buildDateField(
-                        state.dob == null ? 'Select Date' : DateFormat('dd/MM/yyyy').format(state.dob!),
-                        context,
-                        () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: state.dob ?? DateTime.now().subtract(Duration(days: 6570)),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now().subtract(Duration(days: 6570)),
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  dialogBackgroundColor: Colors.white,
-                                  colorScheme: ColorScheme.light(
-                                    primary: Colors.deepPurple,
-                                    onPrimary: Colors.white,
-                                    onSurface: Colors.black,
-                                  ),
-                                  textButtonTheme: TextButtonThemeData(
-                                    style: TextButton.styleFrom(foregroundColor: Colors.deepPurple),
-                                  ),
-                                  dialogTheme: DialogTheme(
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                                  ),
-                                ),
-                                child: child!,
-                              );
-                            },
-                          );
-                          if (date != null) {
-                            cubit.updateDOB(date);
-                          }
-                        },
-                      ),
-                      SizedBox(height: 32.h),
-                    ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(24.w, 10.h, 24.w, 0.h),
-                  child: AppButton(
-                    isLoading: state.apiStatus.isLoading,
-                    text: 'Update profile',
-                    onPressed: () async {
-                      if (cubit.firstNameController.text.trim().isEmpty ||
-                          cubit.usernameController.text.trim().isEmpty ||
-                          cubit.emailController.text.trim().isEmpty ||
-                          state.gender == 'Select' ||
-                          state.dob == null) {
-                        showSnackBar(context: context, message: 'Please fill all the fields before submitting.');
-                        return;
-                      }
-                      await cubit.updateProfile();
-                      Navigator.pop(context);
-                    },
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(24.w, 10.h, 24.w, 20.h),
+                    child: AppButton(
+                      isLoading: state.apiStatus.isLoading,
+                      text: 'Update profile',
+                      onPressed: () async {
+                        if (cubit.firstNameController.text.trim().isEmpty ||
+                            cubit.usernameController.text.trim().isEmpty ||
+                            cubit.emailController.text.trim().isEmpty ||
+                            state.gender == 'Select' ||
+                            state.dob == null) {
+                          showSnackBar(context: context, message: 'Please fill all the fields before submitting.');
+                          return;
+                        }
+                        await cubit.updateProfile();
+                        Navigator.pop(context);
+                      },
 
-                    height: 45.h,
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w700,
-                    backgroundColor: AppColors.primaryPurple,
+                      height: 45.h,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w700,
+                      backgroundColor: AppColors.primaryPurple,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

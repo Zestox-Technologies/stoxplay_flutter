@@ -62,7 +62,7 @@ class _CustomBottomNavbarState extends State<CustomBottomNavbar> {
       profileCubit.loadCachedProfile();
     } else if (index == 1) {
       // Stats tab - load stats with smart caching
-      statsCubit.getMyContests();
+      statsCubit.getMyContests(forceRefresh: true);
     } else if (index == 2) {
       // Profile tab - fetch fresh profile data only if not already loaded
       profileCubit.fetchProfile();

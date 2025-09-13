@@ -171,6 +171,7 @@ class LiveItemWidget extends StatelessWidget {
 
   Widget _buildViewAction(BuildContext context, StatsDataModel data) {
     return GestureDetector(
+      behavior: HitTestBehavior.translucent, // 👈 expands tap area to full bounds
       onTap: () {
         Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: data.id ?? '');
       },

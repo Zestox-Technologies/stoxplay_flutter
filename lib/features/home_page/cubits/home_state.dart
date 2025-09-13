@@ -5,6 +5,7 @@ class HomeState extends Equatable {
   final ApiStatus apiStatus;
   final ApiStatus mostPickedStockApiStatus;
   final ApiStatus sectorListApiStatus;
+  final ApiStatus learningListApiStatus;
   SectorListResponse? sectorModel;
   List<ContestModel>? contestList;
   List<StockDataModel>? stockList;
@@ -20,6 +21,7 @@ class HomeState extends Equatable {
     this.apiStatus = ApiStatus.initial,
     this.mostPickedStockApiStatus = ApiStatus.initial,
     this.sectorListApiStatus = ApiStatus.initial,
+    this.learningListApiStatus = ApiStatus.initial,
     this.isContestEnabled = false,
     this.contestList = const [],
     this.stockList = const [],
@@ -37,6 +39,7 @@ class HomeState extends Equatable {
     List<StockDataModel>? stockList,
     ApiStatus? apiStatus,
     ApiStatus? sectorListApiStatus,
+    ApiStatus? learningListApiStatus,
     bool? isContestEnabled,
     List<AdsModel>? adsList,
     ContestDetailModel? contestDetailModel,
@@ -48,6 +51,7 @@ class HomeState extends Equatable {
       sectorModel: sectorModel ?? this.sectorModel,
       apiStatus: apiStatus ?? this.apiStatus,
       sectorListApiStatus: sectorListApiStatus ?? this.sectorListApiStatus,
+      learningListApiStatus: learningListApiStatus ?? this.learningListApiStatus,
       isContestEnabled: isContestEnabled ?? this.isContestEnabled,
       contestList: contestList ?? this.contestList,
       stockList: stockList ?? this.stockList,
@@ -74,5 +78,6 @@ class HomeState extends Equatable {
     mostPickedStock,
     mostPickedStockApiStatus,
     sectorListApiStatus,
+    learningListApiStatus,
   ];
 }
