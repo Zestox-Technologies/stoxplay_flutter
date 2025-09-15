@@ -6,7 +6,6 @@ import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/pdf_view/pages/pdf_viewer_screen.dart';
-import 'package:stoxplay/features/pdf_view/widgets/book_card.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 

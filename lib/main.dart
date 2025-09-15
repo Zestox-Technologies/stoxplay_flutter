@@ -1,8 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stoxplay/core/cache/cache_manager.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
+import 'package:stoxplay/core/services/fcm_service.dart';
 import 'package:stoxplay/utils/common/widgets/app_component_base.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
 
@@ -13,11 +16,13 @@ GlobalKey<ScaffoldMessengerState> snackBarKey = GlobalKey<ScaffoldMessengerState
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await init();
-
   await AppComponentBase().init();
   await StorageService().init();
   await CacheManager().initialize();
+  await FCMService().initialize();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: AppColors.white,

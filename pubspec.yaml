@@ -68,6 +68,8 @@ dependencies:
   flutter_pdfview: ^1.4.1+1
   webview_flutter: ^4.13.0
   in_app_update: ^4.2.4
+  firebase_messaging: ^16.0.1
+  flutter_local_notifications: ^18.0.1
 
 dev_dependencies:
   flutter_test:

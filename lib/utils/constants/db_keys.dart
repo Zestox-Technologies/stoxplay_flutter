@@ -4,6 +4,7 @@ class DBKeys{
   static const String userTokenKey = 'USER_TOKEN';
   static const String isLoggedInKey = 'IS_LOGGED_IN';
   static const String user = "USER";
+  static const String fcmToken = 'FCM_TOKEN';
   
   // Cache keys
   static const String profileCacheKey = '_cache_profile';

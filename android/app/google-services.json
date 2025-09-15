@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "855697418984",
-    "project_id": "stoxplay-3d226",
-    "storage_bucket": "stoxplay-3d226.firebasestorage.app"
+    "project_number": "890690161401",
+    "project_id": "stoxbook-1e881",
+    "storage_bucket": "stoxbook-1e881.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:855697418984:android:97dc796b108f4a19d9f75d",
+        "mobilesdk_app_id": "1:890690161401:android:c58f1e92aac69d7956b028",
         "android_client_info": {
           "package_name": "com.zestox.stoxbook"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD-HwnEtk0OWe7d1DcK0PE2lXt5cABQvDw"
+          "current_key": "AIzaSyArA13uRYyKjWDryIOviTnVQxDEnsAgeeQ"
         }
       ],
       "services": {
