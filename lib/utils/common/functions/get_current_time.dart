@@ -23,7 +23,7 @@ Future<DateTime?> getCurrentTime() async {
 }
 
 String formatMaxWinIntl(int amount, {bool showRupeeSymbol = true}) {
-  final format = NumberFormat.compactCurrency(decimalDigits: 1, symbol: showRupeeSymbol ? '₹' : '', locale: 'en_IN');
+  final format = NumberFormat.compactCurrency(decimalDigits: 0, symbol: showRupeeSymbol ? '₹' : '', locale: 'en_IN');
   return format.format(amount);
 }
 

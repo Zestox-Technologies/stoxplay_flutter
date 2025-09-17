@@ -209,12 +209,16 @@ class UpcomingItemWidget extends StatelessWidget {
                 // Stats Row
                 Row(
                   children: [
-                    // Medal with 30k
                     Row(
                       children: [
                         Image.asset(AppAssets.firstPrizeIcon, height: 14.h, width: 14.w),
                         Gap(4.w),
-                        TextView(text: "30k", fontSize: 12.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
+                        TextView(
+                          text: formatMaxWinIntl(data.contest?.firstPrize ?? 0, showRupeeSymbol: false),
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          fontColor: AppColors.black,
+                        ),
                       ],
                     ),
                     Gap(16.w),

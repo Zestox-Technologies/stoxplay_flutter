@@ -44,6 +44,8 @@ abstract class HomeRds {
   Future<ContestLeaderboardModel> contestLeaderboard(String params);
 
   Future<List<MostPickedStock>> getMostPickedStocks();
+
+  Future<String> registerToken(String token);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -238,6 +240,18 @@ class HomeRdsImpl extends HomeRds {
       final List<dynamic> jsonList = response.data['data'];
       final mostPickedList = jsonList.map((json) => MostPickedStock.fromJson(json)).toList();
       return mostPickedList;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<String> registerToken(String token) async {
+    try {
+      await client.post(ApiUrls.registerToken, data: {"fcmToken": token});
+      return '';
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

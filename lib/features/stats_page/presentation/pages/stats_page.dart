@@ -54,7 +54,7 @@ class _StatsPageState extends State<StatsPage> {
     switch (selectedIndex) {
       case 0: // Upcoming
         if (state.stats?.upcoming?.isEmpty ?? true) {
-          return Container(height: 200.h, child: Center(child: Text("No Upcoming contests")));
+          return SizedBox(height: 200.h, child: Center(child: Text("No Upcoming contests")));
         }
         return ListView.separated(
           separatorBuilder: (context, index) => SizedBox(height: 10.h),

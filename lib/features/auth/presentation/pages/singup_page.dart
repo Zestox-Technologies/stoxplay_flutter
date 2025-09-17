@@ -7,6 +7,7 @@ import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/auth/data/models/auth_params_model.dart';
 import 'package:stoxplay/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:stoxplay/features/auth/presentation/cubit/auth_state.dart';
+import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/utils/common/functions/snackbar.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/common_stoxplay_icon.dart';
@@ -19,11 +20,23 @@ import 'package:stoxplay/utils/constants/app_colors.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
-class SignUpPage extends StatelessWidget {
-  SignUpPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
+  @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController userIdController = TextEditingController();
+  late HomeCubit homeCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    homeCubit = BlocProvider.of<HomeCubit>(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +50,7 @@ class SignUpPage extends StatelessWidget {
             body: BlocListener<AuthCubit, AuthState>(
               listener: (context, state) {
                 if (state.completeSignUpStatus.isSuccess) {
+                  homeCubit.registerToken();
                   Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
                 }
                 if (state.completeSignUpStatus.isFailed) {

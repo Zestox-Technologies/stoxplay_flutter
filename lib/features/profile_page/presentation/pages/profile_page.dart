@@ -65,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
           color: AppColors.primaryPurple,
           strokeWidth: 2,
           onRefresh: () async {
-            await profileCubit.fetchProfile(); // Refresh profile data
+            await profileCubit.fetchProfile(forceRefresh: true); // Refresh profile data
           },
           child: Column(
             children: [

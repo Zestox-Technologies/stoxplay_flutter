@@ -10,12 +10,14 @@ import 'package:stoxplay/utils/constants/db_keys.dart';
 /// FCM Service class to handle all Firebase Cloud Messaging operations
 class FCMService {
   static final FCMService _instance = FCMService._internal();
+
   factory FCMService() => _instance;
+
   FCMService._internal();
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
-  
+
   String? _fcmToken;
   StreamSubscription<RemoteMessage>? _messageSubscription;
   StreamSubscription<RemoteMessage>? _backgroundMessageSubscription;
@@ -28,19 +30,19 @@ class FCMService {
     try {
       // Initialize local notifications
       await _initializeLocalNotifications();
-      
+
       // Request permission for notifications
       await _requestPermission();
-      
+
       // Get FCM token
       await _getFCMToken();
-      
+
       // Set up message handlers
       await _setupMessageHandlers();
-      
+
       // Listen for token refresh
       _listenToTokenRefresh();
-      
+
       if (kDebugMode) {
         print('FCM Service initialized successfully');
         print('FCM Token: $_fcmToken');
@@ -54,11 +56,11 @@ class FCMService {
 
   /// Initialize local notifications
   Future<void> _initializeLocalNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    
-    const DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings(
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
+
+    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
@@ -89,11 +91,7 @@ class FCMService {
       );
       return settings.authorizationStatus == AuthorizationStatus.authorized;
     } else if (Platform.isAndroid) {
-      final settings = await _firebaseMessaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      final settings = await _firebaseMessaging.requestPermission(alert: true, badge: true, sound: true);
       return settings.authorizationStatus == AuthorizationStatus.authorized;
     }
     return false;
@@ -136,7 +134,7 @@ class FCMService {
   Future<void> _setupMessageHandlers() async {
     // Handle foreground messages
     _messageSubscription = FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    
+
     // Handle background messages when app is opened
     _backgroundMessageSubscription = FirebaseMessaging.onMessageOpenedApp.listen(_handleBackgroundMessage);
   }
@@ -169,8 +167,7 @@ class FCMService {
 
   /// Show local notification
   Future<void> _showLocalNotification(RemoteMessage message) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'high_importance_channel',
       'High Importance Notifications',
       channelDescription: 'This channel is used for important notifications.',
@@ -178,8 +175,7 @@ class FCMService {
       priority: Priority.high,
     );
 
-    const DarwinNotificationDetails iOSPlatformChannelSpecifics =
-        DarwinNotificationDetails(
+    const DarwinNotificationDetails iOSPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
       presentSound: true,
@@ -309,7 +305,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print('Body: ${message.notification?.body}');
     print('Data: ${message.data}');
   }
-  
+
   // TODO: Handle background message processing
   // You can perform background tasks here like updating local database,
   // sending analytics, etc.

@@ -25,6 +25,7 @@ class HomeCubit extends Cubit<HomeState> {
   ContestLeaderboardUseCase contestLeaderboardUseCase;
   ContestDetailsUseCase contestDetailsUseCase;
   GetMostPickedStockUseCase getMostPickedStockUseCase;
+  RegisterTokenUseCase registerTokenUseCase;
 
   HomeCubit({
     required this.sectorListUseCase,
@@ -35,6 +36,7 @@ class HomeCubit extends Cubit<HomeState> {
     required this.contestLeaderboardUseCase,
     required this.contestDetailsUseCase,
     required this.getMostPickedStockUseCase,
+    required this.registerTokenUseCase,
   }) : super(HomeState());
 
   Future<void> getSectorList({bool forceRefresh = false}) async {
@@ -107,15 +109,12 @@ class HomeCubit extends Cubit<HomeState> {
 
     emit(state.copyWith(learningListApiStatus: ApiStatus.loading));
     final learningList = await learningListUseCase.call(type);
-    learningList.fold(
-      (l) => emit(state.copyWith(learningListApiStatus: ApiStatus.failed)),
-      (r) {
-        // Cache the data
-        final cacheData = {'data': r.map((item) => item.toJson()).toList()};
-        StorageService().setCachedData('${DBKeys.learningDataCacheKey}_$type', cacheData);
-        emit(state.copyWith(learningList: r, learningListApiStatus: ApiStatus.success));
-      },
-    );
+    learningList.fold((l) => emit(state.copyWith(learningListApiStatus: ApiStatus.failed)), (r) {
+      // Cache the data
+      final cacheData = {'data': r.map((item) => item.toJson()).toList()};
+      StorageService().setCachedData('${DBKeys.learningDataCacheKey}_$type', cacheData);
+      emit(state.copyWith(learningList: r, learningListApiStatus: ApiStatus.success));
+    });
   }
 
   Future<void> getAdsList({bool forceRefresh = false}) async {
@@ -192,5 +191,10 @@ class HomeCubit extends Cubit<HomeState> {
       StorageService().setCachedData(DBKeys.mostPickedStockCacheKey, r.map((e) => e.toJson()).toList());
       emit(state.copyWith(mostPickedStock: r, mostPickedStockApiStatus: ApiStatus.success));
     });
+  }
+
+  Future<void> registerToken() async {
+    final token = await StorageService().read(DBKeys.fcmToken);
+    await registerTokenUseCase.call(token);
   }
 }

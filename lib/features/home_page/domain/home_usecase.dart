@@ -157,3 +157,14 @@ class GetMostPickedStockUseCase extends UseCase<List<MostPickedStock>, String> {
     return await repo.getMostPickedStock();
   }
 }
+
+class RegisterTokenUseCase extends UseCase<String, String> {
+  final HomeRepo repo;
+
+  RegisterTokenUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, String>> call(String params) async {
+    return await repo.registerToken(params);
+  }
+}

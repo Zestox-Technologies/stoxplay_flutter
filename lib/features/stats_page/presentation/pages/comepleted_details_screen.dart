@@ -189,7 +189,7 @@ class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
                           Image.asset(AppAssets.firstPrizeIcon, height: 14.h, width: 14.w),
                           Gap(4.w),
                           TextView(
-                            text: '30k',
+                            text: formatMaxWinIntl(data.contest?.firstPrize ?? 0, showRupeeSymbol: false),
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
                             fontColor: AppColors.black,

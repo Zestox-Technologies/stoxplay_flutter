@@ -10,6 +10,7 @@ import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/auth/data/models/auth_params_model.dart';
 import 'package:stoxplay/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:stoxplay/features/auth/presentation/cubit/auth_state.dart';
+import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/common/functions/snackbar.dart';
 import 'package:stoxplay/utils/common/widgets/app_button.dart';
@@ -39,10 +40,12 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
   final TextEditingController referralIdController = TextEditingController();
   final FocusNode mobileFocusNode = FocusNode();
   final FocusNode referralFocusNode = FocusNode();
+  late HomeCubit homeCubit;
 
   @override
   void initState() {
     super.initState();
+    homeCubit = BlocProvider.of<HomeCubit>(context);
     _initializeSmsAutofill();
     // Try to fetch phone hint when the phone field gains focus and is empty
     mobileFocusNode.addListener(() {
@@ -161,6 +164,7 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
     final isUserExists = authCubit.state.isPhoneNumberExists ?? false;
 
     if (isUserExists) {
+      homeCubit.registerToken();
       Navigator.pushNamedAndRemoveUntil(context, AppRoutes.mainPage, (route) => false);
     } else {
       Navigator.pushNamed(

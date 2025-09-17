@@ -40,6 +40,8 @@ abstract class HomeRepo {
   Future<Either<AppError, ContestLeaderboardModel>> clientContestLeaderboard(String params);
 
   Future<Either<AppError, List<MostPickedStock>>> getMostPickedStock();
+
+  Future<Either<AppError,String>> registerToken(String token);
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -171,6 +173,16 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<AppError, List<MostPickedStock>>> getMostPickedStock() async {
     try {
       final result = await homeRds.getMostPickedStocks();
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, String>> registerToken(String token)async {
+    try {
+      final result = await homeRds.registerToken(token);
       return Right(result);
     } catch (e) {
       return handleException(e);

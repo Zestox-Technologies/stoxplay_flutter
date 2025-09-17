@@ -101,6 +101,7 @@ class Contest {
   int? spotsRemaining;
   int? spotsFilled;
   int? totalSpots;
+  int? firstPrize;
 
 
   Contest({
@@ -115,6 +116,7 @@ class Contest {
     this.spotsRemaining,
     this.spotsFilled,
     this.totalSpots,
+    this.firstPrize,
   });
 
   factory Contest.fromJson(Map<String, dynamic> json) => Contest(
@@ -129,6 +131,7 @@ class Contest {
     spotsRemaining: json["spotsRemaining"],
     spotsFilled: json["spotsFilled"],
     totalSpots: json["totalSpots"],
+    firstPrize: json["firstPrize"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -143,6 +146,7 @@ class Contest {
     "spotsRemaining": spotsRemaining,
     "spotsFilled": spotsFilled,
     "totalSpots": totalSpots,
+    "firstPrize": firstPrize,
   };
 }
 

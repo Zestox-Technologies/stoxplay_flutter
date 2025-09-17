@@ -447,7 +447,7 @@ class _LeaderboardList extends StatelessWidget {
               final user = data.leaderboard?[index];
               return _LeaderboardItem(
                 rank: index + 1,
-                name: user?.user?.name ?? '',
+                name: user?.teamName ?? '',
                 avatar: user?.user?.profilePictureUrl ?? '',
                 points: user?.points?.toInt() ?? 0,
               );
@@ -485,15 +485,15 @@ class _LeaderboardItem extends StatelessWidget {
               title: Row(
                 children: [
                   TextView(text: name, fontWeight: FontWeight.w600, fontSize: 16.sp),
-                  Gap(8.w),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.purple5A2F.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Text("T1", style: TextStyle(fontSize: 12.sp)),
-                  ),
+                  // Gap(8.w),
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                  //   decoration: BoxDecoration(
+                  //     color: AppColors.purple5A2F.withOpacity(0.1),
+                  //     borderRadius: BorderRadius.circular(8.r),
+                  //   ),
+                  //   child: Text("T1", style: TextStyle(fontSize: 12.sp)),
+                  // ),
                 ],
               ),
               contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),

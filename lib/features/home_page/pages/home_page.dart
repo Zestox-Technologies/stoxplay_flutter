@@ -77,7 +77,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     homeCubit.getAdsList();
     homeCubit.getMostPickedStock();
     homeCubit.getLearningList(Strings.video, forceRefresh: true);
-
     // Check for app updates after initial data loading
     _checkForAppUpdate();
   }
