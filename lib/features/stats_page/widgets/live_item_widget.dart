@@ -104,7 +104,7 @@ class LiveItemWidget extends StatelessWidget {
                       Image.asset(AppAssets.firstPrizeIcon, height: 14.h, width: 14.w),
                       Gap(4.w),
                       TextView(
-                        text: data.prize.toString() ?? '',
+                        text: data.contest?.firstPrize.toString() ?? '',
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w600,
                         fontColor: AppColors.black,
