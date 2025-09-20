@@ -271,7 +271,7 @@ class FCMService {
 
   /// Get stored FCM token from local storage
   Future<String?> getStoredFCMToken() async {
-    return await StorageService().read(DBKeys.fcmToken);
+    return StorageService().read(DBKeys.fcmToken);
   }
 
   /// Clear FCM token

@@ -50,4 +50,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetMyContestUseCase(repo: sl()));
   sl.registerLazySingleton(() => FileUploadUseCase(sl()));
   sl.registerLazySingleton(() => RegisterTokenUseCase(repo: sl()));
+  sl.registerLazySingleton(() => LogoutUseCase(repository: sl()));
+  sl.registerLazySingleton(() => WithdrawRequestPendingApprovalUseCase(repo: sl()));
+  sl.registerLazySingleton(() => ApproveRejectWithdrawRequestUseCase(repo: sl()));
 }

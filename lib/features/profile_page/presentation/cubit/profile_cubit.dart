@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/core/services/fcm_service.dart';
+import 'package:stoxplay/features/auth/domain/auth_usecase.dart';
 import 'package:stoxplay/features/profile_page/data/models/playing_history_model.dart';
 import 'package:stoxplay/features/profile_page/data/models/profile_model.dart';
 import 'package:stoxplay/features/profile_page/domain/profile_usecase.dart';
@@ -14,6 +16,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   final UpdateProfileUseCase updateProfileUseCase;
   final FileUploadUseCase fileUploadUseCase;
   final GetPlayingHistoryUseCase getPlayingHistoryUseCase;
+  final LogoutUseCase logoutUseCase;
 
   // Controllers for profile fields
   final TextEditingController firstNameController = TextEditingController();
@@ -22,8 +25,13 @@ class ProfileCubit extends Cubit<ProfileState> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
-  ProfileCubit(this.getProfileUseCase, this.updateProfileUseCase, this.fileUploadUseCase, this.getPlayingHistoryUseCase)
-    : super(ProfileState());
+  ProfileCubit(
+    this.getProfileUseCase,
+    this.updateProfileUseCase,
+    this.logoutUseCase,
+    this.fileUploadUseCase,
+    this.getPlayingHistoryUseCase,
+  ) : super(ProfileState());
 
   @override
   Future<void> close() {
@@ -185,6 +193,11 @@ class ProfileCubit extends Cubit<ProfileState> {
       print('❌ Profile picture upload failed: $e');
       emit(state.copyWith(apiStatus: ApiStatus.failed, errorMessage: e.toString()));
     }
+  }
+
+  Future<void> logout() async {
+    final token = await FCMService().getStoredFCMToken();
+    await logoutUseCase.call(token ?? '');
   }
 
   Future<void> getPlayingHistory({required int page, required int limit}) async {

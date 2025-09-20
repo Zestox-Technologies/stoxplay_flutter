@@ -50,3 +50,14 @@ class CompleteSignupUseCase extends UseCase<ApiResponse<UserModel>, AuthParamsMo
     return await repository.completeSignUp(params: params);
   }
 }
+
+class LogoutUseCase extends UseCase<String, String> {
+  final AuthRepository repository;
+
+  LogoutUseCase({required this.repository});
+
+  @override
+  Future<Either<AppError, String>> call(String params) async {
+    return await repository.logout(params: params);
+  }
+}

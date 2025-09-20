@@ -6,6 +6,7 @@ class HomeState extends Equatable {
   final ApiStatus mostPickedStockApiStatus;
   final ApiStatus sectorListApiStatus;
   final ApiStatus learningListApiStatus;
+  final ApiStatus approveRejectApiStatus;
   SectorListResponse? sectorModel;
   List<ContestModel>? contestList;
   List<StockDataModel>? stockList;
@@ -15,6 +16,7 @@ class HomeState extends Equatable {
   ContestDetailModel? contestDetailModel;
   ContestLeaderboardModel? contestLeaderboardModel;
   List<MostPickedStock>? mostPickedStock;
+  List<WithdrawRequestModel>? withdrawRequestModel;
 
   HomeState({
     this.sectorModel,
@@ -22,6 +24,7 @@ class HomeState extends Equatable {
     this.mostPickedStockApiStatus = ApiStatus.initial,
     this.sectorListApiStatus = ApiStatus.initial,
     this.learningListApiStatus = ApiStatus.initial,
+    this.approveRejectApiStatus = ApiStatus.initial,
     this.isContestEnabled = false,
     this.contestList = const [],
     this.stockList = const [],
@@ -30,6 +33,7 @@ class HomeState extends Equatable {
     this.contestDetailModel,
     this.contestLeaderboardModel,
     this.mostPickedStock,
+    this.withdrawRequestModel = const[],
   });
 
   HomeState copyWith({
@@ -40,12 +44,14 @@ class HomeState extends Equatable {
     ApiStatus? apiStatus,
     ApiStatus? sectorListApiStatus,
     ApiStatus? learningListApiStatus,
+    ApiStatus? approveRejectApiStatus,
     bool? isContestEnabled,
     List<AdsModel>? adsList,
     ContestDetailModel? contestDetailModel,
     ContestLeaderboardModel? contestLeaderboardModel,
     List<MostPickedStock>? mostPickedStock,
     ApiStatus? mostPickedStockApiStatus,
+    List<WithdrawRequestModel>? withdrawRequestModel,
   }) {
     return HomeState(
       sectorModel: sectorModel ?? this.sectorModel,
@@ -54,6 +60,7 @@ class HomeState extends Equatable {
       learningListApiStatus: learningListApiStatus ?? this.learningListApiStatus,
       isContestEnabled: isContestEnabled ?? this.isContestEnabled,
       contestList: contestList ?? this.contestList,
+      approveRejectApiStatus: approveRejectApiStatus ?? this.approveRejectApiStatus,
       stockList: stockList ?? this.stockList,
       learningList: learningList ?? this.learningList,
       adsList: adsList ?? this.adsList,
@@ -61,6 +68,7 @@ class HomeState extends Equatable {
       contestLeaderboardModel: contestLeaderboardModel ?? this.contestLeaderboardModel,
       mostPickedStock: mostPickedStock ?? this.mostPickedStock,
       mostPickedStockApiStatus: mostPickedStockApiStatus ?? this.mostPickedStockApiStatus,
+      withdrawRequestModel: withdrawRequestModel ?? this.withdrawRequestModel,
     );
   }
 
@@ -79,5 +87,7 @@ class HomeState extends Equatable {
     mostPickedStockApiStatus,
     sectorListApiStatus,
     learningListApiStatus,
+    withdrawRequestModel,
+    approveRejectApiStatus
   ];
 }

@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
               providers: [
                 BlocProvider(create: (context) => TimerCubit()),
                 BlocProvider.value(value: MultiTimerCubit.instance),
-                BlocProvider(create: (context) => ProfileCubit(sl(), sl(), sl(), sl())),
+                BlocProvider(create: (context) => ProfileCubit(sl(), sl(), sl(), sl(),sl())),
                 BlocProvider(create: (context) => StatsCubit(getMyContestUseCase: sl())),
                 BlocProvider(
                   create:
@@ -51,7 +51,9 @@ class MyApp extends StatelessWidget {
                         contestLeaderboardUseCase: sl(),
                         contestDetailsUseCase: sl(),
                         getMostPickedStockUseCase: sl(),
-                        registerTokenUseCase: sl()
+                        registerTokenUseCase: sl(),
+                        withdrawRequestPendingApprovalUseCase: sl(),
+                        approveRejectWithdrawRequestUseCase: sl(),
                       ),
                 ),
               ],

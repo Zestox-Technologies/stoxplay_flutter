@@ -12,9 +12,11 @@ import 'package:stoxplay/features/home_page/data/models/join_contest_response_mo
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/models/QueryParams.dart';
 
+import 'models/approve_reject_withdraw_request_params.dart';
 import 'models/client_teams_response_model.dart';
 import 'models/sector_model.dart';
 
@@ -46,6 +48,10 @@ abstract class HomeRds {
   Future<List<MostPickedStock>> getMostPickedStocks();
 
   Future<String> registerToken(String token);
+
+  Future<List<WithdrawRequestModel>> withdrawRequestsPendingApproval();
+
+  Future<String> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -251,6 +257,36 @@ class HomeRdsImpl extends HomeRds {
   Future<String> registerToken(String token) async {
     try {
       await client.post(ApiUrls.registerToken, data: {"fcmToken": token});
+      return '';
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<List<WithdrawRequestModel>> withdrawRequestsPendingApproval() async {
+    try {
+      final response = await client.get(ApiUrls.withdrawalRequestPendingApproval);
+      final List<dynamic> rawList = response.data['data']['data'];
+      final withdrawRequests = rawList.map((e) => WithdrawRequestModel.fromJson(e as Map<String, dynamic>)).toList();
+
+      return withdrawRequests;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<String> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params) async {
+    try {
+      final response = await client.put(
+        ApiUrls.approveRejectWithdrawRequest(params.requestId ?? ''),
+        data: params.toJson(),
+      );
       return '';
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);

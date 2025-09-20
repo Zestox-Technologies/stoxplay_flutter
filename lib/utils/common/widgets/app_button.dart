@@ -46,7 +46,7 @@ class AppButton extends StatelessWidget {
         padding: padding,
         decoration: BoxDecoration(
           color: backgroundColor ?? AppColors.primaryPurple,
-          border: Border.all(color: AppColors.primaryPurple),
+          border: Border.all(color: backgroundColor ?? AppColors.primaryPurple),
           borderRadius: BorderRadius.circular(borderRadius ?? 8.r),
         ),
         child: Center(

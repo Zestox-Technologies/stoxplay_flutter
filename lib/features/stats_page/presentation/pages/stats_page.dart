@@ -80,7 +80,7 @@ class _StatsPageState extends State<StatsPage> {
 
       case 2: // Completed
         if (state.stats?.completed?.isEmpty ?? true) {
-          return Container(height: 200.h, child: Center(child: Text("No Completed contests")));
+          return SizedBox(height: 200.h, child: Center(child: Text("No Completed contests")));
         }
         return ListView.separated(
           physics: NeverScrollableScrollPhysics(),
@@ -104,7 +104,6 @@ class _StatsPageState extends State<StatsPage> {
         backgroundColor: AppColors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
-        // prevent default leading behavior
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,

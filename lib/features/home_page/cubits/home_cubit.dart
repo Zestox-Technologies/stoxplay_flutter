@@ -1,9 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meta/meta.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/core/network/api_response.dart';
+import 'package:stoxplay/core/services/fcm_service.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/approve_reject_withdraw_request_params.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
@@ -11,6 +14,7 @@ import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_usecase.dart';
 import 'package:stoxplay/utils/constants/db_keys.dart';
 
@@ -26,6 +30,8 @@ class HomeCubit extends Cubit<HomeState> {
   ContestDetailsUseCase contestDetailsUseCase;
   GetMostPickedStockUseCase getMostPickedStockUseCase;
   RegisterTokenUseCase registerTokenUseCase;
+  WithdrawRequestPendingApprovalUseCase withdrawRequestPendingApprovalUseCase;
+  ApproveRejectWithdrawRequestUseCase approveRejectWithdrawRequestUseCase;
 
   HomeCubit({
     required this.sectorListUseCase,
@@ -37,6 +43,8 @@ class HomeCubit extends Cubit<HomeState> {
     required this.contestDetailsUseCase,
     required this.getMostPickedStockUseCase,
     required this.registerTokenUseCase,
+    required this.withdrawRequestPendingApprovalUseCase,
+    required this.approveRejectWithdrawRequestUseCase,
   }) : super(HomeState());
 
   Future<void> getSectorList({bool forceRefresh = false}) async {
@@ -155,6 +163,15 @@ class HomeCubit extends Cubit<HomeState> {
     );
   }
 
+  Future<void> getWithdrawRequest() async {
+    emit(state.copyWith(apiStatus: ApiStatus.loading, withdrawRequestModel: []));
+    final response = await withdrawRequestPendingApprovalUseCase.call('');
+    response.fold(
+      (l) => emit(state.copyWith(apiStatus: ApiStatus.failed)),
+      (r) => emit(state.copyWith(withdrawRequestModel: r, apiStatus: ApiStatus.success)),
+    );
+  }
+
   Future<void> getContestLeaderboard(String contestId) async {
     emit(state.copyWith(apiStatus: ApiStatus.loading));
     final contestDetails = await contestLeaderboardUseCase.call(contestId);
@@ -194,7 +211,24 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future<void> registerToken() async {
-    final token = await StorageService().read(DBKeys.fcmToken);
-    await registerTokenUseCase.call(token);
+    final token = await FCMService().getStoredFCMToken();
+    await registerTokenUseCase.call(token ?? '');
+  }
+
+  Future<void> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params) async {
+    emit(state.copyWith(approveRejectApiStatus: ApiStatus.loading));
+    final response = await approveRejectWithdrawRequestUseCase.call(params);
+    response.fold((l) => emit(state.copyWith(approveRejectApiStatus: ApiStatus.failed)), (r) {
+      Fluttertoast.showToast(msg: "Withdraw Request ${params.remarks}");
+      // Clear the withdraw request list after successful approval/rejection
+      emit(state.copyWith(
+        approveRejectApiStatus: ApiStatus.success,
+        withdrawRequestModel: [],
+      ));
+    });
+  }
+
+  void clearWithdrawRequests() {
+    emit(state.copyWith(withdrawRequestModel: []));
   }
 }

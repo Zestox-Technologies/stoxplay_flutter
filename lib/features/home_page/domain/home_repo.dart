@@ -12,7 +12,10 @@ import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
+
+import '../data/models/approve_reject_withdraw_request_params.dart';
 
 abstract class HomeRepo {
   Future<Either<AppError, SectorListResponse>> getSectorList();
@@ -41,7 +44,11 @@ abstract class HomeRepo {
 
   Future<Either<AppError, List<MostPickedStock>>> getMostPickedStock();
 
-  Future<Either<AppError,String>> registerToken(String token);
+  Future<Either<AppError, String>> registerToken(String token);
+
+  Future<Either<AppError, List<WithdrawRequestModel>>> withdrawalRequestPendingApproval();
+
+  Future<Either<AppError, String>> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params);
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -180,9 +187,29 @@ class HomeRepoImpl extends HomeRepo {
   }
 
   @override
-  Future<Either<AppError, String>> registerToken(String token)async {
+  Future<Either<AppError, String>> registerToken(String token) async {
     try {
       final result = await homeRds.registerToken(token);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, List<WithdrawRequestModel>>> withdrawalRequestPendingApproval() async {
+    try {
+      final result = await homeRds.withdrawRequestsPendingApproval();
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, String>> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params) async {
+    try {
+      final result = await homeRds.approveRejectWithdrawRequest(params);
       return Right(result);
     } catch (e) {
       return handleException(e);

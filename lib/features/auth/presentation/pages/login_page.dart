@@ -38,7 +38,6 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
   final ValueNotifier<bool> isCheckboxChecked = ValueNotifier<bool>(false);
   final ValueNotifier<int> stepper = ValueNotifier<int>(0);
   final TextEditingController referralIdController = TextEditingController();
-  final FocusNode mobileFocusNode = FocusNode();
   final FocusNode referralFocusNode = FocusNode();
   late HomeCubit homeCubit;
 
@@ -47,12 +46,6 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
     super.initState();
     homeCubit = BlocProvider.of<HomeCubit>(context);
     _initializeSmsAutofill();
-    // Try to fetch phone hint when the phone field gains focus and is empty
-    mobileFocusNode.addListener(() {
-      if (mobileFocusNode.hasFocus && mobileNoController.text.isEmpty) {
-        _getPhoneHint();
-      }
-    });
   }
 
   void _resetFormState(AuthCubit authCubit) {
@@ -107,7 +100,6 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
     mobileNoController.dispose();
     otpController.dispose();
     referralIdController.dispose();
-    mobileFocusNode.dispose();
     referralFocusNode.dispose();
     isCheckboxChecked.dispose();
     stepper.dispose();
@@ -195,9 +187,6 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
   void _handlePhoneNumberValidation(String value, AuthCubit authCubit) {
     // Clear any previous error messages and check phone number
     authCubit.checkPhoneNumber(value);
-    Future.delayed(const Duration(milliseconds: 100), () {
-      referralFocusNode.requestFocus();
-    });
   }
 
   Widget _buildPhoneInputStep(BuildContext context, AuthCubit authCubit) {
@@ -208,7 +197,6 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
           selector: (state) => state.checkPhoneApiStatus,
           builder: (context, state) {
             return CommonTextfield(
-              focusNode: mobileFocusNode,
               controller: mobileNoController,
               title: Strings.mobileNumber.toUpperCase(),
               prefixText: "+91   ",
@@ -224,12 +212,7 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
                   authCubit.clearInitiateSignUpStatus();
                 }
               },
-              onTap: () async {
-                // If empty on tap, open hint picker to let user select the number
-                if (mobileNoController.text.isEmpty) {
-                  await _getPhoneHint();
-                }
-              },
+              // Removed automatic hint picker on tap to prevent bottom sheet
               suffix: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

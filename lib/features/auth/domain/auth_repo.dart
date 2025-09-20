@@ -14,6 +14,8 @@ abstract class AuthRepository {
   Future<Either<AppError, ApiResponse<UserModel?>>> verifyOtp({required AuthParamsModel params});
 
   Future<Either<AppError, ApiResponse<UserModel>>> completeSignUp({required AuthParamsModel params});
+
+  Future<Either<AppError, String>> logout({required String params});
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -60,6 +62,16 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<AppError, ApiResponse<UserModel>>> completeSignUp({required AuthParamsModel params}) async {
     try {
       final result = await authRds.completeSignUp(params: params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, String>> logout({required String params}) async {
+    try {
+      final result = await authRds.logout(params: params);
       return Right(result);
     } catch (e) {
       return handleException(e);

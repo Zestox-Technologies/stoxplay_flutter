@@ -15,6 +15,7 @@ class ApiUrls {
   static const String verifyOTP = 'auth/client/verify-otp';
   static const String loginWithOTP = 'auth/client/login-with-otp';
   static const String completeSignUp = 'auth/client/complete-signup';
+  static const String logout = 'auth/client/logout';
 
   ///contest flow
   static const String getSectorList = 'stock-management/sectors?isActive=true';
@@ -29,17 +30,21 @@ class ApiUrls {
   static getStocksList(String contestId) => '/client/contests/$contestId/stocks';
 
   static joinContest(String contestId) => '/client/contests/$contestId/join';
+
   static clientContestDetails(String contestId) => '/client/contests/$contestId/details';
+
   static clientContestLeaderboard(String contestId) => '/client/contests/$contestId/leaderboard';
   static const String getProfile = 'users/profile';
   static const String fileUpload = 'files/upload';
   static const String learningContent = 'learning-content';
   static const String getAds = 'ads-management/client';
 
-  static clientTeams(String teamId) => '/client/teams/$teamId';
+  static String clientTeams(String teamId) => '/client/teams/$teamId';
   static const String getPlayingHistory = 'client/history';
   static const String mostPickedStocks = '/market/stats/most-picked';
 
-
   static const String registerToken = '/notifications/register-token';
+  static const String withdrawalRequestPendingApproval = '/withdraw-requests/pending-approval';
+
+  static String approveRejectWithdrawRequest(String requestId) => '/withdraw-requests/$requestId/process';
 }

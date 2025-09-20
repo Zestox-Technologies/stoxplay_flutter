@@ -9,13 +9,17 @@ import 'package:shimmer/shimmer.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/approve_reject_withdraw_request_params.dart';
+import 'package:stoxplay/features/home_page/data/models/approve_reject_withdraw_request_params.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
+import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/learn_list_shimmer.dart';
 import 'package:stoxplay/features/home_page/widgets/most_picked_stock_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/news_list.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
+import 'package:stoxplay/utils/common/widgets/app_button.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -40,6 +44,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Timer? _timer;
   List list = [Strings.play, Strings.learn];
   DateTime? _lastUpdateCheck;
+  bool _isWithdrawDialogOpen = false;
 
   @override
   void initState() {
@@ -76,6 +81,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     homeCubit.getSectorList();
     homeCubit.getAdsList();
     homeCubit.getMostPickedStock();
+    homeCubit.getWithdrawRequest();
     homeCubit.getLearningList(Strings.video, forceRefresh: true);
     // Check for app updates after initial data loading
     _checkForAppUpdate();
@@ -100,11 +106,54 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
   }
 
-  void showWithdrawDialog() async {
+  void showWithdrawDialog(WithdrawRequestModel data) async {
+    if (_isWithdrawDialogOpen) return; // Prevent multiple dialogs
+
+    _isWithdrawDialogOpen = true;
     await showDialog(
       context: context,
-      builder: (context) {
-        return Dialog(child: WithdrawDialog());
+      barrierDismissible: false,
+      barrierColor: AppColors.black.withAlpha(400),
+      builder: (ctx) {
+        return PopScope(
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) {
+              _isWithdrawDialogOpen = false; // Reset flag when dialog is closed
+              return;
+            }
+          },
+          canPop: false,
+          child: BlocListener<HomeCubit, HomeState>(
+            listenWhen: (prev, curr) => prev.approveRejectApiStatus != curr.approveRejectApiStatus,
+            listener: (context, state) {
+              if (state.approveRejectApiStatus.isSuccess || state.approveRejectApiStatus.isFailed) {
+                Navigator.pop(context); // Close when done
+                _isWithdrawDialogOpen = false;
+              }
+            },
+            child: Dialog(
+              child: BlocSelector<HomeCubit, HomeState, ApiStatus>(
+                selector: (state) => state.approveRejectApiStatus,
+                builder: (context, state) {
+                  return WithdrawDialog(
+                    data: data,
+                    isLoading: state.isLoading,
+                    onApprove: () {
+                      homeCubit.approveRejectWithdrawRequest(
+                        ApproveRejectWithdrawRequestParams(data.id ?? '', "APPROVED", "Approved"),
+                      );
+                    },
+                    onReject: () {
+                      homeCubit.approveRejectWithdrawRequest(
+                        ApproveRejectWithdrawRequestParams(data.id ?? '', "REJECTED", "Rejected"),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        );
       },
     );
   }
@@ -161,7 +210,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         profileCubit.fetchProfile(forceRefresh: true),
       ]);
     }
-
+    homeCubit.getWithdrawRequest();
     // Also check for app updates during manual refresh
     await checkForUpdate();
     _lastUpdateCheck = DateTime.now();
@@ -206,206 +255,215 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ],
         ),
       ),
-      body: RefreshIndicator(
-        color: AppColors.primaryPurple,
-        onRefresh: _refreshHomeData,
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  BlocSelector<HomeCubit, HomeState, List<AdsModel>>(
-                    bloc: homeCubit,
-                    selector: (state) => state.adsList ?? [],
-                    builder: (context, adsList) {
-                      return SizedBox(
-                        height: 150.h,
-                        child: PageView.builder(
-                          controller: _pageController,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: adsList.length,
-                          itemBuilder: (context, index) {
-                            return Image.network(
-                              adsList[index].fileUrl ?? '',
-                              width: MediaQuery.of(context).size.width,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  Gap(10.h), // Some spacing before the sticky tab
-                ],
+      body: BlocListener<HomeCubit, HomeState>(
+        bloc: homeCubit,
+        listener: (context, state) {
+          // Only show dialog if there are pending withdraw requests and no dialog is already open
+          if (state.withdrawRequestModel != null && state.withdrawRequestModel!.isNotEmpty && !_isWithdrawDialogOpen) {
+            showWithdrawDialog(state.withdrawRequestModel!.first);
+          }
+        },
+        child: RefreshIndicator(
+          color: AppColors.primaryPurple,
+          onRefresh: _refreshHomeData,
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    BlocSelector<HomeCubit, HomeState, List<AdsModel>>(
+                      bloc: homeCubit,
+                      selector: (state) => state.adsList ?? [],
+                      builder: (context, adsList) {
+                        return SizedBox(
+                          height: 150.h,
+                          child: PageView.builder(
+                            controller: _pageController,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: adsList.length,
+                            itemBuilder: (context, index) {
+                              return Image.network(
+                                adsList[index].fileUrl ?? '',
+                                width: MediaQuery.of(context).size.width,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    Gap(10.h), // Some spacing before the sticky tab
+                  ],
+                ),
               ),
-            ),
 
-            // Sticky Tab Bar (Horizontal ListView)
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _StickyTabDelegate(
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: AppColors.white, // Important for sticking effect
-                    border: Border.all(color: AppColors.blue7E.withValues(alpha: 0.1)),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
-                  child: ValueListenableBuilder(
-                    valueListenable: selectedIndex,
-                    builder: (context, selected, _) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: CommonTabWidget(
-                              onTap: () {
-                                selectedIndex.value = 0;
-                              },
-                              isSelected: selectedIndex.value == 0,
-                              title: Strings.play,
+              // Sticky Tab Bar (Horizontal ListView)
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _StickyTabDelegate(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.white, // Important for sticking effect
+                      border: Border.all(color: AppColors.blue7E.withValues(alpha: 0.1)),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.h),
+                    child: ValueListenableBuilder(
+                      valueListenable: selectedIndex,
+                      builder: (context, selected, _) {
+                        return Row(
+                          children: [
+                            Expanded(
+                              child: CommonTabWidget(
+                                onTap: () {
+                                  selectedIndex.value = 0;
+                                },
+                                isSelected: selectedIndex.value == 0,
+                                title: Strings.play,
+                              ),
                             ),
-                          ),
-                          Gap(10.w),
-                          Expanded(
-                            child: CommonTabWidget(
-                              onTap: () {
-                                selectedIndex.value = 1;
-                                // Only call API if learning list is empty or null
-                                if (homeCubit.state.learningList == null || homeCubit.state.learningList!.isEmpty) {
-                                  homeCubit.getLearningList(Strings.video);
-                                }
-                              },
-                              isSelected: selectedIndex.value == 1,
-                              title: Strings.learn,
+                            Gap(10.w),
+                            Expanded(
+                              child: CommonTabWidget(
+                                onTap: () {
+                                  selectedIndex.value = 1;
+                                  // Only call API if learning list is empty or null
+                                  if (homeCubit.state.learningList == null || homeCubit.state.learningList!.isEmpty) {
+                                    homeCubit.getLearningList(Strings.video);
+                                  }
+                                },
+                                isSelected: selectedIndex.value == 1,
+                                title: Strings.learn,
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Content based on selected index
-            SliverToBoxAdapter(
-              child: ValueListenableBuilder(
-                valueListenable: selectedIndex,
-                builder: (context, selected, _) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 22.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Gap(15.h),
-                        selected == 0
-                            ? Column(
-                              children: [
-                                Stack(
-                                  children: [
-                                    Divider(color: AppColors.black).paddingTop(5.h),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Container(
-                                        color: AppColors.white,
-                                        child: TextView(
-                                          text: Strings.sectorsPlay,
-                                          fontSize: 18.sp,
-                                        ).paddingSymmetric(horizontal: 20.w),
+              // Content based on selected index
+              SliverToBoxAdapter(
+                child: ValueListenableBuilder(
+                  valueListenable: selectedIndex,
+                  builder: (context, selected, _) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 22.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Gap(15.h),
+                          selected == 0
+                              ? Column(
+                                children: [
+                                  Stack(
+                                    children: [
+                                      Divider(color: AppColors.black).paddingTop(5.h),
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: Container(
+                                          color: AppColors.white,
+                                          child: TextView(
+                                            text: Strings.sectorsPlay,
+                                            fontSize: 18.sp,
+                                          ).paddingSymmetric(horizontal: 20.w),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Gap(15.h),
+                                    ],
+                                  ),
+                                  Gap(15.h),
 
-                                BlocBuilder<HomeCubit, HomeState>(
-                                  bloc: homeCubit,
-                                  builder: (context, state) {
-                                    final isLoading = state.sectorListApiStatus.isLoading;
-                                    final sectorList = state.sectorModel?.sectors ?? [];
+                                  BlocBuilder<HomeCubit, HomeState>(
+                                    bloc: homeCubit,
+                                    builder: (context, state) {
+                                      final isLoading = state.sectorListApiStatus.isLoading;
+                                      final sectorList = state.sectorModel?.sectors ?? [];
 
-                                    if (isLoading) {
-                                      return const HomePageShimmer();
-                                    }
+                                      if (isLoading) {
+                                        return const HomePageShimmer();
+                                      }
 
-                                    // if (sectorList.isEmpty) {
-                                    //   return Column(children: [Gap(100.h), Text("No contest found")]);
-                                    // }
+                                      // if (sectorList.isEmpty) {
+                                      //   return Column(children: [Gap(100.h), Text("No contest found")]);
+                                      // }
 
-                                    return Column(
-                                      children: [
-                                        GridView.builder(
-                                          itemCount: sectorList.length,
-                                          shrinkWrap: true,
-                                          physics: NeverScrollableScrollPhysics(),
-                                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 2,
-                                            childAspectRatio:
-                                                MediaQuery.of(context).size.width >= 600
-                                                    ? 1.5 // Tablet
-                                                    : (MediaQuery.of(context).size.width > 400 &&
-                                                        MediaQuery.of(context).size.height < 900)
-                                                    ? 1.5
-                                                    : 0.7,
-                                            crossAxisSpacing: 20,
-                                            mainAxisSpacing: 20,
+                                      return Column(
+                                        children: [
+                                          GridView.builder(
+                                            itemCount: sectorList.length,
+                                            shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
+                                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 2,
+                                              childAspectRatio:
+                                                  MediaQuery.of(context).size.width >= 600
+                                                      ? 1.5 // Tablet
+                                                      : (MediaQuery.of(context).size.width > 400 &&
+                                                          MediaQuery.of(context).size.height < 900)
+                                                      ? 1.5
+                                                      : 0.7,
+                                              crossAxisSpacing: 20,
+                                              mainAxisSpacing: 20,
+                                            ),
+                                            itemBuilder: (context, index) {
+                                              return ContestWidget(
+                                                data: sectorList[index],
+                                                cubit: homeCubit,
+                                                nextMatchDate: state.sectorModel?.nextMatchDate ?? '',
+                                              );
+                                            },
                                           ),
-                                          itemBuilder: (context, index) {
-                                            return ContestWidget(
-                                              data: sectorList[index],
-                                              cubit: homeCubit,
-                                              nextMatchDate: state.sectorModel?.nextMatchDate ?? '',
-                                            );
-                                          },
-                                        ),
-                                        Gap(20.h),
-                                        TextView(
-                                          text: 'TOP 5 MOST PICKED STOCKS',
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16.sp,
-                                        ),
-                                        Gap(10.h),
-                                        BlocBuilder<HomeCubit, HomeState>(
-                                          bloc: homeCubit,
-                                          builder: (context, state) {
-                                            if (state.mostPickedStockApiStatus.isLoading) {
-                                              return shimmerStockCard();
-                                            }
-                                            return ListView.separated(
-                                              shrinkWrap: true,
-                                              separatorBuilder: (context, index) => Gap(10.h),
-                                              physics: NeverScrollableScrollPhysics(),
-                                              itemCount: state.mostPickedStock?.length ?? 0,
-                                              itemBuilder: (context, index) {
-                                                final stock = state.mostPickedStock?[index];
-                                                return MostPickedStockWidget(data: stock ?? MostPickedStock());
-                                              },
-                                            );
-                                          },
-                                        ),
-                                        Gap(50.h),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ],
-                            )
-                            : BlocBuilder<HomeCubit, HomeState>(
-                              bloc: homeCubit,
-                              builder: (context, state) {
-                                if (state.learningListApiStatus.isLoading) {
-                                  return const LearnListShimmer();
-                                }
-                                return LearnList(list: state.learningList ?? []);
-                              },
-                            ),
-                      ],
-                    ),
-                  );
-                },
+                                          Gap(20.h),
+                                          TextView(
+                                            text: 'TOP 5 MOST PICKED STOCKS',
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16.sp,
+                                          ),
+                                          Gap(10.h),
+                                          BlocBuilder<HomeCubit, HomeState>(
+                                            bloc: homeCubit,
+                                            builder: (context, state) {
+                                              if (state.mostPickedStockApiStatus.isLoading) {
+                                                return shimmerStockCard();
+                                              }
+                                              return ListView.separated(
+                                                shrinkWrap: true,
+                                                separatorBuilder: (context, index) => Gap(10.h),
+                                                physics: NeverScrollableScrollPhysics(),
+                                                itemCount: state.mostPickedStock?.length ?? 0,
+                                                itemBuilder: (context, index) {
+                                                  final stock = state.mostPickedStock?[index];
+                                                  return MostPickedStockWidget(data: stock ?? MostPickedStock());
+                                                },
+                                              );
+                                            },
+                                          ),
+                                          Gap(50.h),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              )
+                              : BlocBuilder<HomeCubit, HomeState>(
+                                bloc: homeCubit,
+                                builder: (context, state) {
+                                  if (state.learningListApiStatus.isLoading) {
+                                    return const LearnListShimmer();
+                                  }
+                                  return LearnList(list: state.learningList ?? []);
+                                },
+                              ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -536,10 +594,65 @@ class _StickyTabDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class WithdrawDialog extends StatelessWidget {
-  const WithdrawDialog({super.key});
+  final WithdrawRequestModel data;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
+  final bool isLoading;
+
+  const WithdrawDialog({
+    super.key,
+    required this.data,
+    required this.onApprove,
+    required this.onReject,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(child: Column(children: [Text("Do you want to withdraw 10,000 coins?")]));
+    return Padding(
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.account_balance_wallet, size: 48, color: AppColors.primaryPurple),
+          const SizedBox(height: 16),
+          Text("Redeem Request", style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+
+          Text(
+            "Do you want to withdraw ${data.amount ?? 0} coins?",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+          const SizedBox(height: 24),
+          if (isLoading)
+            CircularProgressIndicator()
+          else
+            Row(
+              children: [
+                Expanded(child: AppButton(text: "Reject", onPressed: onReject, backgroundColor: AppColors.red)),
+                const SizedBox(width: 12),
+                Expanded(child: AppButton(text: "Approve", onPressed: onApprove, backgroundColor: AppColors.green)),
+              ],
+            ),
+          Gap(10.h),
+          Text(
+            "You can make only one withdrawal request per day.",
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.black87),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "For your security, we recommend saving a screenshot of this confirmation.",
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
   }
 }

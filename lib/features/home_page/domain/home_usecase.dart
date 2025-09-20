@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:stoxplay/core/network/app_error.dart';
 import 'package:stoxplay/core/network/use_case.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
+import 'package:stoxplay/features/home_page/data/models/approve_reject_withdraw_request_params.dart';
 import 'package:stoxplay/features/home_page/data/models/client_teams_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
@@ -12,6 +13,7 @@ import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
+import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
 import 'package:stoxplay/features/home_page/domain/home_repo.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 
@@ -166,5 +168,25 @@ class RegisterTokenUseCase extends UseCase<String, String> {
   @override
   Future<Either<AppError, String>> call(String params) async {
     return await repo.registerToken(params);
+  }
+}
+
+class WithdrawRequestPendingApprovalUseCase extends UseCase<List<WithdrawRequestModel>, String> {
+  final HomeRepo repo;
+
+  WithdrawRequestPendingApprovalUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, List<WithdrawRequestModel>>> call(String params) async {
+    return await repo.withdrawalRequestPendingApproval();
+  }
+}
+
+class ApproveRejectWithdrawRequestUseCase extends UseCase<String, ApproveRejectWithdrawRequestParams> {
+  final HomeRepo repo;
+  ApproveRejectWithdrawRequestUseCase({required this.repo});
+  @override
+  Future<Either<AppError, String>> call(ApproveRejectWithdrawRequestParams params) async {
+    return await repo.approveRejectWithdrawRequest(params);
   }
 }

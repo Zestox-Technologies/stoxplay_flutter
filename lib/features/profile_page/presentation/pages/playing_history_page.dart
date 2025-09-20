@@ -31,7 +31,7 @@ class _PlayingHistoryPageState extends State<PlayingHistoryPage> {
     try {
       _profileCubit = BlocProvider.of<ProfileCubit>(context);
     } catch (_) {
-      _profileCubit = ProfileCubit(sl(), sl(), sl(), sl());
+      _profileCubit = ProfileCubit(sl(), sl(), sl(), sl(),sl());
       _ownsCubit = true;
     }
     _fetchData();

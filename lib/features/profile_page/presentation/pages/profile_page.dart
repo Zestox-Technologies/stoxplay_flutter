@@ -44,7 +44,8 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) {
         return LogoutBS(
-          onLogout: () {
+          onLogout: () async {
+            await profileCubit.logout();
             StorageService().setLoggedIn(false);
             StorageService().clearUserToken();
             StorageService().remove(DBKeys.user);

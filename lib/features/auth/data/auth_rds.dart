@@ -16,6 +16,8 @@ abstract class AuthRds {
   Future<ApiResponse<UserModel?>> verifyOtp({required AuthParamsModel params});
 
   Future<ApiResponse<UserModel>> completeSignUp({required AuthParamsModel params});
+
+  Future<String> logout({required String params});
 }
 
 class AuthRdsImpl implements AuthRds {
@@ -90,6 +92,18 @@ class AuthRdsImpl implements AuthRds {
       });
 
       return baseResponse;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: 'An unexpected error occurred');
+    }
+  }
+
+  @override
+  Future<String> logout({required String params}) async {
+    try {
+      final response = await client.post(ApiUrls.logout, data: {"fcmToken" :params});
+      return '';
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {
