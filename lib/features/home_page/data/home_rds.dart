@@ -11,6 +11,7 @@ import 'package:stoxplay/features/home_page/data/models/join_contest_params_mode
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
+import 'package:stoxplay/features/home_page/data/models/notification_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
@@ -52,6 +53,10 @@ abstract class HomeRds {
   Future<List<WithdrawRequestModel>> withdrawRequestsPendingApproval();
 
   Future<String> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params);
+
+  Future<NotificationModel> getNotifications(Map<String, dynamic> params);
+
+  Future<String> markNotificationAsRead(String notificationId);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -273,6 +278,30 @@ class HomeRdsImpl extends HomeRds {
       final withdrawRequests = rawList.map((e) => WithdrawRequestModel.fromJson(e as Map<String, dynamic>)).toList();
 
       return withdrawRequests;
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<NotificationModel> getNotifications(Map<String, dynamic> params) async {
+    try {
+      final response = await client.get(ApiUrls.notifications, queryParameters: params);
+      return NotificationModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<String> markNotificationAsRead(String notificationId) async {
+    try {
+      await client.put(ApiUrls.markNotificationAsRead(notificationId));
+      return 'Notification marked as read successfully';
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {

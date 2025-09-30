@@ -14,6 +14,7 @@ import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 
 class CompletedDetailsScreen extends StatefulWidget {
@@ -95,6 +96,7 @@ class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
                       name: item?.teamName ?? '',
                       points: item?.points?.toInt() ?? 0,
                       prize: item?.prize?.toInt() ?? 0,
+                      teamId: item?.teamId ?? '',
                     );
                   },
                 );
@@ -268,65 +270,71 @@ class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
     required String name,
     required int points,
     required int prize,
+    required String teamId,
   }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 8.h),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: AppColors.blackD7D7, width: 1),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(10.w),
-        child: Row(
-          children: [
-            Gap(5.w),
-            // Rank
-            TextView(text: "#${rank.toString()}", fontWeight: FontWeight.w700),
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: teamId ?? '');
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 8.h),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(10.r),
+          border: Border.all(color: AppColors.blackD7D7, width: 1),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(10.w),
+          child: Row(
+            children: [
+              Gap(5.w),
+              // Rank
+              TextView(text: "#${rank.toString()}", fontWeight: FontWeight.w700),
 
-            Gap(10.w),
+              Gap(10.w),
 
-            // Profile picture
-            CircleAvatar(
-              radius: 18.r,
-              backgroundColor: AppColors.blackD7D7,
-              child: ClipOval(
-                child: CachedImageWidget(imageUrl: profileUrl, height: 36.h, width: 36.w, fit: BoxFit.cover),
+              // Profile picture
+              CircleAvatar(
+                radius: 18.r,
+                backgroundColor: AppColors.blackD7D7,
+                child: ClipOval(
+                  child: CachedImageWidget(imageUrl: profileUrl, height: 36.h, width: 36.w, fit: BoxFit.cover),
+                ),
               ),
-            ),
 
-            Gap(10.w),
+              Gap(10.w),
 
-            // Name and points
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              // Name and points
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextView(text: name, fontSize: 14.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
+                    Row(
+                      children: [
+                        Image.asset(AppAssets.cupIcon, height: 14.h, width: 14.w),
+                        Gap(4.w),
+                        TextView(
+                          text: '$points Points',
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          fontColor: AppColors.black6666,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextView(text: name, fontSize: 14.sp, fontWeight: FontWeight.w600, fontColor: AppColors.black),
-                  Row(
-                    children: [
-                      Image.asset(AppAssets.cupIcon, height: 14.h, width: 14.w),
-                      Gap(4.w),
-                      TextView(
-                        text: '$points Points',
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        fontColor: AppColors.black6666,
-                      ),
-                    ],
-                  ),
+                  TextView(text: prize.toString() ?? '0', fontSize: 14.sp),
+                  Gap(5.w),
+                  Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextView(text: prize.toString() ?? '0', fontSize: 14.sp),
-                Gap(5.w),
-                Image.asset(AppAssets.stoxplayCoin, height: 15.h, width: 15.w),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -45,6 +45,8 @@ class ApiUrls {
 
   static const String registerToken = '/notifications/register-token';
   static const String withdrawalRequestPendingApproval = '/withdraw-requests/pending-approval';
+  static const String notifications = '/notifications';
+  static String markNotificationAsRead(String notificationId) => '/notifications/$notificationId/read';
 
   static String approveRejectWithdrawRequest(String requestId) => '/withdraw-requests/$requestId/process';
 }

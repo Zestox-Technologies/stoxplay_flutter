@@ -191,7 +191,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         profileCubit.fetchProfile();
                       },
                     ),
-                    _ProfileListTile(icon: "🔔", title: "Notification", onTap: () {}),
+                    _ProfileListTile(
+                      icon: "🔔",
+                      title: "Notification",
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.notificationPage);
+                      },
+                    ),
                     _SectionHeader(title: "Support & Help"),
                     _ProfileListTile(
                       icon: "🎮",

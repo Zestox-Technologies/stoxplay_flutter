@@ -53,4 +53,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => LogoutUseCase(repository: sl()));
   sl.registerLazySingleton(() => WithdrawRequestPendingApprovalUseCase(repo: sl()));
   sl.registerLazySingleton(() => ApproveRejectWithdrawRequestUseCase(repo: sl()));
+  sl.registerLazySingleton(() => NotificationUseCase(repo: sl()));
+  sl.registerLazySingleton(() => MarkNotificationAsReadUseCase(repo: sl()));
 }

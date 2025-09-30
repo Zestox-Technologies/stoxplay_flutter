@@ -10,6 +10,7 @@ import 'package:stoxplay/features/home_page/data/models/join_contest_params_mode
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
+import 'package:stoxplay/features/home_page/data/models/notification_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
@@ -49,6 +50,10 @@ abstract class HomeRepo {
   Future<Either<AppError, List<WithdrawRequestModel>>> withdrawalRequestPendingApproval();
 
   Future<Either<AppError, String>> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params);
+
+  Future<Either<AppError, NotificationModel>> getNotifications(Map<String,dynamic> params);
+
+  Future<Either<AppError, String>> markNotificationAsRead(String notificationId);
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -210,6 +215,26 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<AppError, String>> approveRejectWithdrawRequest(ApproveRejectWithdrawRequestParams params) async {
     try {
       final result = await homeRds.approveRejectWithdrawRequest(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, NotificationModel>> getNotifications(Map<String, dynamic> params)async {
+    try {
+      final result = await homeRds.getNotifications(params);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, String>> markNotificationAsRead(String notificationId) async {
+    try {
+      final result = await homeRds.markNotificationAsRead(notificationId);
       return Right(result);
     } catch (e) {
       return handleException(e);

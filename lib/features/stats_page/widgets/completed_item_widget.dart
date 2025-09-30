@@ -88,7 +88,7 @@ class CompletedItemWidget extends StatelessWidget {
                   ),
                   TextView(text: 'Rank: ${data.rank.toString()}', fontSize: 12.sp, fontWeight: FontWeight.w500),
                   TextView(
-                    text: "Time: 4:15 PM",
+                    text: "Time: 4:00 PM",
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                     fontColor: AppColors.black,

@@ -32,10 +32,7 @@ class CachedImageWidget extends StatelessWidget {
         width: width,
         fit: fit,
         errorWidget: (context, url, error) {
-          return Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Image.asset(errorAsset, height: height, width: width, fit: fit),
-          );
+          return Image.asset(errorAsset, height: height, width: width, fit: fit);
         },
       ),
     );

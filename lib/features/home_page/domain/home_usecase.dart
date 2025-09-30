@@ -11,6 +11,7 @@ import 'package:stoxplay/features/home_page/data/models/join_contest_params_mode
 import 'package:stoxplay/features/home_page/data/models/join_contest_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
+import 'package:stoxplay/features/home_page/data/models/notification_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
 import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
@@ -184,9 +185,33 @@ class WithdrawRequestPendingApprovalUseCase extends UseCase<List<WithdrawRequest
 
 class ApproveRejectWithdrawRequestUseCase extends UseCase<String, ApproveRejectWithdrawRequestParams> {
   final HomeRepo repo;
+
   ApproveRejectWithdrawRequestUseCase({required this.repo});
+
   @override
   Future<Either<AppError, String>> call(ApproveRejectWithdrawRequestParams params) async {
     return await repo.approveRejectWithdrawRequest(params);
+  }
+}
+
+class NotificationUseCase extends UseCase<NotificationModel, Map<String, dynamic>> {
+  final HomeRepo repo;
+
+  NotificationUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, NotificationModel>> call(Map<String, dynamic> params) async {
+    return await repo.getNotifications(params);
+  }
+}
+
+class MarkNotificationAsReadUseCase extends UseCase<String, String> {
+  final HomeRepo repo;
+
+  MarkNotificationAsReadUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, String>> call(String notificationId) async {
+    return await repo.markNotificationAsRead(notificationId);
   }
 }

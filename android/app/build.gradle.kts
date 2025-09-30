@@ -21,7 +21,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.zestox.stoxbook"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "29.0.13113456 rc1"
 
     defaultConfig {
         applicationId = "com.zestox.stoxbook"

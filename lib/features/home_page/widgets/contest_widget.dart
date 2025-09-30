@@ -48,7 +48,7 @@ class ContestWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                Gap(10.w),
+                Gap(5.w),
                 Expanded(
                   child: TextView(
                     fontSize: 16.sp,
@@ -61,8 +61,6 @@ class ContestWidget extends StatelessWidget {
                 ),
               ],
             ),
-            // Container(width: MediaQuery.of(context).size.width.w, height: 1, color: AppColors.black.withOpacity(0.2)),
-            // Gap(10.h),
             SizedBox(
               height: 80.h,
               child: LineChart(
@@ -93,8 +91,8 @@ class ContestWidget extends StatelessWidget {
               ),
             ),
             Gap(20.h),
-            TextView(text: '💰Win ${formatMaxWinIntl(data.maxWin ?? 0)}', fontSize: 12.sp, fontWeight: FontWeight.w600),
-            TextView(text: '👥${data.totalJoined ?? 0} joined', fontSize: 12.sp, fontWeight: FontWeight.w600),
+            TextView(text: '💰 Win ${formatMaxWinIntl(data.maxWin ?? 0)}', fontSize: 12.sp, fontWeight: FontWeight.w600),
+            TextView(text: '👥 ${data.totalJoined ?? 0} joined', fontSize: 12.sp, fontWeight: FontWeight.w600),
             Spacer(),
             AppButton(
               key: _buttonKey,

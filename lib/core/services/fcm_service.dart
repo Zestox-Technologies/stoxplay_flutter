@@ -5,6 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
+import 'package:stoxplay/main.dart';
+import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/db_keys.dart';
 
 /// FCM Service class to handle all Firebase Cloud Messaging operations
@@ -207,11 +209,12 @@ class FCMService {
   void _handleNotificationNavigation(RemoteMessage message) {
     // TODO: Implement navigation logic based on message data
     // Example:
-    // if (message.data['type'] == 'contest') {
-    //   // Navigate to contest screen
-    // } else if (message.data['type'] == 'leaderboard') {
-    //   // Navigate to leaderboard screen
-    // }
+    if (message.data['type'] == 'WITHDRAW_REQUEST') {
+      navigatorKey.currentState?.pushNamed(AppRoutes.mainPage);
+      // Navigate to contest screen
+    } else if (message.data['type'] == 'leaderboard') {
+      // Navigate to leaderboard screen
+    }
   }
 
   /// Send FCM token to server

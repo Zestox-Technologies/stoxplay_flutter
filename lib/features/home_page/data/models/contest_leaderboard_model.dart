@@ -62,6 +62,7 @@ class Leaderboard {
   int? prize;
   double? points;
   User? user;
+  String? teamId;
 
   Leaderboard({
     this.teamName,
@@ -69,6 +70,7 @@ class Leaderboard {
     this.prize,
     this.points,
     this.user,
+    this.teamId,
   });
 
   factory Leaderboard.fromJson(Map<String, dynamic> json) => Leaderboard(
@@ -77,6 +79,7 @@ class Leaderboard {
     prize: json["prize"],
     points: json["points"]?.toDouble(),
     user: json["user"] == null ? null : User.fromJson(json["user"]),
+    teamId: json["teamId"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -85,6 +88,7 @@ class Leaderboard {
     "prize": prize,
     "points": points,
     "user": user?.toJson(),
+    "teamId": teamId,
   };
 }
 

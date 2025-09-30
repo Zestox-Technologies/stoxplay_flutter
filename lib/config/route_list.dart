@@ -5,6 +5,7 @@ import 'package:stoxplay/features/home_page/pages/battleground_page/pages/battle
 import 'package:stoxplay/features/home_page/pages/contest_details_page/contest_data_screen.dart';
 import 'package:stoxplay/features/home_page/pages/contest_details_page/contest_details_page.dart';
 import 'package:stoxplay/features/home_page/pages/home_page.dart';
+import 'package:stoxplay/features/home_page/pages/notification_page.dart';
 import 'package:stoxplay/features/home_page/pages/stock_selection_page/stock_selection_screen.dart';
 import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
 import 'package:stoxplay/features/main_navigation/main_navigation_page.dart';
@@ -41,5 +42,6 @@ class RouteList {
     AppRoutes.completedDetailsScreen: (context) => CompletedDetailsScreen(),
     AppRoutes.howToPlayWebView: (context) => HowToPlayWebView(),
     AppRoutes.privacyPolicyScreen: (context) => PrivacyPolicyScreen(),
+    AppRoutes.notificationPage: (context) => NotificationPage(),
   };
 }

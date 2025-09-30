@@ -24,6 +24,7 @@ class MainNavigationPage extends StatelessWidget {
     return true; // Exit app
   }
 
+
   @override
   Widget build(BuildContext context) {
     return PopScope(

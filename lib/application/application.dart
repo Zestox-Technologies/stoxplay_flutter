@@ -6,8 +6,10 @@ import 'package:stoxplay/config/route_list.dart';
 import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/local_storage/storage_service.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
+import 'package:stoxplay/features/home_page/cubits/notification_cubit.dart';
 import 'package:stoxplay/features/profile_page/presentation/cubit/profile_cubit.dart';
 import 'package:stoxplay/features/stats_page/presentation/cubit/stats_cubit.dart';
+import 'package:stoxplay/main.dart';
 import 'package:stoxplay/utils/common/cubits/multi_timer_cubit.dart';
 import 'package:stoxplay/utils/common/cubits/timer_cubit.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
               providers: [
                 BlocProvider(create: (context) => TimerCubit()),
                 BlocProvider.value(value: MultiTimerCubit.instance),
-                BlocProvider(create: (context) => ProfileCubit(sl(), sl(), sl(), sl(),sl())),
+                BlocProvider(create: (context) => ProfileCubit(sl(), sl(), sl(), sl(), sl())),
                 BlocProvider(create: (context) => StatsCubit(getMyContestUseCase: sl())),
                 BlocProvider(
                   create:
@@ -56,9 +58,14 @@ class MyApp extends StatelessWidget {
                         approveRejectWithdrawRequestUseCase: sl(),
                       ),
                 ),
+                BlocProvider(
+                  create:
+                      (context) => NotificationCubit(notificationUseCase: sl(), markNotificationAsReadUseCase: sl()),
+                ),
               ],
               child: MaterialApp(
                 title: Strings.stoxplay,
+                navigatorKey: navigatorKey,
                 debugShowCheckedModeBanner: false,
                 routes: RouteList.routes,
                 useInheritedMediaQuery: true,

@@ -38,34 +38,22 @@ class LeaderboardPage extends StatelessWidget {
             actions: [
               selectedIndex.value == 1
                   ? SizedBox(
-                    width:
-                        kToolbarHeight, // Match the space of the leading icon
+                    width: kToolbarHeight, // Match the space of the leading icon
                   )
                   : SizedBox.shrink(),
             ],
           ),
           body: Column(
             children: [
-              Container(
-                height: 0.5.h,
-                width: double.maxFinite,
-                color: Colors.grey,
-              ),
+              Container(height: 0.5.h, width: double.maxFinite, color: Colors.grey),
               selectedIndex.value == 0
                   ? Expanded(
                     child: Stack(
                       children: [
-                        Positioned.fill(
-                          bottom: 200.h,
-                          child: Image.asset(AppAssets.lightSplashStrokes),
-                        ),
+                        Positioned.fill(bottom: 200.h, child: Image.asset(AppAssets.lightSplashStrokes)),
                         Column(
                           children: [
-                            Container(
-                              height: 1.h,
-                              width: double.maxFinite,
-                              color: Colors.grey,
-                            ),
+                            Container(height: 1.h, width: double.maxFinite, color: Colors.grey),
                             Expanded(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -75,22 +63,12 @@ class LeaderboardPage extends StatelessWidget {
                                       height: 40.h,
                                       child: Stack(
                                         children: [
-                                          Positioned.fill(
-                                            child: Divider(
-                                              color: AppColors.black,
-                                            ),
-                                          ),
+                                          Positioned.fill(child: Divider(color: AppColors.black)),
                                           Center(
                                             child: Container(
                                               color: AppColors.white,
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 20.w,
-                                              ),
-                                              child: TextView(
-                                                text:
-                                                    Strings.winnersLeaderboard,
-                                                fontSize: 20.sp,
-                                              ),
+                                              padding: EdgeInsets.symmetric(horizontal: 20.w),
+                                              child: TextView(text: Strings.winnersLeaderboard, fontSize: 20.sp),
                                             ),
                                           ),
                                         ],
@@ -100,8 +78,7 @@ class LeaderboardPage extends StatelessWidget {
                                     ListView.separated(
                                       itemCount: 3,
                                       shrinkWrap: true,
-                                      separatorBuilder:
-                                          (context, index) => Gap(15.h),
+                                      separatorBuilder: (context, index) => Gap(15.h),
                                       itemBuilder:
                                           (context, index) => GestureDetector(
                                             onTap: () {
@@ -134,15 +111,10 @@ class LeaderboardPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Gap(10.h),
-                                Image.asset(
-                                  AppAssets.celebrationStarImage,
-                                  height: 120.h,
-                                ),
+                                Image.asset(AppAssets.celebrationStarImage, height: 120.h),
                                 Stack(
                                   children: [
-                                    Divider(
-                                      color: AppColors.black,
-                                    ).paddingTop(5.h),
+                                    Divider(color: AppColors.black).paddingTop(5.h),
                                     Align(
                                       alignment: Alignment.center,
                                       child: Container(
@@ -155,10 +127,7 @@ class LeaderboardPage extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                TextView(
-                                  text: Strings.topPerformersInTheMatch,
-                                  fontSize: 24.sp,
-                                ),
+                                TextView(text: Strings.topPerformersInTheMatch, fontSize: 24.sp),
                                 Gap(10.h),
                               ],
                             ),
@@ -166,9 +135,7 @@ class LeaderboardPage extends StatelessWidget {
                           Expanded(
                             child: Container(
                               decoration: BoxDecoration(
-                                color:
-                                    Colors
-                                        .white, // or your desired background color
+                                color: Colors.white, // or your desired background color
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0x66000000),
@@ -177,78 +144,52 @@ class LeaderboardPage extends StatelessWidget {
                                     spreadRadius: 0, // same as CSS
                                   ),
                                 ],
-                                borderRadius: BorderRadius.circular(
-                                  10,
-                                ), // optional
+                                borderRadius: BorderRadius.circular(10), // optional
                               ),
                               child: Column(
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 20.w,
-                                      vertical: 10.h,
-                                    ),
+                                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         TextView(text: "Name"),
                                         Row(
-                                          children: [
-                                            TextView(text: "Winnings"),
-                                            Gap(20.w),
-                                            TextView(text: "Points"),
-                                          ],
+                                          children: [TextView(text: "Winnings"), Gap(20.w), TextView(text: "Points")],
                                         ),
                                       ],
                                     ),
                                   ),
-                                  Container(
-                                    height: 0.5.h,
-                                    color: AppColors.black6666,
-                                  ),
+                                  Container(height: 0.5.h, color: AppColors.black6666),
                                   Expanded(
                                     child: ListView.separated(
                                       shrinkWrap: true,
                                       separatorBuilder:
-                                          (context, index) => Container(
-                                            height: 0.5.h,
-                                            color: AppColors.black6666,
-                                          ),
+                                          (context, index) => Container(height: 0.5.h, color: AppColors.black6666),
                                       itemCount: 10,
                                       itemBuilder: (context, index) {
                                         return Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
                                               children: [
                                                 Container(
-                                                  margin: EdgeInsets.symmetric(
-                                                    horizontal: 20.w,
-                                                    vertical: 10.h,
-                                                  ),
+                                                  margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        Colors
-                                                            .white, // Border color
+                                                    color: Colors.white, // Border color
                                                     shape: BoxShape.circle,
                                                     border: Border.all(
-                                                      color: AppColors.blue7E
-                                                          .withOpacity(0.5),
-                                                      width:
-                                                          1, // Change border width here
+                                                      color: AppColors.blue7E.withOpacity(0.5),
+                                                      width: 1, // Change border width here
                                                     ),
                                                   ),
                                                   child: CircleAvatar(
                                                     radius: 20.r,
-                                                    backgroundColor:
-                                                        Colors.transparent,
+                                                    backgroundColor: Colors.transparent,
                                                     child: ClipOval(
                                                       child: Image.asset(
                                                         AppAssets.bankWars,
-                                                        height:
-                                                            40, // adjust if needed
+                                                        height: 40, // adjust if needed
                                                         width: 40,
                                                         fit: BoxFit.cover,
                                                       ),
@@ -256,23 +197,18 @@ class LeaderboardPage extends StatelessWidget {
                                                   ),
                                                 ),
                                                 Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     TextView(
                                                       text: "Rahul Soni",
                                                       fontSize: 16.sp,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      fontWeight:
-                                                          FontWeight.w700,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      fontWeight: FontWeight.w700,
                                                     ),
                                                     TextView(
                                                       text: "Winnings-8,10,000",
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontColor:
-                                                          AppColors.black46464,
+                                                      fontWeight: FontWeight.w400,
+                                                      fontColor: AppColors.black46464,
                                                     ),
                                                   ],
                                                 ),
@@ -283,11 +219,7 @@ class LeaderboardPage extends StatelessWidget {
                                                 Row(
                                                   children: [
                                                     TextView(text: "15k"),
-                                                    Image.asset(
-                                                      AppAssets.stoxplayCoin,
-                                                      height: 16.h,
-                                                      width: 16.w,
-                                                    ),
+                                                    Image.asset(AppAssets.stoxplayCoin, height: 16.h, width: 16.w),
                                                   ],
                                                 ),
                                                 Gap(40.w),

@@ -6,13 +6,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:stoxplay/core/di/service_locator.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/features/home_page/cubits/home_cubit.dart';
+import 'package:stoxplay/features/home_page/cubits/notification_cubit.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
-import 'package:stoxplay/features/home_page/data/models/approve_reject_withdraw_request_params.dart';
 import 'package:stoxplay/features/home_page/data/models/approve_reject_withdraw_request_params.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/withdraw_request_model.dart';
+import 'package:stoxplay/features/home_page/pages/notification_page.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_shimmer_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/contest_widget.dart';
 import 'package:stoxplay/features/home_page/widgets/learn_list_shimmer.dart';
@@ -25,6 +27,7 @@ import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
 
@@ -246,10 +249,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               },
             ),
             CommonAppbarTitle(),
-            Badge(
-              backgroundColor: AppColors.primaryPurple,
-              smallSize: 8,
-              alignment: Alignment.topLeft,
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, AppRoutes.notificationPage);
+              },
               child: Image.asset(AppAssets.notificationIcon, height: 24, width: 24),
             ),
           ],
@@ -271,6 +274,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
+                    Gap(10.h),
                     BlocSelector<HomeCubit, HomeState, List<AdsModel>>(
                       bloc: homeCubit,
                       selector: (state) => state.adsList ?? [],
