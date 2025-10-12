@@ -181,7 +181,7 @@ class _LoginPageState extends State<LoginPage> with CodeAutoFill {
   void _handleInitiateSignUpSuccess(BuildContext context) {
     stepper.value = 1;
     context.read<TimerCubit>().startTimer(seconds: 60);
-    showSnackBar(context: context, message: "OTP sent successfully", backgroundColor: AppColors.green);
+    // showSnackBar(context: context, message: "OTP sent successfully", backgroundColor: AppColors.green);
   }
 
   void _handlePhoneNumberValidation(String value, AuthCubit authCubit) {

@@ -40,12 +40,15 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<ProfileCubit, ProfileState>(
+      listenWhen: (previous, current) {
+        // Only react when profileModel reference changes from null -> non-null or to a new instance
+        final changedModel = previous.profileModel != current.profileModel;
+        return changedModel && current.profileModel != null;
+      },
       listener: (context, state) {
-        // Update controllers when profile data becomes available
-        if (state.profileModel != null) {
-          final cubit = context.read<ProfileCubit>();
-          cubit.initializeControllers();
-        }
+        // Initialize controllers only when profile data becomes newly available
+        final cubit = context.read<ProfileCubit>();
+        cubit.initializeControllers();
       },
       child: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
@@ -112,11 +115,22 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                           AppButton(
                             text: 'Change Image',
                             onPressed: () async {
-                              final imagePicker = ImagePicker();
-                              final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-                              if (pickedFile != null) {
-                                profileImage.value = pickedFile;
-                                await cubit.uploadProfilePicture(pickedFile.path);
+                              try {
+                                final imagePicker = ImagePicker();
+                                final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+                                if (pickedFile != null) {
+                                  profileImage.value = pickedFile;
+                                  try {
+                                    await cubit.uploadProfilePicture(pickedFile.path);
+                                  } catch (e) {
+                                    showSnackBar(
+                                      context: context,
+                                      message: 'Failed to upload image. Please try again.',
+                                    );
+                                  }
+                                }
+                              } catch (e) {
+                                showSnackBar(context: context, message: 'Unable to access gallery. Check permissions.');
                               }
                             },
                             height: 32.h,
@@ -163,7 +177,6 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                               builder: (context, child) {
                                 return Theme(
                                   data: Theme.of(context).copyWith(
-                                    dialogBackgroundColor: Colors.white,
                                     colorScheme: ColorScheme.light(
                                       primary: Colors.deepPurple,
                                       onPrimary: Colors.white,
@@ -172,6 +185,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                                     textButtonTheme: TextButtonThemeData(
                                       style: TextButton.styleFrom(foregroundColor: Colors.deepPurple),
                                     ),
+                                    dialogTheme: DialogThemeData(backgroundColor: Colors.white),
                                   ),
                                   child: child!,
                                 );
@@ -192,16 +206,38 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                       isLoading: state.apiStatus.isLoading,
                       text: 'Update profile',
                       onPressed: () async {
-                        if (cubit.firstNameController.text.trim().isEmpty ||
-                            cubit.usernameController.text.trim().isEmpty ||
-                            cubit.emailController.text.trim().isEmpty ||
-                            state.gender == 'Select' ||
+                        final fullName = cubit.firstNameController.text.trim();
+                        final userName = cubit.usernameController.text.trim();
+                        final email = cubit.emailController.text.trim();
+
+                        if (fullName.isEmpty ||
+                            userName.isEmpty ||
+                            email.isEmpty ||
+                            (state.gender == 'SELECT') ||
                             state.dob == null) {
                           showSnackBar(context: context, message: 'Please fill all the fields before submitting.');
                           return;
                         }
-                        await cubit.updateProfile();
-                        Navigator.pop(context);
+
+                        final emailRegex = RegExp(r'^\S+@\S+\.\S+$');
+                        if (!emailRegex.hasMatch(email)) {
+                          showSnackBar(context: context, message: 'Please enter a valid email address.');
+                          return;
+                        }
+
+                        if (userName.length < 3) {
+                          showSnackBar(context: context, message: 'Username must be at least 3 characters.');
+                          return;
+                        }
+
+                        try {
+                          await cubit.updateProfile();
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        } catch (e) {
+                          showSnackBar(context: context, message: 'Failed to update profile. Please try again.');
+                        }
                       },
 
                       height: 45.h,
@@ -220,7 +256,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   }
 
   Widget _buildTextField(TextEditingController controller, {required String title}) {
-    return CommonTextfield(controller: controller, title: title, hintText: '');
+    return CommonTextfield(controller: controller, title: title, hintText: title);
   }
 
   Widget _buildDropdownField(String value, ValueChanged<String> onChanged) {

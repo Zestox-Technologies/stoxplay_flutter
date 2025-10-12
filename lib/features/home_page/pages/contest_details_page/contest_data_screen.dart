@@ -27,7 +27,6 @@ class ContestDataScreen extends StatefulWidget {
 
 class _ContestDataScreenState extends State<ContestDataScreen> {
   int selectedTab = 0; // 0: Leaderboard, 1: Winnings
-  final String currentUser = 'Ravi Mehta';
   ValueNotifier<int> selectedIndex = ValueNotifier(0);
   late HomeCubit homeCubit;
   String? contestId;

@@ -24,4 +24,5 @@ class AppRoutes {
   static const String howToPlayWebView = '/howToPlayWebView';
   static const String privacyPolicyScreen = '/privacyPolicyScreen';
   static const String notificationPage = '/notificationPage';
+  static const String helpCenterPage = '/helpCenterPage';
 }

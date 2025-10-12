@@ -52,6 +52,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<AppError, ApiResponse<UserModel?>>> verifyOtp({required AuthParamsModel params}) async {
     try {
       final result = await authRds.verifyOtp(params: params);
+      if (result.success != true) {
+        return Left(UnknownError(message: result.message));
+      }
       return Right(result);
     } catch (e) {
       return handleException(e);
@@ -62,6 +65,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<AppError, ApiResponse<UserModel>>> completeSignUp({required AuthParamsModel params}) async {
     try {
       final result = await authRds.completeSignUp(params: params);
+      if (result.success != true) {
+        return Left(UnknownError(message: result.message));
+      }
       return Right(result);
     } catch (e) {
       return handleException(e);

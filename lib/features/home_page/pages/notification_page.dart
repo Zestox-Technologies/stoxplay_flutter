@@ -31,7 +31,7 @@ class _NotificationPageState extends State<NotificationPage> with TickerProvider
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: _buildAppBar(),
-      body: Column(children: [_buildInfoBanner(), Expanded(child: _buildNotificationList())]),
+      body: Column(children: [Expanded(child: _buildNotificationList())]),
     );
   }
 

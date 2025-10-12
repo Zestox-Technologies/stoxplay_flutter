@@ -29,8 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     profileCubit = BlocProvider.of<ProfileCubit>(context);
-    // Use smart loading - fetch only if not already loaded
-    profileCubit.fetchProfile();
+    // Always refresh on entry to ensure latest profile after signup or edits
+    profileCubit.fetchProfile(forceRefresh: true);
     super.initState();
   }
 
@@ -206,7 +206,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         Navigator.pushNamed(context, AppRoutes.howToPlayWebView);
                       },
                     ),
-                    _ProfileListTile(icon: "❓", title: "Help Center", onTap: () {}),
+                    _ProfileListTile(
+                      icon: "❓",
+                      title: "Help Center",
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.helpCenterPage);
+                      },
+                    ),
                     _SectionHeader(title: "Legal"),
                     _ProfileListTile(
                       icon: "👤",

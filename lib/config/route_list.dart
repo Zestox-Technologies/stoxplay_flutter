@@ -11,6 +11,7 @@ import 'package:stoxplay/features/leaderboard_page/pages/leaderboard_page.dart';
 import 'package:stoxplay/features/main_navigation/main_navigation_page.dart';
 import 'package:stoxplay/features/on_boarding_page/on_boarding_page.dart';
 import 'package:stoxplay/features/pdf_view/pages/books_list_screen.dart';
+import 'package:stoxplay/features/profile_page/presentation/pages/help_center_page.dart';
 import 'package:stoxplay/features/profile_page/presentation/pages/how_to_play_webview.dart';
 import 'package:stoxplay/features/profile_page/presentation/pages/personal_info_page.dart';
 import 'package:stoxplay/features/profile_page/presentation/pages/playing_history_page.dart';
@@ -43,5 +44,6 @@ class RouteList {
     AppRoutes.howToPlayWebView: (context) => HowToPlayWebView(),
     AppRoutes.privacyPolicyScreen: (context) => PrivacyPolicyScreen(),
     AppRoutes.notificationPage: (context) => NotificationPage(),
+    AppRoutes.helpCenterPage: (context) => HelpCenterPage(),
   };
 }

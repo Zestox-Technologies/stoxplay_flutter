@@ -103,7 +103,7 @@ class Device {
 
   static bool isFoldable(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return size.width > 400 && size.height < 900;
+    return size.width > 405 && size.height < 900;
   }
 
   static bool isPhone(BuildContext context) {

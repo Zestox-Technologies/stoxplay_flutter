@@ -27,6 +27,7 @@ import 'package:stoxplay/utils/common/widgets/common_appbar_title.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
 import 'package:stoxplay/utils/constants/app_assets.dart';
 import 'package:stoxplay/utils/constants/app_colors.dart';
+import 'package:stoxplay/utils/constants/app_constants.dart';
 import 'package:stoxplay/utils/constants/app_routes.dart';
 import 'package:stoxplay/utils/constants/app_strings.dart';
 import 'package:stoxplay/utils/extensions/extensions.dart';
@@ -48,6 +49,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   List list = [Strings.play, Strings.learn];
   DateTime? _lastUpdateCheck;
   bool _isWithdrawDialogOpen = false;
+  bool _didRouteAwareInitialLoad = false;
 
   @override
   void initState() {
@@ -97,6 +99,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     _pageController.dispose();
     selectedIndex.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Ensure initial APIs also fire when navigating here after signup
+    if (!_didRouteAwareInitialLoad && ModalRoute.of(context)?.isCurrent == true) {
+      _didRouteAwareInitialLoad = true;
+      // Run after first frame to avoid layout jank
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Smart load similar to initState
+        profileCubit.loadCachedProfile();
+        homeCubit.getSectorList();
+        homeCubit.getAdsList();
+        homeCubit.getMostPickedStock();
+        homeCubit.getWithdrawRequest();
+        homeCubit.getLearningList(Strings.video, forceRefresh: true);
+        await checkForUpdate();
+        _lastUpdateCheck = DateTime.now();
+      });
+    }
   }
 
   @override
@@ -402,10 +425,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                               crossAxisCount: 2,
                                               childAspectRatio:
-                                                  MediaQuery.of(context).size.width >= 600
+                                                  Device.isTablet(context)
                                                       ? 1.5 // Tablet
-                                                      : (MediaQuery.of(context).size.width > 400 &&
-                                                          MediaQuery.of(context).size.height < 900)
+                                                      : Device.isFoldable(context)
                                                       ? 1.5
                                                       : 0.7,
                                               crossAxisSpacing: 20,

@@ -97,10 +97,18 @@ class AuthCubit extends Cubit<AuthState> {
       },
       (data) async {
         // Set login status and save user data after successful signup
+        final token = data.data?.token;
+        if (token == null || token.isEmpty) {
+          emit(state.copyWith(
+            completeSignUpStatus: ApiStatus.failed,
+            completeSignUpErrorMessage: 'Signup failed: missing token',
+          ));
+          return;
+        }
         StorageService().setLoggedIn(true);
         StorageService().write(DBKeys.user, data.data?.toJson());
-        await StorageService().saveUserToken(data.data!.token!);
-        ApiService().updateAuthHeader(data.data!.token!);
+        await StorageService().saveUserToken(token);
+        ApiService().updateAuthHeader(token);
         emit(state.copyWith(completeSignUpStatus: ApiStatus.success, user: data.data));
       },
     );

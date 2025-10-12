@@ -89,9 +89,9 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                   }
                 }
                 break;
-              case CloseReceived(:final code, :final reason):
+              case CloseReceived():
                 break;
-              case BinaryDataReceived(:final data):
+              case BinaryDataReceived():
                 break;
             }
           });
@@ -123,7 +123,12 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
         if (didPop) {
           return;
         }
-        Navigator.popUntil(context, (route) => route.settings.name == AppRoutes.mainPage);
+        Navigator.popUntil(context, (route) {
+          if (route.settings.name == AppRoutes.completedDetailsScreen) {
+            return route.settings.name == AppRoutes.completedDetailsScreen;
+          }
+          return route.settings.name == AppRoutes.mainPage;
+        });
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
@@ -172,7 +177,12 @@ class _BattlegroundPageState extends State<BattlegroundPage> {
                                 children: [
                                   IconButton(
                                     onPressed: () {
-                                      Navigator.popUntil(context, (route) => route.settings.name == AppRoutes.mainPage);
+                                      Navigator.popUntil(context, (route) {
+                                        if (route.settings.name == AppRoutes.completedDetailsScreen) {
+                                          return route.settings.name == AppRoutes.completedDetailsScreen;
+                                        }
+                                        return route.settings.name == AppRoutes.mainPage;
+                                      });
                                     },
                                     icon: Icon(Icons.arrow_back_ios_new, color: AppColors.white),
                                   ),
