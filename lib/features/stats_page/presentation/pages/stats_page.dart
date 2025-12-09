@@ -67,7 +67,7 @@ class _StatsPageState extends State<StatsPage> {
 
       case 1: // Live
         if (state.stats?.live?.isEmpty ?? true) {
-          return Container(height: 200.h, child: Center(child: Text("No Live contests")));
+          return SizedBox(height: 200.h, child: Center(child: Text("No Live contests")));
         }
         return ListView.separated(
           physics: NeverScrollableScrollPhysics(),

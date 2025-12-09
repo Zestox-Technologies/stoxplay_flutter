@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:stoxplay/features/home_page/pages/battleground_page/models/battleground_arguments.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -182,9 +183,17 @@ class LiveItemWidget extends StatelessWidget {
 
   Widget _buildViewAction(BuildContext context, StatsDataModel data) {
     return GestureDetector(
-      behavior: HitTestBehavior.translucent, // 👈 expands tap area to full bounds
+      behavior: HitTestBehavior.translucent,
       onTap: () {
-        Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: data.id ?? '');
+        Navigator.pushNamed(
+          context,
+          AppRoutes.battleGroundScreen,
+          arguments: BattlegroundArguments(
+            teamId: data.id ?? '',
+            teamName: data.name ?? '',
+            isFromLive: true,
+          ),
+        );
       },
       child: Row(
         mainAxisSize: MainAxisSize.min,

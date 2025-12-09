@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stoxplay/features/home_page/pages/battleground_page/models/battleground_arguments.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -274,7 +275,15 @@ class _CompletedDetailsScreenState extends State<CompletedDetailsScreen> {
   }) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: teamId ?? '');
+        Navigator.pushNamed(
+          context,
+          AppRoutes.battleGroundScreen,
+          arguments: BattlegroundArguments(
+            teamId: teamId ?? '',
+            teamName: name,
+            isFromLive: false,
+          ),
+        );
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 8.h),

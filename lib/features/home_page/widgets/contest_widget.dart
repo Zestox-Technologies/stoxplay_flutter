@@ -91,7 +91,11 @@ class ContestWidget extends StatelessWidget {
               ),
             ),
             Gap(20.h),
-            TextView(text: '💰 Win ${formatMaxWinIntl(data.maxWin ?? 0)}', fontSize: 12.sp, fontWeight: FontWeight.w600),
+            TextView(
+              text: '💰 Win ${formatMaxWinIntl(data.maxWin ?? 0)}',
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w600,
+            ),
             TextView(text: '👥 ${data.totalJoined ?? 0} joined', fontSize: 12.sp, fontWeight: FontWeight.w600),
             Spacer(),
             AppButton(
@@ -104,7 +108,12 @@ class ContestWidget extends StatelessWidget {
               textColor: AppColors.white,
               onPressed: () async {
                 final isContestEnabled = await cubit.getContestStatus();
-                if (isContestEnabled) {
+                bool notEditable =
+                    (DateTime.now().hour >= 9 &&
+                        DateTime.now().hour <= 15 &&
+                        DateTime.now().weekday != DateTime.saturday &&
+                        DateTime.now().weekday != DateTime.sunday);
+                if (isContestEnabled && !notEditable) {
                   Navigator.pushNamed(context, AppRoutes.contestDetailsPage, arguments: data);
                 } else {
                   Fluttertoast.showToast(msg: "Market is live!!! please join after 4 PM");

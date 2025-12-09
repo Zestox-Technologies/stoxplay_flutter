@@ -179,7 +179,7 @@ class ContestDetailsWidget extends StatelessWidget {
                           ],
                         ),
                         TextView(
-                          text: "Start @${DateFormat('hh:mm a').format(data.startTime!)}",
+                          text: "Start @9:00 AM",
                           fontColor: AppColors.black6666,
                           fontSize: 12.sp,
                         ),

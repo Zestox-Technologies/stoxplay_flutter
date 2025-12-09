@@ -56,6 +56,7 @@ class MyApp extends StatelessWidget {
                         registerTokenUseCase: sl(),
                         withdrawRequestPendingApprovalUseCase: sl(),
                         approveRejectWithdrawRequestUseCase: sl(),
+                        getBattlegroundDataUseCase: sl(),
                       ),
                 ),
                 BlocProvider(
