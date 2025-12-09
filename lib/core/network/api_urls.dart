@@ -49,4 +49,6 @@ class ApiUrls {
   static String markNotificationAsRead(String notificationId) => '/notifications/$notificationId/read';
 
   static String approveRejectWithdrawRequest(String requestId) => '/withdraw-requests/$requestId/process';
+
+  static String getTeamData(String teamId) => '/client/teams/$teamId/battleground';
 }

@@ -79,7 +79,6 @@ class StockSelectionWidget extends StatelessWidget {
                           ? 5
                               .h // Tablet
                           : (MediaQuery.of(context).size.width > 400 && MediaQuery.of(context).size.height < 900)
-
                           ? 10
                               .h // Foldable / medium screens
                           : 5.h, // Normal phones
@@ -91,7 +90,6 @@ class StockSelectionWidget extends StatelessWidget {
                           ? 3
                               .h // Tablet
                           : (MediaQuery.of(context).size.width > 400 && MediaQuery.of(context).size.height < 900)
-
                           ? 10
                               .h // Foldable / mid-size
                           : 3.h, // Normal phone

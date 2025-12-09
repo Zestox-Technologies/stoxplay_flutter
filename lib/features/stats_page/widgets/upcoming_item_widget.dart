@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:stoxplay/features/home_page/pages/battleground_page/models/battleground_arguments.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:stoxplay/features/stats_page/data/stats_model.dart';
 import 'package:stoxplay/utils/common/cubits/multi_timer_cubit.dart';
 import 'package:stoxplay/utils/common/functions/get_current_time.dart';
+import 'package:stoxplay/utils/common/functions/snackbar.dart';
 import 'package:stoxplay/utils/common/widgets/cached_image_widget.dart';
 import 'package:stoxplay/utils/common/widgets/progress_bar_widget.dart';
 import 'package:stoxplay/utils/common/widgets/text_view.dart';
@@ -265,7 +267,15 @@ class UpcomingItemWidget extends StatelessWidget {
                           GestureDetector(
                             behavior: HitTestBehavior.translucent, // 👈 expands tap area to full bounds
                             onTap: () {
-                              Navigator.pushNamed(context, AppRoutes.battleGroundScreen, arguments: data.id ?? '');
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.battleGroundScreen,
+                                arguments: BattlegroundArguments(
+                                  teamId: data.id ?? '',
+                                  teamName: data.name ?? '',
+                                  isFromLive: false,
+                                ),
+                              );
                             },
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h), // 👈 add padding
@@ -289,6 +299,12 @@ class UpcomingItemWidget extends StatelessWidget {
                           // Edit Button
                           GestureDetector(
                             onTap: () {
+                              if (DateTime.now().hour >= 9 &&
+                                  DateTime.now().hour <= 15 &&
+                                  DateTime.now().weekday != DateTime.saturday &&
+                                  DateTime.now().weekday != DateTime.sunday) {
+                                showSnackBar(context: context, message: 'You cannot edit team after 9 AM');
+                              }
                               Navigator.pushNamed(
                                 context,
                                 AppRoutes.stockSelectionScreen,

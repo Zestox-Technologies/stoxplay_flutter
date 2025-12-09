@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stoxplay/features/home_page/pages/battleground_page/models/battleground_arguments.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -49,7 +50,11 @@ class ConfirmationBs extends StatelessWidget {
                     Navigator.pushNamed(
                       context,
                       AppRoutes.battleGroundScreen,
-                      arguments: state.joinContestResponse?.id ?? '',
+                      arguments: BattlegroundArguments(
+                        teamId: state.joinContestResponse?.id ?? '',
+                        teamName: state.joinContestResponse?.name ?? '',
+                        isFromLive: false,
+                      ),
                     );
                   });
                 } else if (state.joinContestApiStatus.isFailed) {
