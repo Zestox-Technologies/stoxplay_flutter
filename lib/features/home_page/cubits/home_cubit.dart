@@ -11,6 +11,7 @@ import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dar
 import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/learning_model.dart';
+import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/most_picked_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/sector_model.dart';
 import 'package:stoxplay/features/home_page/data/models/stock_data_model.dart';
@@ -32,6 +33,7 @@ class HomeCubit extends Cubit<HomeState> {
   RegisterTokenUseCase registerTokenUseCase;
   WithdrawRequestPendingApprovalUseCase withdrawRequestPendingApprovalUseCase;
   ApproveRejectWithdrawRequestUseCase approveRejectWithdrawRequestUseCase;
+  GetBattlegroundDataUseCase getBattlegroundDataUseCase;
 
   HomeCubit({
     required this.sectorListUseCase,
@@ -45,6 +47,7 @@ class HomeCubit extends Cubit<HomeState> {
     required this.registerTokenUseCase,
     required this.withdrawRequestPendingApprovalUseCase,
     required this.approveRejectWithdrawRequestUseCase,
+    required this.getBattlegroundDataUseCase,
   }) : super(HomeState());
 
   Future<void> getSectorList({bool forceRefresh = false}) async {
@@ -230,5 +233,17 @@ class HomeCubit extends Cubit<HomeState> {
 
   void clearWithdrawRequests() {
     emit(state.copyWith(withdrawRequestModel: []));
+  }
+
+  Future<void> getBattlegroundData(String teamId) async {
+    emit(state.copyWith(battlegroundApiStatus: ApiStatus.loading));
+    final response = await getBattlegroundDataUseCase.call(teamId);
+    response.fold(
+      (l) => emit(state.copyWith(battlegroundApiStatus: ApiStatus.failed)),
+      (r) => emit(state.copyWith(
+        battlegroundData: r,
+        battlegroundApiStatus: ApiStatus.success,
+      )),
+    );
   }
 }

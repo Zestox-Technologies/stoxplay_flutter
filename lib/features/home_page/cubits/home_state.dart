@@ -7,6 +7,7 @@ class HomeState extends Equatable {
   final ApiStatus sectorListApiStatus;
   final ApiStatus learningListApiStatus;
   final ApiStatus approveRejectApiStatus;
+  final ApiStatus battlegroundApiStatus;
   SectorListResponse? sectorModel;
   List<ContestModel>? contestList;
   List<StockDataModel>? stockList;
@@ -17,6 +18,7 @@ class HomeState extends Equatable {
   ContestLeaderboardModel? contestLeaderboardModel;
   List<MostPickedStock>? mostPickedStock;
   List<WithdrawRequestModel>? withdrawRequestModel;
+  ScoreUpdatePayload? battlegroundData;
 
   HomeState({
     this.sectorModel,
@@ -25,6 +27,7 @@ class HomeState extends Equatable {
     this.sectorListApiStatus = ApiStatus.initial,
     this.learningListApiStatus = ApiStatus.initial,
     this.approveRejectApiStatus = ApiStatus.initial,
+    this.battlegroundApiStatus = ApiStatus.initial,
     this.isContestEnabled = false,
     this.contestList = const [],
     this.stockList = const [],
@@ -34,6 +37,7 @@ class HomeState extends Equatable {
     this.contestLeaderboardModel,
     this.mostPickedStock,
     this.withdrawRequestModel = const[],
+    this.battlegroundData,
   });
 
   HomeState copyWith({
@@ -52,6 +56,8 @@ class HomeState extends Equatable {
     List<MostPickedStock>? mostPickedStock,
     ApiStatus? mostPickedStockApiStatus,
     List<WithdrawRequestModel>? withdrawRequestModel,
+    ScoreUpdatePayload? battlegroundData,
+    ApiStatus? battlegroundApiStatus,
   }) {
     return HomeState(
       sectorModel: sectorModel ?? this.sectorModel,
@@ -69,6 +75,8 @@ class HomeState extends Equatable {
       mostPickedStock: mostPickedStock ?? this.mostPickedStock,
       mostPickedStockApiStatus: mostPickedStockApiStatus ?? this.mostPickedStockApiStatus,
       withdrawRequestModel: withdrawRequestModel ?? this.withdrawRequestModel,
+      battlegroundData: battlegroundData ?? this.battlegroundData,
+      battlegroundApiStatus: battlegroundApiStatus ?? this.battlegroundApiStatus,
     );
   }
 
@@ -88,6 +96,8 @@ class HomeState extends Equatable {
     sectorListApiStatus,
     learningListApiStatus,
     withdrawRequestModel,
-    approveRejectApiStatus
+    approveRejectApiStatus,
+    battlegroundData,
+    battlegroundApiStatus,
   ];
 }

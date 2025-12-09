@@ -4,6 +4,7 @@ import 'package:stoxplay/features/home_page/data/home_rds.dart';
 import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
 import 'package:stoxplay/features/home_page/data/models/client_teams_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
+import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
@@ -54,6 +55,8 @@ abstract class HomeRepo {
   Future<Either<AppError, NotificationModel>> getNotifications(Map<String,dynamic> params);
 
   Future<Either<AppError, String>> markNotificationAsRead(String notificationId);
+
+  Future<Either<AppError, ScoreUpdatePayload>> getBattlegroundData(String teamId);
 }
 
 class HomeRepoImpl extends HomeRepo {
@@ -235,6 +238,16 @@ class HomeRepoImpl extends HomeRepo {
   Future<Either<AppError, String>> markNotificationAsRead(String notificationId) async {
     try {
       final result = await homeRds.markNotificationAsRead(notificationId);
+      return Right(result);
+    } catch (e) {
+      return handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<AppError, ScoreUpdatePayload>> getBattlegroundData(String teamId) async {
+    try {
+      final result = await homeRds.getBattlegroundData(teamId);
       return Right(result);
     } catch (e) {
       return handleException(e);

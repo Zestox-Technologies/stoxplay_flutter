@@ -40,6 +40,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ContestDetailsUseCase(repo: sl()));
   sl.registerLazySingleton(() => ContestLeaderboardUseCase(repo: sl()));
   sl.registerLazySingleton(() => GetMostPickedStockUseCase(repo: sl()));
+  sl.registerLazySingleton(() => GetBattlegroundDataUseCase(repo: sl()));
   sl.registerLazySingleton(() => GetPlayingHistoryUseCase(sl()));
 
   // Profile Feature

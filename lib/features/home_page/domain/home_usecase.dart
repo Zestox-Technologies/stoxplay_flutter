@@ -5,6 +5,7 @@ import 'package:stoxplay/features/home_page/data/models/ads_model.dart';
 import 'package:stoxplay/features/home_page/data/models/approve_reject_withdraw_request_params.dart';
 import 'package:stoxplay/features/home_page/data/models/client_teams_response_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_detail_model.dart';
+import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_leaderboard_model.dart';
 import 'package:stoxplay/features/home_page/data/models/contest_model.dart';
 import 'package:stoxplay/features/home_page/data/models/join_contest_params_model.dart';
@@ -213,5 +214,16 @@ class MarkNotificationAsReadUseCase extends UseCase<String, String> {
   @override
   Future<Either<AppError, String>> call(String notificationId) async {
     return await repo.markNotificationAsRead(notificationId);
+  }
+}
+
+class GetBattlegroundDataUseCase extends UseCase<ScoreUpdatePayload, String> {
+  final HomeRepo repo;
+
+  GetBattlegroundDataUseCase({required this.repo});
+
+  @override
+  Future<Either<AppError, ScoreUpdatePayload>> call(String teamId) async {
+    return await repo.getBattlegroundData(teamId);
   }
 }

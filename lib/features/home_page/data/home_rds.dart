@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:stoxplay/features/home_page/data/models/live_stock_model.dart';
 import 'package:stoxplay/core/network/api_response.dart';
 import 'package:stoxplay/core/network/api_service.dart';
 import 'package:stoxplay/core/network/api_urls.dart';
@@ -57,6 +58,8 @@ abstract class HomeRds {
   Future<NotificationModel> getNotifications(Map<String, dynamic> params);
 
   Future<String> markNotificationAsRead(String notificationId);
+
+  Future<ScoreUpdatePayload> getBattlegroundData(String teamId);
 }
 
 class HomeRdsImpl extends HomeRds {
@@ -317,6 +320,19 @@ class HomeRdsImpl extends HomeRds {
         data: params.toJson(),
       );
       return '';
+    } on DioException catch (e) {
+      throw NetworkError.fromDioError(e);
+    } catch (e) {
+      throw UnknownError(message: e.toString());
+    }
+  }
+
+  @override
+  Future<ScoreUpdatePayload> getBattlegroundData(String teamId) async {
+    try {
+      final response = await client.get(ApiUrls.getTeamData(teamId));
+      final data = response.data['data'];
+      return ScoreUpdatePayload.fromJson(data);
     } on DioException catch (e) {
       throw NetworkError.fromDioError(e);
     } catch (e) {
